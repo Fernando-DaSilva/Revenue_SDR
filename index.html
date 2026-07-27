@@ -197,10 +197,10 @@
             <ul tabindex="0" class="dropdown-content z-[100] menu p-2 shadow-2xl bg-base-200 border border-base-300 rounded-box w-56 mb-2 text-xs space-y-1">
               <li class="menu-title text-[10px] uppercase font-bold text-base-content/50 px-2 py-1">Conta & Permissões</li>
               <li><a @click="selectTab('settings')">⚙️ Configurações Tenant</a></li>
-              <li><a @click="selectTab('theme_studio')">🎨 Studio de Temas</a></li>
-              <li><a @click="selectTab('billing')">💳 Assinatura & Cotas</a></li>
+              <li><a @click="selectTab('theme_studio')" class="flex items-center gap-2"><span x-html="getLucideSVG('palette', { strokeWidth: 2, class: 'w-3.5 h-3.5 text-primary' })"></span> Studio de Temas</a></li>
+              <li><a @click="selectTab('billing')" class="flex items-center gap-2"><span x-html="getLucideSVG('credit-card', { strokeWidth: 2, class: 'w-3.5 h-3.5 text-secondary' })"></span> Assinatura & Cotas</a></li>
               <div class="divider my-1"></div>
-              <li><a class="text-error font-bold" @click="alert('Sessão encerrada com segurança.')">🔒 Encerrar Sessão</a></li>
+              <li><a class="text-error font-bold flex items-center gap-2" @click="showNotification('Sessão encerrada com segurança.', 'info')"><span x-html="getLucideSVG('log-out', { strokeWidth: 2, class: 'w-3.5 h-3.5' })"></span> Encerrar Sessão</a></li>
             </ul>
           </div>
         </div>
@@ -220,7 +220,7 @@
           <div class="flex items-center gap-2 min-w-0">
             <!-- Mobile Drawer Toggle Button -->
             <button @click="mobileSidebarOpen = !mobileSidebarOpen" class="btn btn-sm btn-ghost btn-square lg:hidden text-base-content/80 hover:text-primary shrink-0" title="Abrir Menu">
-              <span class="text-base">☰</span>
+              <span x-html="getLucideSVG('menu', { strokeWidth: 2, class: 'w-4 h-4' })"></span>
             </button>
 
             <h2 class="text-base lg:text-lg font-extrabold tracking-tight shrink-0 whitespace-nowrap" x-text="isTabActive('leads') ? 'Pipeline de Leads' : (isTabActive('dashboard') ? 'Central de Controle / DHS' : (activeTab === 'inbox' ? 'Inbox de Atendimento' : (activeTab === 'cadences' ? 'Cadências & Agentes' : (isTabActive('memory') ? 'AI Memory & Brain' : (activeTab === 'data_management' ? 'Gestão de Dados & Histórico' : (isTabActive('theme_studio') ? 'Studio de Temas White-Label' : (isTabActive('billing') ? 'Planos, Faturamento & Cotas' : (activeTab === 'settings' ? 'Configurações Tenant' : 'Command Center'))))))))"></h2>
