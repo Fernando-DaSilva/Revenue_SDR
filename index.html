@@ -139,13 +139,13 @@
                     </template>
                   </button>
 
-                  <!-- Sub-items for Data Management -->
+                  <!-- Sub-items for navigation -->
                   <template x-if="item.subItems && isTabActive(item.id) && !sidebarCollapsed">
                     <div class="ml-7 pl-2 border-l border-base-300 space-y-1 my-1">
                       <template x-for="sub in item.subItems" :key="sub.id">
                         <button 
-                          @click="activeTab = item.id; dataTab = sub.id"
-                          :class="dataTab === sub.id ? 'text-primary font-bold bg-primary/10' : 'text-base-content/60 hover:text-base-content hover:bg-base-300/40'"
+                          @click="selectSubTab(item.id, sub.id)"
+                          :class="isSubTabActive(item.id, sub.id) ? 'text-primary font-bold bg-primary/10' : 'text-base-content/60 hover:text-base-content hover:bg-base-300/40'"
                           class="btn btn-xs btn-block justify-start text-[11px] font-medium py-1 h-auto rounded border-0 gap-1.5">
                           <span class="text-[9px]">↳</span>
                           <span x-text="sub.label"></span>
@@ -482,6 +482,13 @@
 
           <!-- GESTÃO DE DADOS & HISTÓRICO SUB-VISÕES (activeTab === 'data_management') -->
           <nav x-show="activeTab === 'data_management'" class="flex flex-wrap items-center gap-1.5 bg-base-100 p-1.5 rounded-xl border border-base-300 w-full min-w-0 shadow-xs">
+            <button 
+              @click="dataTab = 'overview'" 
+              :class="dataTab === 'overview' ? 'btn-primary font-bold shadow-xs' : 'btn-ghost text-base-content/70 hover:text-base-content'"
+              class="btn btn-xs gap-1.5 text-xs whitespace-nowrap shrink-0">
+              <span>🗄️</span> Visão Geral & Infraestrutura
+            </button>
+
             <button 
               @click="dataTab = 'tiering_retention'" 
               :class="dataTab === 'tiering_retention' ? 'btn-primary font-bold shadow-xs' : 'btn-ghost text-base-content/70 hover:text-base-content'"
@@ -5655,6 +5662,283 @@
         <!-- ==================== TAB: GESTÃO DE DADOS, BACKUP & HISTÓRICO (activeTab === 'data_management') ==================== -->
         <div x-show="activeTab === 'data_management'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6">
 
+          <!-- ==================== SUB-VISÃO 0: VISÃO GERAL & INFRAESTRUTURA DE DADOS (dataTab === 'overview') ==================== -->
+          <div x-show="dataTab === 'overview'" x-transition:enter="transition ease-out duration-200" class="space-y-6">
+
+            <!-- Banner Topo & Status de Infraestrutura -->
+            <div class="card bg-base-100 border border-base-300 shadow-sm p-6 relative overflow-hidden">
+              <div class="absolute right-0 top-0 w-96 h-full bg-gradient-to-l from-primary/10 via-secondary/5 to-transparent pointer-events-none"></div>
+              <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+                <div class="space-y-1.5 max-w-3xl">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-2xl">🗄️</span>
+                    <h3 class="text-xl font-extrabold text-base-content">Painel Central de Infraestrutura de Dados</h3>
+                    <span class="badge badge-success font-bold text-xs gap-1">
+                      <span class="w-2 h-2 rounded-full bg-success animate-pulse"></span>
+                      Operacional 100%
+                    </span>
+                    <span class="badge badge-outline badge-xs font-mono font-bold text-info">ADR-002 / ADR-015 / ADR-016</span>
+                  </div>
+                  <p class="text-xs text-base-content/70 leading-relaxed">
+                    Arquitetura híbrida de dados de alta performance do Revenue SDR OS. Combina <strong class="text-base-content">Hot Storage de ultra-baixa latência (Turso / libSQL SQLite WAL)</strong> para conversas em tempo real com <strong class="text-base-content">Cold Storage DW (Supabase PostgreSQL 16)</strong> munido de buscas semânticas vetoriais (<code class="font-mono text-primary">pgvector</code> 1536d) e Full-Text Search (<code class="font-mono text-secondary">tsvector</code>).
+                  </p>
+                </div>
+
+                <div class="flex items-center gap-2 shrink-0 flex-wrap">
+                  <button @click="runEtlPipelineOnDemand()" class="btn btn-primary btn-sm font-bold text-xs gap-2 shadow-md shadow-primary/20">
+                    <span>⚡</span> Executar Pipeline D-1
+                  </button>
+                  <button @click="createBackupSnapshotOnDemand()" class="btn btn-outline btn-neutral btn-sm font-bold text-xs gap-1.5">
+                    <span>💾</span> Snapshot Backup
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- GRID DE METRICAS OPERACIONAIS (4 KPIS DE INFRA) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              
+              <!-- Card 1: Hot Storage Turso -->
+              <div class="card bg-base-100 border border-base-300 shadow-sm p-4 space-y-3 hover:border-primary/50 transition-all">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-extrabold uppercase tracking-wider text-base-content/60">Hot Storage (Local)</span>
+                  <span class="badge badge-success badge-xs font-bold">Turso libSQL</span>
+                </div>
+                <div class="flex items-baseline justify-between">
+                  <span class="text-2xl font-black font-mono text-base-content" x-text="`${dataManagement.hotStorage.sizeMb} MB`">142.5 MB</span>
+                  <span class="text-xs font-semibold text-base-content/60" x-text="`/ ${dataManagement.hotStorage.maxMb} MB`">/ 500 MB</span>
+                </div>
+                <div class="w-full bg-base-200 rounded-full h-2 overflow-hidden">
+                  <div class="bg-primary h-2 rounded-full transition-all duration-500" :style="`width: ${(dataManagement.hotStorage.sizeMb / dataManagement.hotStorage.maxMb) * 100}%`"></div>
+                </div>
+                <div class="flex items-center justify-between text-[11px] text-base-content/70 pt-1">
+                  <span>Conversas Ativas: <strong class="font-mono text-base-content" x-text="dataManagement.hotStorage.activeConversations.toLocaleString()">1,240</strong></span>
+                  <span class="text-success font-mono font-bold" x-text="`< ${dataManagement.hotStorage.readLatencyMs}ms`">&lt; 3.8ms</span>
+                </div>
+              </div>
+
+              <!-- Card 2: Cold Storage DW -->
+              <div class="card bg-base-100 border border-base-300 shadow-sm p-4 space-y-3 hover:border-secondary/50 transition-all">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-extrabold uppercase tracking-wider text-base-content/60">Cold DW & Vectors</span>
+                  <span class="badge badge-info badge-xs font-bold">Supabase DW</span>
+                </div>
+                <div class="flex items-baseline justify-between">
+                  <span class="text-2xl font-black font-mono text-secondary" x-text="`${dataManagement.coldStorage.sizeGb} GB`">12.8 GB</span>
+                  <span class="badge badge-ghost badge-xs font-mono font-bold">PostgreSQL 16</span>
+                </div>
+                <p class="text-[11px] text-base-content/70">
+                  <strong class="font-mono text-base-content" x-text="dataManagement.coldStorage.totalArchivedMessages.toLocaleString()">450,200</strong> msgs arquivadas.
+                </p>
+                <div class="flex items-center gap-1.5 text-[10px] font-bold text-success pt-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-success"></span>
+                  <span>pgvector (1536d) & FTS Ativos</span>
+                </div>
+              </div>
+
+              <!-- Card 3: ETL Pipeline D-1 -->
+              <div class="card bg-base-100 border border-base-300 shadow-sm p-4 space-y-3 hover:border-accent/50 transition-all">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-extrabold uppercase tracking-wider text-base-content/60">ETL Pipeline D-1</span>
+                  <span class="badge badge-accent badge-xs font-bold">Automático</span>
+                </div>
+                <div>
+                  <span class="text-lg font-black font-mono text-base-content" x-text="dataManagement.etlJob.recordsProcessed.toLocaleString()">14,250</span>
+                  <span class="text-[11px] text-base-content/60 block">registros migrados/último job</span>
+                </div>
+                <div class="text-[11px] space-y-0.5 border-t border-base-200 pt-2 text-base-content/70">
+                  <div>Última execução: <span class="font-mono font-bold text-base-content" x-text="dataManagement.etlJob.lastRun">02:00 AM</span></div>
+                  <div>Próximo disparo: <span class="font-mono text-primary font-semibold" x-text="dataManagement.etlJob.nextRun">Amanhã 02:00</span></div>
+                </div>
+              </div>
+
+              <!-- Card 4: Disaster Recovery & Snapshots -->
+              <div class="card bg-base-100 border border-base-300 shadow-sm p-4 space-y-3 hover:border-warning/50 transition-all">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-extrabold uppercase tracking-wider text-base-content/60">Backups & Réplicas</span>
+                  <span class="badge badge-warning badge-xs font-bold">Turso Sync</span>
+                </div>
+                <div class="flex items-baseline justify-between">
+                  <span class="text-2xl font-black font-mono text-base-content" x-text="`${dataManagement.backups.length} Snapshots`">3 Snapshots</span>
+                  <span class="badge badge-success badge-xs font-mono font-bold">0ms Lag</span>
+                </div>
+                <p class="text-[11px] text-base-content/70">
+                  SQLite WAL Checksum SHA-256 verificado. Sincronia em nuvem contínua.
+                </p>
+                <div class="flex items-center justify-between text-[10px] font-mono text-base-content/60 pt-1">
+                  <span>Retenção: 30 dias</span>
+                  <span class="text-success font-bold">Ready for DR</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- DIAGRAMA VISUAL DA TOPOLOGIA DA INFRAESTRUTURA DE DADOS -->
+            <div class="card bg-base-100 border border-base-300 shadow-sm p-6 space-y-4">
+              <div class="flex items-center justify-between border-b border-base-200 pb-3">
+                <div>
+                  <h4 class="font-extrabold text-base text-base-content flex items-center gap-2">
+                    <span>🧭</span> Arquitetura e Fluxo de Dados de Armazenamento
+                  </h4>
+                  <p class="text-xs text-base-content/60">Mapeamento em tempo real do pipeline de movimentação, indexação e arquivamento de conversas.</p>
+                </div>
+                <span class="badge badge-sm badge-outline font-mono text-xs">Visão Topológica</span>
+              </div>
+
+              <!-- Fluxo em 4 Etapas Visuais -->
+              <div class="grid grid-cols-1 md:grid-cols-4 gap-3 relative">
+                
+                <!-- Etapa 1 -->
+                <div class="bg-base-200/50 p-4 rounded-xl border border-base-300 space-y-2 relative group hover:border-primary transition-all">
+                  <div class="flex items-center justify-between">
+                    <span class="w-7 h-7 rounded-lg bg-primary/20 text-primary flex items-center justify-center font-bold text-xs">1</span>
+                    <span class="badge badge-xs badge-success gap-1 font-bold">
+                      <span class="w-1.5 h-1.5 rounded-full bg-success animate-pulse"></span> Entrada
+                    </span>
+                  </div>
+                  <h5 class="font-extrabold text-xs text-base-content">Ingestão & Omnichannel</h5>
+                  <p class="text-[11px] text-base-content/60">Mensagens e transcrições via WhatsApp, E-mail e Voz chegam via webhooks SSE.</p>
+                  <div class="text-[10px] font-mono text-primary font-semibold pt-1">⚡ Tempo real (&lt; 50ms)</div>
+                </div>
+
+                <!-- Etapa 2 -->
+                <div class="bg-base-200/50 p-4 rounded-xl border border-base-300 space-y-2 relative group hover:border-primary transition-all">
+                  <div class="flex items-center justify-between">
+                    <span class="w-7 h-7 rounded-lg bg-primary/20 text-primary flex items-center justify-center font-bold text-xs">2</span>
+                    <span class="badge badge-xs badge-primary font-bold">Hot Storage</span>
+                  </div>
+                  <h5 class="font-extrabold text-xs text-base-content">Turso / libSQL Local</h5>
+                  <p class="text-[11px] text-base-content/60">Gravação imediata em banco `.db` local em modo SQLite WAL para latência ultra-baixa.</p>
+                  <div class="text-[10px] font-mono text-primary font-semibold pt-1">📦 Latência &lt; 3.8ms</div>
+                </div>
+
+                <!-- Etapa 3 -->
+                <div class="bg-base-200/50 p-4 rounded-xl border border-base-300 space-y-2 relative group hover:border-secondary transition-all">
+                  <div class="flex items-center justify-between">
+                    <span class="w-7 h-7 rounded-lg bg-secondary/20 text-secondary flex items-center justify-center font-bold text-xs">3</span>
+                    <span class="badge badge-xs badge-accent font-bold">ETL Job D-1</span>
+                  </div>
+                  <h5 class="font-extrabold text-xs text-base-content">Sincronização & Expurgos</h5>
+                  <p class="text-[11px] text-base-content/60">Processo noturno D-1 extrai conversas inativas (&gt;30 dias), gera embeddings e migra para o DW.</p>
+                  <div class="text-[10px] font-mono text-secondary font-semibold pt-1">🌙 Execução D-1 às 02:00</div>
+                </div>
+
+                <!-- Etapa 4 -->
+                <div class="bg-base-200/50 p-4 rounded-xl border border-base-300 space-y-2 relative group hover:border-info transition-all">
+                  <div class="flex items-center justify-between">
+                    <span class="w-7 h-7 rounded-lg bg-info/20 text-info flex items-center justify-center font-bold text-xs">4</span>
+                    <span class="badge badge-xs badge-info font-bold">Cold DW & Backup</span>
+                  </div>
+                  <h5 class="font-extrabold text-xs text-base-content">Supabase Postgres 16</h5>
+                  <p class="text-[11px] text-base-content/60">Buscas FTS + pgvector semântico habilitados. Backup automatizado snapshot `.db.gz` na nuvem.</p>
+                  <div class="text-[10px] font-mono text-info font-semibold pt-1">❄️ Histórico de Longo Prazo</div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- CARDS DE ATALHO COMPONENTIZADOS PARA SUB-FUNÇÕES -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+              
+              <!-- Card Atalho 1: Storage Tiering & Retenção -->
+              <div class="card bg-base-100 border border-base-300 shadow-sm p-5 space-y-4 hover:border-primary/60 transition-all">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-2xl font-bold shrink-0">
+                    📊
+                  </div>
+                  <div>
+                    <h5 class="font-extrabold text-sm text-base-content">Storage Tiering & Retenção</h5>
+                    <p class="text-[11px] text-base-content/60">Configuração de TTL e Regras ETL</p>
+                  </div>
+                </div>
+                <p class="text-xs text-base-content/70 leading-relaxed">
+                  Gerencie a transição entre o Hot Storage local e o Cold Storage. Ajuste os dias de retenção (TTL), exceções para leads em negociação e acione pipelines sob demanda.
+                </p>
+                <div class="pt-2 border-t border-base-200 flex items-center justify-between">
+                  <span class="text-[11px] font-mono text-base-content/60">Regra atual: 30 dias</span>
+                  <button @click="dataTab = 'tiering_retention'" class="btn btn-xs btn-primary font-bold gap-1">
+                    Gerenciar Tiering ➔
+                  </button>
+                </div>
+              </div>
+
+              <!-- Card Atalho 2: Cold Search & Histórico -->
+              <div class="card bg-base-100 border border-base-300 shadow-sm p-5 space-y-4 hover:border-secondary/60 transition-all">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center text-2xl font-bold shrink-0">
+                    🔍
+                  </div>
+                  <div>
+                    <h5 class="font-extrabold text-sm text-base-content">Cold Search & Histórico</h5>
+                    <p class="text-[11px] text-base-content/60">FTS e Busca Semântica por Contexto</p>
+                  </div>
+                </div>
+                <p class="text-xs text-base-content/70 leading-relaxed">
+                  Pesquise no acervo de mensagens arquivadas usando termos exatos ou busca semântica por inteligência vetorial (<code class="font-mono text-secondary">pgvector</code>). Exporte transcrições ou restaure ao Hot DB.
+                </p>
+                <div class="pt-2 border-t border-base-200 flex items-center justify-between">
+                  <span class="text-[11px] font-mono text-base-content/60">450.2k conversas</span>
+                  <button @click="dataTab = 'conversation_history'" class="btn btn-xs btn-secondary font-bold gap-1">
+                    Acessar Cold Search ➔
+                  </button>
+                </div>
+              </div>
+
+              <!-- Card Atalho 3: Backups & Disaster Recovery -->
+              <div class="card bg-base-100 border border-base-300 shadow-sm p-5 space-y-4 hover:border-accent/60 transition-all">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 rounded-xl bg-accent/10 text-accent flex items-center justify-center text-2xl font-bold shrink-0">
+                    💾
+                  </div>
+                  <div>
+                    <h5 class="font-extrabold text-sm text-base-content">Backups & Restauração</h5>
+                    <p class="text-[11px] text-base-content/60">Snapshots & Replicação Turso Cloud</p>
+                  </div>
+                </div>
+                <p class="text-xs text-base-content/70 leading-relaxed">
+                  Supervisione a replicação de banco de dados em tempo real, efetue downloads de backups comprimidos <code class="font-mono text-accent">.db.gz</code> e execute simulações de recuperação de desastre.
+                </p>
+                <div class="pt-2 border-t border-base-200 flex items-center justify-between">
+                  <span class="text-[11px] font-mono text-base-content/60">Checksum SHA-256 OK</span>
+                  <button @click="dataTab = 'backup_restore'" class="btn btn-xs btn-outline btn-accent font-bold gap-1">
+                    Ver Backups ➔
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- LOG DE EVENTOS E MANUTENÇÃO AUTOMÁTICA DA INFRAESTRUTURA DE DADOS -->
+            <div class="card bg-base-100 border border-base-300 shadow-sm p-5 space-y-3">
+              <div class="flex items-center justify-between border-b border-base-200 pb-2.5">
+                <div class="flex items-center gap-2">
+                  <span class="text-lg">📜</span>
+                  <h5 class="font-extrabold text-sm text-base-content">Log de Operações & Manutenção do Banco</h5>
+                </div>
+                <span class="badge badge-ghost text-[10px] font-mono">SQLite WAL Log & Sync Audit</span>
+              </div>
+
+              <div class="bg-base-200/80 p-3 rounded-xl border border-base-300 font-mono text-xs space-y-1.5 overflow-x-auto">
+                <div class="flex items-center gap-2 text-success">
+                  <span class="text-base-content/40">[2026-07-27 17:00:00]</span>
+                  <span class="font-bold">[SUCCESS]</span>
+                  <span>Checkpoint SQLite WAL executado com sucesso. Checksum SHA-256 verificado.</span>
+                </div>
+                <div class="flex items-center gap-2 text-info">
+                  <span class="text-base-content/40">[2026-07-27 02:00:00]</span>
+                  <span class="font-bold">[ETL D-1]</span>
+                  <span>Pipeline D-1 concluído. 14.250 registros migrados para o Cold DW (Supabase).</span>
+                </div>
+                <div class="flex items-center gap-2 text-secondary">
+                  <span class="text-base-content/40">[2026-07-26 02:00:00]</span>
+                  <span class="font-bold">[BACKUP]</span>
+                  <span>Snapshot de backup gerado: 2026-07-26_snapshot.db.gz (142 MB).</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
           <!-- ==================== SUB-VISÃO 1: STORAGE TIERING & PIPELINE D-1 (dataTab === 'tiering_retention') ==================== -->
           <div x-show="dataTab === 'tiering_retention'" x-transition:enter="transition ease-out duration-200" class="space-y-6">
 
@@ -6265,6 +6549,9 @@
       </div>
 
       <div class="flex items-center gap-2">
+        <button @click="openLeadJourney(selectedLead)" class="btn btn-xs btn-primary font-bold gap-1 shadow-xs" title="Ver Jornada Executiva SLA">
+          <span>🗺️</span> Jornada SLA
+        </button>
         <button @click="takeoverLead(selectedLead)" class="btn btn-xs btn-outline btn-secondary font-bold gap-1">
           <span>👤</span> Takeover Humano
         </button>
@@ -13977,7 +14264,7 @@
         commandCenterTab: 'overview', // Sub-visões: 'overview', 'live_feed', 'copilot', 'handoffs'
         leadsView: 'kanban', // Sub-visões do Pipeline de Leads: 'kanban', 'list', 'merge'
         leadDrawerTab: 'overview', // Sub-abas do Lead Profile Drawer: 'overview', 'memory', 'timeline', 'chat'
-        dataTab: 'tiering_retention', // Sub-visões: 'tiering_retention', 'conversation_history', 'backup_restore'
+        dataTab: 'overview', // Sub-visões: 'overview', 'tiering_retention', 'conversation_history', 'backup_restore'
         timeframe: 'week', // 'today', 'week', 'month'
         executorFilter: 'all', // 'all', 'ai', 'human'
 
@@ -15235,16 +15522,60 @@
           {
             title: '📍 OPERAÇÃO & ATENDIMENTO',
             items: [
-              { id: 'leads', activeId: 'pipeline', label: 'Pipeline & Leads', icon: '📊', badge: '142' },
-              { id: 'dashboard', activeId: 'dhs', label: 'Central de Controle / DHS', icon: '🎯' },
+              { 
+                id: 'leads', 
+                activeId: 'pipeline', 
+                label: 'Pipeline & Leads', 
+                icon: '📊', 
+                badge: '142',
+                subItems: [
+                  { id: 'kanban', label: 'Board Kanban' },
+                  { id: 'list', label: 'Lista / Tabela' },
+                  { id: 'merge', label: 'Duplicatas & Merge' }
+                ]
+              },
+              { 
+                id: 'dashboard', 
+                activeId: 'dhs', 
+                label: 'Central de Controle / DHS', 
+                icon: '🎯',
+                subItems: [
+                  { id: 'overview', label: 'Visão Geral & KPIs' },
+                  { id: 'live_feed', label: 'Live Monitor' },
+                  { id: 'copilot', label: 'AI Copilot & Insights' },
+                  { id: 'handoffs', label: 'Handoffs & Alertas' }
+                ]
+              },
               { id: 'inbox', activeId: 'inbox', label: 'Inbox de Atendimento', icon: '💬', badge: '3', badgeColor: 'badge-error' }
             ]
           },
           {
             title: '🤖 INTELIGÊNCIA & AUTOMAÇÃO',
             items: [
-              { id: 'cadences', activeId: 'cadences', label: 'Cadências & Agentes IA', icon: '⚡' },
-              { id: 'memory', activeId: 'brain', label: 'Memória & Revenue Brain', icon: '🧠' }
+              { 
+                id: 'cadences', 
+                activeId: 'cadences', 
+                label: 'Cadências & Agentes IA', 
+                icon: '⚡',
+                subItems: [
+                  { id: 'cadences', label: 'Réguas & Cadências' },
+                  { id: 'agents', label: 'Agentes SDR & Personas' },
+                  { id: 'builder', label: 'Construtor Visual' },
+                  { id: 'analytics', label: 'Analytics & Testes A/B' }
+                ]
+              },
+              { 
+                id: 'memory', 
+                activeId: 'brain', 
+                label: 'Memória & Revenue Brain', 
+                icon: '🧠',
+                subItems: [
+                  { id: 'knowledge_base', label: 'Base RAG & Documentos' },
+                  { id: 'lead_memories', label: 'Memória dos Leads' },
+                  { id: 'guardrails', label: 'Guardrails & Objeções' },
+                  { id: 'brain_audit', label: 'Auditoria & CoT' }
+                ]
+              }
             ]
           },
           {
@@ -15255,10 +15586,9 @@
                 activeId: 'data_management', 
                 label: 'Gestão de Dados & Histórico', 
                 icon: '🗄️', 
-                badge: 'NOVO', 
-                badgeColor: 'badge-primary',
                 statusDot: true,
                 subItems: [
+                  { id: 'overview', label: 'Visão Geral & Infraestrutura' },
                   { id: 'tiering_retention', label: 'Tiering D-1 & Retenção' },
                   { id: 'conversation_history', label: 'Cold Search & Histórico' },
                   { id: 'backup_restore', label: 'Backups & Restauração' }
@@ -15275,7 +15605,21 @@
           {
             title: '🏢 ADMINISTRAÇÃO TENANT',
             items: [
-              { id: 'settings', activeId: 'settings', label: 'Configurações Tenant', icon: '⚙️' },
+              { 
+                id: 'settings', 
+                activeId: 'settings', 
+                label: 'Configurações Tenant', 
+                icon: '⚙️',
+                subItems: [
+                  { id: 'organization', label: 'Perfil & Branding' },
+                  { id: 'theme_manager', label: 'Temas White-Label' },
+                  { id: 'users_team', label: 'Equipe & RBAC' },
+                  { id: 'channels_integrations', label: 'Canais & CRM' },
+                  { id: 'billing_usage', label: 'Plano & IA BYOK' },
+                  { id: 'invoices_billing', label: 'Faturamento & Histórico' },
+                  { id: 'financial_contacts', label: 'Contatos no Financeiro' }
+                ]
+              },
               { id: 'billing', activeId: 'billing', label: 'Planos, Faturamento & Cotas', icon: '💳' }
             ]
           }
@@ -15305,8 +15649,8 @@
             this.settingsTab = 'billing_usage';
           } else if (tabId === 'data_management') {
             this.activeTab = 'data_management';
-            if (!['tiering_retention', 'conversation_history', 'backup_restore'].includes(this.dataTab)) {
-              this.dataTab = 'tiering_retention';
+            if (!['overview', 'tiering_retention', 'conversation_history', 'backup_restore'].includes(this.dataTab)) {
+              this.dataTab = 'overview';
             }
           } else {
             this.activeTab = tabId;
@@ -15314,6 +15658,30 @@
           if (window.innerWidth < 1024) {
             this.mobileSidebarOpen = false;
           }
+        },
+
+        selectSubTab(parentId, subId) {
+          this.selectTab(parentId);
+          if (parentId === 'leads') this.leadsView = subId;
+          else if (parentId === 'dashboard') this.commandCenterTab = subId;
+          else if (parentId === 'cadences') this.cadenceTab = subId;
+          else if (parentId === 'memory') this.memoryTab = subId;
+          else if (parentId === 'settings') this.settingsTab = subId;
+          else if (parentId === 'data_management') this.dataTab = subId;
+          if (window.innerWidth < 1024) {
+            this.mobileSidebarOpen = false;
+          }
+        },
+
+        isSubTabActive(parentId, subId) {
+          if (!this.isTabActive(parentId)) return false;
+          if (parentId === 'leads') return this.leadsView === subId;
+          if (parentId === 'dashboard') return this.commandCenterTab === subId;
+          if (parentId === 'cadences') return this.cadenceTab === subId;
+          if (parentId === 'memory') return this.memoryTab === subId;
+          if (parentId === 'settings') return this.settingsTab === subId;
+          if (parentId === 'data_management') return this.dataTab === subId;
+          return false;
         },
 
         navItems: [
