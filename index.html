@@ -6238,11 +6238,6 @@
 
         </div>
 
-      </main>
-
-    </div>
-  </div>
-
   <!-- ==================== GAVETA LATERAL DE PERFIL DO LEAD (LEAD PROFILE DRAWER / MEMORY BRAIN) ==================== -->
   <div 
     x-show="selectedLead !== null"
@@ -15308,6 +15303,11 @@
           } else if (tabId === 'billing') {
             this.activeTab = 'settings';
             this.settingsTab = 'billing_usage';
+          } else if (tabId === 'data_management') {
+            this.activeTab = 'data_management';
+            if (!['tiering_retention', 'conversation_history', 'backup_restore'].includes(this.dataTab)) {
+              this.dataTab = 'tiering_retention';
+            }
           } else {
             this.activeTab = tabId;
           }
