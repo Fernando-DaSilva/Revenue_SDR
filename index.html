@@ -22,55 +22,136 @@
   <!-- APP SHELL -->
   <div class="flex h-screen overflow-hidden">
 
+    <!-- ==================== MOBILE BACKDROP OVERLAY ==================== -->
+    <div 
+      x-show="mobileSidebarOpen" 
+      @click="mobileSidebarOpen = false" 
+      x-transition:enter="transition-opacity ease-linear duration-300"
+      x-transition:enter-start="opacity-0"
+      x-transition:enter-end="opacity-100"
+      x-transition:leave="transition-opacity ease-linear duration-300"
+      x-transition:leave-start="opacity-100"
+      x-transition:leave-end="opacity-0"
+      class="fixed inset-0 bg-base-900/60 backdrop-blur-xs z-40 lg:hidden">
+    </div>
+
     <!-- ==================== LEFT SIDEBAR NAVIGATION ==================== -->
-    <aside class="w-64 bg-base-200 border-r border-base-300 flex flex-col justify-between z-20 shrink-0">
+    <aside 
+      :class="{
+        'w-64': !sidebarCollapsed,
+        'w-20': sidebarCollapsed,
+        'translate-x-0': mobileSidebarOpen,
+        '-translate-x-full lg:translate-x-0': !mobileSidebarOpen
+      }"
+      class="fixed lg:static inset-y-0 left-0 z-50 bg-base-200 border-r border-base-300 flex flex-col justify-between shrink-0 transition-all duration-300 ease-in-out shadow-xl lg:shadow-none overflow-x-hidden">
       
       <!-- Top Sidebar: Logo & Nav -->
-      <div>
+      <div class="flex flex-col flex-1 min-h-0">
         <!-- Brand & Tenant Info -->
-        <div class="p-4 border-b border-base-300 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-primary text-primary-content flex items-center justify-center font-bold text-lg shadow-md shadow-primary/30">
+        <div class="p-3 lg:p-4 border-b border-base-300 flex items-center justify-between min-w-0">
+          <div class="flex items-center gap-3 overflow-hidden min-w-0">
+            <div class="w-9 h-9 rounded-xl bg-primary text-primary-content flex items-center justify-center font-bold text-lg shadow-md shadow-primary/30 shrink-0">
               ⚡
             </div>
-            <div>
-              <h1 class="font-extrabold text-base tracking-tight leading-tight">Revenue SDR</h1>
-              <span class="text-[11px] font-semibold text-primary uppercase tracking-widest">OS v0.2.0</span>
+            <div x-show="!sidebarCollapsed" class="min-w-0 flex-1">
+              <h1 class="font-extrabold text-base tracking-tight leading-tight truncate">Revenue SDR</h1>
+              <span class="text-[11px] font-semibold text-primary uppercase tracking-widest block">OS v0.2.0</span>
             </div>
           </div>
+          
+          <!-- DESKTOP COLLAPSE TOGGLE BUTTON -->
+          <button 
+            @click="sidebarCollapsed = !sidebarCollapsed" 
+            :title="sidebarCollapsed ? 'Expandir Menu Sidebar' : 'Recolher Menu Sidebar'"
+            class="btn btn-xs btn-ghost btn-square text-base-content/60 hover:text-primary shrink-0 hidden lg:flex">
+            <span x-text="sidebarCollapsed ? '⏩' : '⏪'"></span>
+          </button>
         </div>
 
-        <!-- Current Tenant Badge -->
-        <div class="px-4 py-3 bg-base-300/50 mx-3 my-3 rounded-lg flex items-center justify-between border border-base-300 min-w-0">
+        <!-- Current Tenant Badge & White Label Shortcut -->
+        <div x-show="!sidebarCollapsed" class="px-3 py-2 bg-base-300/40 mx-3 my-2 rounded-xl flex items-center justify-between border border-base-300/60 min-w-0 shrink-0">
           <div class="flex items-center gap-2 overflow-hidden min-w-0 flex-1">
             <div class="w-2.5 h-2.5 rounded-full bg-success animate-pulse shrink-0"></div>
             <span class="text-xs font-semibold truncate" x-text="activeTenant.name">Clínica Bela Health</span>
           </div>
-          <button @click="activeTab = 'settings'; settingsTab = 'theme_manager';" title="Abrir Gerenciador de Temas White-Label" class="badge badge-xs badge-primary font-bold shrink-0 ml-2 hover:scale-105 cursor-pointer transition-transform gap-1">
+          <button @click="selectTab('theme_studio')" title="Abrir Studio de Temas White-Label" class="badge badge-xs badge-primary font-bold shrink-0 ml-1.5 hover:scale-105 cursor-pointer transition-transform gap-1">
             <span>🎨</span> WHITE-LABEL
           </button>
         </div>
+        
+        <!-- Collapsed Tenant Dot -->
+        <div x-show="sidebarCollapsed" class="py-2 flex justify-center border-b border-base-300/40 shrink-0" title="Clínica Bela Health (Tenant Ativo)">
+          <div class="w-3 h-3 rounded-full bg-success animate-pulse"></div>
+        </div>
 
-        <!-- Navigation Links -->
-        <nav class="px-3 space-y-1 mt-2">
-          <template x-for="item in navItems" :key="item.id">
-            <button 
-              @click="activeTab = item.id"
-              :class="activeTab === item.id ? 'btn-primary shadow-sm' : 'btn-ghost text-base-content/70 hover:text-base-content'"
-              class="btn btn-sm btn-block justify-start font-medium text-xs gap-3 py-2.5 h-auto relative">
-              <span class="text-base" x-html="item.icon"></span>
-              <span x-text="item.label"></span>
-              <span x-if="item.badge" class="badge badge-xs badge-secondary ml-auto font-bold" x-text="item.badge"></span>
-            </button>
+        <!-- Categorized Navigation Links -->
+        <nav class="flex-1 overflow-y-auto px-2 py-3 space-y-4 custom-scrollbar">
+          <template x-for="cat in navCategories" :key="cat.title">
+            <div class="space-y-1">
+              <!-- Category Header -->
+              <div x-show="!sidebarCollapsed" class="px-3 text-[10px] font-extrabold uppercase tracking-wider text-base-content/50 mb-1.5 flex items-center justify-between">
+                <span x-text="cat.title"></span>
+              </div>
+              <div x-show="sidebarCollapsed" class="h-px bg-base-300/60 my-2 mx-2"></div>
+
+              <!-- Category Items -->
+              <template x-for="item in cat.items" :key="item.id">
+                <div class="space-y-1">
+                  <button 
+                    @click="selectTab(item.id)"
+                    :class="isTabActive(item.id) ? 'bg-primary/15 text-primary font-bold border-l-4 border-primary shadow-xs' : 'text-base-content/70 hover:text-base-content hover:bg-base-300/50'"
+                    :title="sidebarCollapsed ? (item.label + ' (' + cat.title + ')') : ''"
+                    class="btn btn-sm btn-block justify-start text-xs gap-3 py-2.5 h-auto relative border-0 rounded-lg transition-all"
+                    :class="{'tooltip tooltip-right': sidebarCollapsed}"
+                    :data-tip="item.label">
+                    
+                    <span class="text-base shrink-0 flex items-center justify-center w-5" x-text="item.icon"></span>
+                    
+                    <span x-show="!sidebarCollapsed" class="truncate flex-1 text-left" x-text="item.label"></span>
+                    
+                    <!-- Badge or Status Dot -->
+                    <template x-if="!sidebarCollapsed && item.badge">
+                      <span 
+                        class="badge badge-xs font-bold ml-auto shrink-0" 
+                        :class="item.badgeColor || 'badge-secondary'" 
+                        x-text="item.badge">
+                      </span>
+                    </template>
+                    
+                    <template x-if="!sidebarCollapsed && item.statusDot">
+                      <span class="relative flex h-2 w-2 ml-auto shrink-0">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
+                      </span>
+                    </template>
+                  </button>
+
+                  <!-- Sub-items for Data Management -->
+                  <template x-if="item.subItems && isTabActive(item.id) && !sidebarCollapsed">
+                    <div class="ml-7 pl-2 border-l border-base-300 space-y-1 my-1">
+                      <template x-for="sub in item.subItems" :key="sub.id">
+                        <button 
+                          @click="activeTab = item.id; dataTab = sub.id"
+                          :class="dataTab === sub.id ? 'text-primary font-bold bg-primary/10' : 'text-base-content/60 hover:text-base-content hover:bg-base-300/40'"
+                          class="btn btn-xs btn-block justify-start text-[11px] font-medium py-1 h-auto rounded border-0 gap-1.5">
+                          <span class="text-[9px]">↳</span>
+                          <span x-text="sub.label"></span>
+                        </button>
+                      </template>
+                    </div>
+                  </template>
+                </div>
+              </template>
+            </div>
           </template>
         </nav>
       </div>
 
       <!-- Bottom Sidebar: Agent Status & Quick Settings -->
-      <div class="p-4 border-t border-base-300 space-y-3">
+      <div class="p-3 border-t border-base-300 space-y-2.5 bg-base-200/90 shrink-0">
         <!-- AI SDR Agent Health -->
-        <div class="bg-base-100 p-3 rounded-xl border border-base-300 shadow-sm">
-          <div class="flex items-center justify-between mb-1.5">
+        <div x-show="!sidebarCollapsed" class="bg-base-100 p-2.5 rounded-xl border border-base-300/80 shadow-2xs">
+          <div class="flex items-center justify-between mb-1">
             <div class="flex items-center gap-2">
               <span class="relative flex h-2 w-2">
                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
@@ -78,27 +159,37 @@
               </span>
               <span class="text-xs font-bold">Agente IA (SDR-01)</span>
             </div>
-            <span class="badge badge-xs badge-success">Online</span>
+            <span class="badge badge-xs badge-success font-semibold">Online</span>
           </div>
-          <p class="text-[11px] text-base-content/70">Ativo processando 42 cadências em tempo real.</p>
+          <p class="text-[10px] text-base-content/60 leading-tight">42 cadências ativas em tempo real.</p>
         </div>
 
-        <!-- User Info & Quick Theme Shortcut -->
-        <div class="flex items-center justify-between pt-1 min-w-0">
-          <div class="flex items-center gap-3 min-w-0 flex-1">
-            <div class="avatar placeholder shrink-0">
-              <div class="bg-neutral text-neutral-content rounded-full w-8 h-8 font-semibold text-xs flex items-center justify-center">
-                FD
+        <!-- User Info & Dropdown Menu -->
+        <div class="flex items-center justify-between pt-0.5 min-w-0">
+          <div class="dropdown dropdown-top" :class="sidebarCollapsed ? 'dropdown-right' : 'dropdown-end w-full'">
+            <button tabindex="0" class="btn btn-ghost btn-sm w-full flex items-center justify-between px-1.5 py-1.5 h-auto rounded-xl hover:bg-base-300/60">
+              <div class="flex items-center gap-2.5 min-w-0 text-left">
+                <div class="avatar placeholder shrink-0">
+                  <div class="bg-primary text-primary-content rounded-full w-8 h-8 font-bold text-xs flex items-center justify-center shadow-xs">
+                    FD
+                  </div>
+                </div>
+                <div x-show="!sidebarCollapsed" class="min-w-0 flex-1 overflow-hidden">
+                  <p class="text-xs font-bold truncate leading-tight">Fernando Silva</p>
+                  <p class="text-[10px] text-base-content/60 truncate leading-tight">Gestor SDR Admin</p>
+                </div>
               </div>
-            </div>
-            <div class="flex-1 overflow-hidden text-left min-w-0">
-              <p class="text-xs font-bold truncate">Fernando Silva</p>
-              <p class="text-[10px] text-base-content/60 truncate">Gestor de Operações SDR</p>
-            </div>
+              <span x-show="!sidebarCollapsed" class="text-xs text-base-content/50 shrink-0 ml-1">⚙️</span>
+            </button>
+            <ul tabindex="0" class="dropdown-content z-[100] menu p-2 shadow-2xl bg-base-200 border border-base-300 rounded-box w-56 mb-2 text-xs space-y-1">
+              <li class="menu-title text-[10px] uppercase font-bold text-base-content/50 px-2 py-1">Conta & Permissões</li>
+              <li><a @click="selectTab('settings')">⚙️ Configurações Tenant</a></li>
+              <li><a @click="selectTab('theme_studio')">🎨 Studio de Temas</a></li>
+              <li><a @click="selectTab('billing')">💳 Assinatura & Cotas</a></li>
+              <div class="divider my-1"></div>
+              <li><a class="text-error font-bold" @click="alert('Sessão encerrada com segurança.')">🔒 Encerrar Sessão</a></li>
+            </ul>
           </div>
-          <button @click="activeTab = 'settings'; settingsTab = 'theme_manager';" title="Abrir Studio Gerenciador de Temas" class="btn btn-xs btn-ghost btn-square text-base-content/70 hover:text-primary hover:bg-base-300 shrink-0">
-            🎨
-          </button>
         </div>
       </div>
     </aside>
@@ -114,12 +205,20 @@
           
           <!-- Left Title / Breadcrumb -->
           <div class="flex items-center gap-2 min-w-0">
-            <h2 class="text-base lg:text-lg font-extrabold tracking-tight shrink-0 whitespace-nowrap" x-text="activeTab === 'leads' ? 'Pipeline de Leads' : (activeTab === 'cadences' ? 'Cadências & Agentes' : (activeTab === 'memory' ? 'AI Memory & Brain' : (activeTab === 'settings' ? 'Configurações Tenant' : 'Command Center')))"></h2>
-            <span class="badge badge-error badge-sm font-bold animate-pulse text-[10px] shrink-0" x-show="activeTab === 'dashboard' && handoffQueue.length > 0" x-text="`${handoffQueue.length} Alertas`"></span>
-            <span class="badge badge-primary badge-sm font-bold text-[10px] shrink-0" x-show="activeTab === 'leads'" x-text="`${leadsList.length} Leads`"></span>
+            <!-- Mobile Drawer Toggle Button -->
+            <button @click="mobileSidebarOpen = !mobileSidebarOpen" class="btn btn-sm btn-ghost btn-square lg:hidden text-base-content/80 hover:text-primary shrink-0" title="Abrir Menu">
+              <span class="text-base">☰</span>
+            </button>
+
+            <h2 class="text-base lg:text-lg font-extrabold tracking-tight shrink-0 whitespace-nowrap" x-text="isTabActive('leads') ? 'Pipeline de Leads' : (isTabActive('dashboard') ? 'Central de Controle / DHS' : (activeTab === 'inbox' ? 'Inbox de Atendimento' : (activeTab === 'cadences' ? 'Cadências & Agentes' : (isTabActive('memory') ? 'AI Memory & Brain' : (activeTab === 'data_management' ? 'Gestão de Dados & Histórico' : (isTabActive('theme_studio') ? 'Studio de Temas White-Label' : (isTabActive('billing') ? 'Planos, Faturamento & Cotas' : (activeTab === 'settings' ? 'Configurações Tenant' : 'Command Center'))))))))"></h2>
+            
+            <span class="badge badge-error badge-sm font-bold animate-pulse text-[10px] shrink-0" x-show="isTabActive('dashboard') && handoffQueue.length > 0" x-text="`${handoffQueue.length} Alertas`"></span>
+            <span class="badge badge-primary badge-sm font-bold text-[10px] shrink-0" x-show="isTabActive('leads')" x-text="`${leadsList.length} Leads`"></span>
             <span class="badge badge-secondary badge-sm font-bold text-[10px] shrink-0" x-show="activeTab === 'cadences'" x-text="`${cadencesList.length} Cadências`"></span>
-            <span class="badge badge-accent badge-sm font-bold text-[10px] shrink-0" x-show="activeTab === 'memory'" x-text="`${documentsList.length} Docs | ${leadMemoriesList.length} Memórias`"></span>
+            <span class="badge badge-accent badge-sm font-bold text-[10px] shrink-0" x-show="isTabActive('memory')" x-text="`${documentsList.length} Docs | ${leadMemoriesList.length} Memórias`"></span>
             <span class="badge badge-warning badge-sm font-bold text-[10px] shrink-0 hidden md:inline-flex" x-show="activeTab === 'settings'" x-text="`Org: ${orgForm.name}`"></span>
+            <span class="badge badge-info badge-sm font-bold text-[10px] shrink-0" x-show="activeTab === 'data_management'" x-text="`Hot: ${dataManagement.hotStorage.sizeMb}MB | Cold: ${dataManagement.coldStorage.sizeGb}GB`"></span>
+            <span class="badge badge-error badge-sm font-bold text-[10px] shrink-0" x-show="activeTab === 'inbox'">3 Mensagens Pendentes</span>
           </div>
 
           <!-- Right Header Actions -->
@@ -372,6 +471,32 @@
               class="btn btn-xs gap-1.5 text-xs whitespace-nowrap shrink-0">
               <span>📞</span> Contatos no Financeiro
               <span class="badge badge-xs badge-secondary font-bold" x-text="financialContacts.length"></span>
+            </button>
+          </nav>
+
+          <!-- GESTÃO DE DADOS & HISTÓRICO SUB-VISÕES (activeTab === 'data_management') -->
+          <nav x-show="activeTab === 'data_management'" class="flex flex-wrap items-center gap-1.5 bg-base-100 p-1.5 rounded-xl border border-base-300 w-full min-w-0 shadow-xs">
+            <button 
+              @click="dataTab = 'tiering_retention'" 
+              :class="dataTab === 'tiering_retention' ? 'btn-primary font-bold shadow-xs' : 'btn-ghost text-base-content/70 hover:text-base-content'"
+              class="btn btn-xs gap-1.5 text-xs whitespace-nowrap shrink-0">
+              <span>📊</span> Storage Tiering & Pipeline D-1
+            </button>
+
+            <button 
+              @click="dataTab = 'conversation_history'" 
+              :class="dataTab === 'conversation_history' ? 'btn-primary font-bold shadow-xs' : 'btn-ghost text-base-content/70 hover:text-base-content'"
+              class="btn btn-xs gap-1.5 text-xs whitespace-nowrap shrink-0">
+              <span>🔍</span> Histórico de Conversas & Cold Search
+              <span class="badge badge-xs badge-info font-bold" x-text="filteredSearchResults.length"></span>
+            </button>
+
+            <button 
+              @click="dataTab = 'backup_restore'" 
+              :class="dataTab === 'backup_restore' ? 'btn-primary font-bold shadow-xs' : 'btn-ghost text-base-content/70 hover:text-base-content'"
+              class="btn btn-xs gap-1.5 text-xs whitespace-nowrap shrink-0">
+              <span>💾</span> Backups, Replicas & Desastre
+              <span class="badge badge-xs badge-secondary font-bold" x-text="dataManagement.backups.length"></span>
             </button>
           </nav>
         </div>
@@ -1264,6 +1389,207 @@
 
           </div>
 
+        </div>
+
+        <!-- ==================== TAB: INBOX DE ATENDIMENTO (activeTab === 'inbox') ==================== -->
+        <div x-show="activeTab === 'inbox'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6">
+          
+          <!-- TOP BANNER KPI -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="card bg-base-200 border border-base-300 p-4 flex flex-row items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-xl font-bold">💬</div>
+              <div>
+                <div class="text-xs font-semibold text-base-content/60">Conversas Ativas</div>
+                <div class="text-xl font-extrabold">24 Conversas</div>
+              </div>
+            </div>
+            <div class="card bg-base-200 border border-base-300 p-4 flex flex-row items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-error/10 text-error flex items-center justify-center text-xl font-bold">🚨</div>
+              <div>
+                <div class="text-xs font-semibold text-base-content/60">Aguardando Humano</div>
+                <div class="text-xl font-extrabold text-error">3 Alertas</div>
+              </div>
+            </div>
+            <div class="card bg-base-200 border border-base-300 p-4 flex flex-row items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-success/10 text-success flex items-center justify-center text-xl font-bold">⚡</div>
+              <div>
+                <div class="text-xs font-semibold text-base-content/60">SDR IA Atendendo</div>
+                <div class="text-xl font-extrabold text-success">21 Leads</div>
+              </div>
+            </div>
+            <div class="card bg-base-200 border border-base-300 p-4 flex flex-row items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-info/10 text-info flex items-center justify-center text-xl font-bold">⏱️</div>
+              <div>
+                <div class="text-xs font-semibold text-base-content/60">Tempo Médio de Resposta</div>
+                <div class="text-xl font-extrabold text-info">1.2 Minutos</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- MULTICHANNEL CHAT CONTAINER -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 h-[650px]">
+            
+            <!-- LEFT CHAT LIST (4 cols) -->
+            <div class="lg:col-span-4 bg-base-200 border border-base-300 rounded-2xl flex flex-col overflow-hidden">
+              <!-- Search & Filters -->
+              <div class="p-3 border-b border-base-300 space-y-2">
+                <div class="relative">
+                  <input type="text" placeholder="Buscar por lead ou empresa..." class="input input-sm input-bordered w-full pl-8 text-xs">
+                  <span class="absolute left-2.5 top-2 text-xs opacity-50">🔍</span>
+                </div>
+                <div class="flex items-center gap-1 overflow-x-auto text-xs pb-1">
+                  <button class="btn btn-xs btn-primary font-bold">Todos</button>
+                  <button class="btn btn-xs btn-ghost text-base-content/70">WhatsApp</button>
+                  <button class="btn btn-xs btn-ghost text-base-content/70">Email</button>
+                  <button class="btn btn-xs btn-ghost text-error">🚨 Handoff</button>
+                </div>
+              </div>
+
+              <!-- Conversations List -->
+              <div class="flex-1 overflow-y-auto divide-y divide-base-300/50">
+                <!-- Lead Item 1 -->
+                <div class="p-3 hover:bg-base-300/50 cursor-pointer bg-primary/10 border-l-4 border-primary transition-colors">
+                  <div class="flex items-center justify-between mb-1">
+                    <div class="flex items-center gap-2">
+                      <span class="badge badge-xs badge-success gap-1">WhatsApp</span>
+                      <span class="font-bold text-xs truncate">Dr. Roberto Alves</span>
+                    </div>
+                    <span class="text-[10px] text-base-content/60">14:32</span>
+                  </div>
+                  <p class="text-xs text-base-content/80 truncate">Gostaria de agendar a demonstração sobre o plano premium...</p>
+                  <div class="flex items-center justify-between mt-2 text-[10px]">
+                    <span class="badge badge-xs badge-outline">SDR-01 IA</span>
+                    <span class="text-success font-semibold">🟢 Qualificado SQL</span>
+                  </div>
+                </div>
+
+                <!-- Lead Item 2 -->
+                <div class="p-3 hover:bg-base-300/50 cursor-pointer transition-colors">
+                  <div class="flex items-center justify-between mb-1">
+                    <div class="flex items-center gap-2">
+                      <span class="badge badge-xs badge-success gap-1">WhatsApp</span>
+                      <span class="font-bold text-xs truncate">Mariana Costa</span>
+                    </div>
+                    <span class="text-[10px] text-base-content/60">14:15</span>
+                  </div>
+                  <p class="text-xs text-base-content/80 truncate">Qual o tempo de implementação da solução?</p>
+                  <div class="flex items-center justify-between mt-2 text-[10px]">
+                    <span class="badge badge-xs badge-warning animate-pulse">Alerta Handoff</span>
+                    <span class="text-warning font-semibold">🟡 Aguardando Operador</span>
+                  </div>
+                </div>
+
+                <!-- Lead Item 3 -->
+                <div class="p-3 hover:bg-base-300/50 cursor-pointer transition-colors">
+                  <div class="flex items-center justify-between mb-1">
+                    <div class="flex items-center gap-2">
+                      <span class="badge badge-xs badge-info gap-1">E-mail</span>
+                      <span class="font-bold text-xs truncate">Carlos Eduardo</span>
+                    </div>
+                    <span class="text-[10px] text-base-content/60">13:40</span>
+                  </div>
+                  <p class="text-xs text-base-content/80 truncate">Solicito envio da minuta de contrato para homologação...</p>
+                  <div class="flex items-center justify-between mt-2 text-[10px]">
+                    <span class="badge badge-xs badge-outline">SDR-02 IA</span>
+                    <span class="text-info font-semibold">🔵 Em Negociação</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- MIDDLE CHAT THREAD (5 cols) -->
+            <div class="lg:col-span-5 bg-base-200 border border-base-300 rounded-2xl flex flex-col overflow-hidden">
+              <!-- Active Chat Header -->
+              <div class="p-3 bg-base-100 border-b border-base-300 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="avatar placeholder">
+                    <div class="bg-primary text-primary-content rounded-full w-9 h-9 font-bold text-xs">RA</div>
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-sm">Dr. Roberto Alves</h4>
+                    <p class="text-[11px] text-base-content/60">Hospital São Lucas • +55 11 98765-4321</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button @click="showWhatsAppTakeoverModal = true" class="btn btn-xs btn-warning font-bold gap-1">
+                    <span>🤝</span> Assumir Conversa
+                  </button>
+                </div>
+              </div>
+
+              <!-- Chat Messages Scroll -->
+              <div class="flex-1 overflow-y-auto p-4 space-y-3 bg-base-300/20">
+                <!-- Lead Msg -->
+                <div class="chat chat-start">
+                  <div class="chat-header text-[10px] text-base-content/60 mb-0.5">Dr. Roberto Alves • 14:28</div>
+                  <div class="chat-bubble chat-bubble-neutral text-xs">Olá! Gostaria de entender melhor como funciona a qualificação de leads via WhatsApp.</div>
+                </div>
+
+                <!-- AI Msg -->
+                <div class="chat chat-end">
+                  <div class="chat-header text-[10px] text-base-content/60 mb-0.5">Agente IA (Sofia SDR) • 14:29</div>
+                  <div class="chat-bubble chat-bubble-primary text-xs">Olá Dr. Roberto! Nossa IA SDR conversa de forma 100% natural, aplica a metodologia BANT em tempo real e agenda a demonstração diretamente na agenda dos seus vendedores. Gostaria de agendar 15 minutos hoje?</div>
+                </div>
+
+                <!-- Lead Msg -->
+                <div class="chat chat-start">
+                  <div class="chat-header text-[10px] text-base-content/60 mb-0.5">Dr. Roberto Alves • 14:32</div>
+                  <div class="chat-bubble chat-bubble-neutral text-xs">Perfeito. Vocês têm horário disponível hoje às 16h30?</div>
+                </div>
+              </div>
+
+              <!-- Chat Input Area -->
+              <div class="p-3 bg-base-100 border-t border-base-300 space-y-2">
+                <div class="flex items-center gap-2">
+                  <input type="text" placeholder="Digite uma resposta manual (intervém sobre a IA)..." class="input input-sm input-bordered flex-1 text-xs">
+                  <button class="btn btn-sm btn-primary font-bold">Enviar</button>
+                </div>
+                <div class="flex items-center justify-between text-[10px] text-base-content/60">
+                  <span>Modo IA: <strong>Ativo (SDR-01)</strong></span>
+                  <span class="cursor-pointer hover:underline text-primary">Usar Resposta Rápida (Template)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT LEAD SUMMARY (3 cols) -->
+            <div class="lg:col-span-3 bg-base-200 border border-base-300 rounded-2xl p-4 space-y-4 overflow-y-auto">
+              <div class="text-center pb-3 border-b border-base-300">
+                <div class="avatar placeholder mb-2">
+                  <div class="bg-secondary text-secondary-content rounded-full w-12 h-12 font-extrabold text-base">RA</div>
+                </div>
+                <h3 class="font-extrabold text-sm">Dr. Roberto Alves</h3>
+                <p class="text-xs text-base-content/70">Diretor Médico @ Hospital São Lucas</p>
+                <span class="badge badge-success badge-sm font-bold mt-2">Score BANT: 94/100</span>
+              </div>
+
+              <!-- Quick Details -->
+              <div class="space-y-2 text-xs">
+                <div class="flex justify-between py-1 border-b border-base-300/40">
+                  <span class="text-base-content/60">Canal:</span>
+                  <span class="font-semibold">WhatsApp Official</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-base-300/40">
+                  <span class="text-base-content/60">Orçamento:</span>
+                  <span class="font-semibold">R$ 45k/mês</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-base-300/40">
+                  <span class="text-base-content/60">Cadência:</span>
+                  <span class="font-semibold">Inbound High Intent</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-base-300/40">
+                  <span class="text-base-content/60">Etapa Funil:</span>
+                  <span class="font-semibold text-primary">Reunião Agendada</span>
+                </div>
+              </div>
+
+              <!-- Quick Actions -->
+              <div class="space-y-2 pt-2">
+                <button @click="showScheduleMeetingModal = true" class="btn btn-xs btn-block btn-primary font-bold">📅 Agendar Reunião Demo</button>
+                <button @click="showChangeStageModal = true" class="btn btn-xs btn-block btn-outline btn-secondary font-bold">🔄 Alterar Etapa do Lead</button>
+                <button @click="openLeadDrawer(leadsList[0])" class="btn btn-xs btn-block btn-ghost font-bold">📋 Ver Prontuário Completo</button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- ==================== TAB: CADÊNCIAS & AGENTES (activeTab === 'cadences') ==================== -->
@@ -5177,6 +5503,592 @@
             </div>
 
           </div>
+
+          </div>
+
+        </div>
+
+        <!-- ==================== TAB: GESTÃO DE DADOS, BACKUP & HISTÓRICO (activeTab === 'data_management') ==================== -->
+        <div x-show="activeTab === 'data_management'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6">
+
+          <!-- ==================== SUB-VISÃO 1: STORAGE TIERING & PIPELINE D-1 (dataTab === 'tiering_retention') ==================== -->
+          <div x-show="dataTab === 'tiering_retention'" x-transition:enter="transition ease-out duration-200" class="space-y-6">
+
+            <!-- Banner Topo & Descrição Arquitetural -->
+            <div class="card bg-base-100 border border-base-300 shadow-sm p-6 relative overflow-hidden">
+              <div class="absolute right-0 top-0 w-80 h-full bg-gradient-to-l from-primary/10 via-secondary/5 to-transparent pointer-events-none"></div>
+              <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+                <div class="space-y-1 max-w-3xl">
+                  <div class="flex items-center gap-2">
+                    <span class="text-2xl">📊</span>
+                    <h3 class="text-xl font-extrabold text-base-content">Storage Tiering & Pipeline D-1</h3>
+                    <span class="badge badge-primary font-bold text-xs">ADR-002 / ADR-015 / ADR-016</span>
+                  </div>
+                  <p class="text-xs text-base-content/70 leading-relaxed">
+                    Arquitetura híbrida de armazenamento. Mantém conversas recentes em tempo real e de baixa latência no 
+                    <strong class="text-base-content">Hot Storage (Turso / libSQL local)</strong> e migra historicamente mensagens antigas, transcrições e vetores de IA para o 
+                    <strong class="text-base-content">Cold Storage (Supabase PostgreSQL DW com pgvector e Full-Text Search)</strong> através de jobs ETL automatizados D-1.
+                  </p>
+                </div>
+
+                <div class="flex items-center gap-2 shrink-0">
+                  <button @click="runEtlPipelineOnDemand()" class="btn btn-primary btn-sm font-bold text-xs gap-2 shadow-md shadow-primary/20">
+                    <span>⚡</span> Executar Pipeline D-1 Agora
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- GRID DE KPIS DE ARMAZENAMENTO -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+              
+              <!-- Card 1: Hot Storage -->
+              <div class="card bg-base-100 border border-base-300 shadow-sm p-5 space-y-4 hover:border-primary/50 transition-colors">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg">
+                      ⚡
+                    </div>
+                    <div>
+                      <h4 class="font-extrabold text-sm text-base-content">Hot Storage Local</h4>
+                      <p class="text-[11px] text-base-content/60">Turso / libSQL (.db local)</p>
+                    </div>
+                  </div>
+                  <span class="badge badge-success font-bold text-[10px] gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-success animate-pulse"></span>
+                    Saudável
+                  </span>
+                </div>
+
+                <div class="space-y-2">
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="text-base-content/70 font-medium">Uso de Armazenamento</span>
+                    <span class="font-mono font-bold text-base-content" x-text="`${dataManagement.hotStorage.sizeMb} MB / ${dataManagement.hotStorage.maxMb} MB`">142.5 MB / 500 MB</span>
+                  </div>
+                  <div class="w-full bg-base-200 rounded-full h-2.5 overflow-hidden">
+                    <div class="bg-primary h-2.5 rounded-full transition-all duration-500" :style="`width: ${(dataManagement.hotStorage.sizeMb / dataManagement.hotStorage.maxMb) * 100}%`"></div>
+                  </div>
+                </div>
+
+                <div class="pt-2 border-t border-base-200 grid grid-cols-2 gap-2 text-xs">
+                  <div>
+                    <span class="text-[10px] text-base-content/60 block">Conversas Ativas</span>
+                    <strong class="font-mono text-sm text-base-content" x-text="dataManagement.hotStorage.activeConversations.toLocaleString()">1,240</strong>
+                  </div>
+                  <div>
+                    <span class="text-[10px] text-base-content/60 block">Latência Média</span>
+                    <strong class="font-mono text-sm text-success" x-text="`< ${dataManagement.hotStorage.readLatencyMs} ms`">&lt; 3.8 ms</strong>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card 2: Cold Storage / DW -->
+              <div class="card bg-base-100 border border-base-300 shadow-sm p-5 space-y-4 hover:border-secondary/50 transition-colors">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center font-bold text-lg">
+                      ❄️
+                    </div>
+                    <div>
+                      <h4 class="font-extrabold text-sm text-base-content">Cold Storage / DW</h4>
+                      <p class="text-[11px] text-base-content/60" x-text="dataManagement.coldStorage.provider">Supabase (PostgreSQL 16)</p>
+                    </div>
+                  </div>
+                  <span class="badge badge-info font-bold text-[10px]">Cold DW</span>
+                </div>
+
+                <div class="space-y-2">
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="text-base-content/70 font-medium">Volume Acumulado</span>
+                    <span class="font-mono font-bold text-secondary text-base" x-text="`${dataManagement.coldStorage.sizeGb} GB`">12.8 GB</span>
+                  </div>
+                  <p class="text-[11px] text-base-content/60">
+                    <strong class="font-mono text-base-content" x-text="dataManagement.coldStorage.totalArchivedMessages.toLocaleString()">450,200</strong> mensagens e transcrições arquivadas.
+                  </p>
+                </div>
+
+                <div class="pt-2 border-t border-base-200 flex items-center justify-between text-xs">
+                  <div class="flex items-center gap-1.5">
+                    <span class="badge badge-xs badge-success font-bold">pgvector</span>
+                    <span class="text-[11px] text-base-content/70">Ativo</span>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="badge badge-xs badge-success font-bold">tsvector FTS</span>
+                    <span class="text-[11px] text-base-content/70">Ativo</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card 3: Status Job ETL D-1 -->
+              <div class="card bg-base-100 border border-base-300 shadow-sm p-5 space-y-4 hover:border-accent/50 transition-colors">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center font-bold text-lg">
+                      🔄
+                    </div>
+                    <div>
+                      <h4 class="font-extrabold text-sm text-base-content">Status Job ETL D-1</h4>
+                      <p class="text-[11px] text-base-content/60">Sincronização Noturna</p>
+                    </div>
+                  </div>
+                  <span class="badge badge-success font-bold text-[10px]" x-text="dataManagement.etlJob.status === 'completed' ? 'Concluído' : 'Em Execução'">Concluído</span>
+                </div>
+
+                <div class="space-y-1.5 text-xs">
+                  <div class="flex items-center justify-between">
+                    <span class="text-base-content/70">Último Disparo:</span>
+                    <span class="font-mono font-semibold text-base-content" x-text="dataManagement.etlJob.lastRun">2026-07-27 02:00:00</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-base-content/70">Migrados nas 24h:</span>
+                    <span class="font-mono font-bold text-primary" x-text="`${dataManagement.etlJob.recordsProcessed.toLocaleString()} regs`">14,250 regs</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-base-content/70">Próximo Agendamento:</span>
+                    <span class="font-mono text-base-content/80" x-text="dataManagement.etlJob.nextRun">2026-07-28 02:00:00</span>
+                  </div>
+                </div>
+
+                <div class="pt-2 border-t border-base-200 flex items-center justify-between text-[11px]">
+                  <span class="text-base-content/60">Frequência: <strong class="text-base-content">Diária (02:00 AM)</strong></span>
+                  <button @click="runEtlPipelineOnDemand()" class="text-primary hover:underline font-bold">Manual ⚡</button>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- PAINEL DE CONFIGURAÇÃO DE REGRAS DE RETENÇÃO & TTL -->
+            <div class="card bg-base-100 border border-base-300 shadow-sm p-6 space-y-5">
+              <div class="flex items-center justify-between border-b border-base-200 pb-4">
+                <div>
+                  <h4 class="font-extrabold text-base text-base-content flex items-center gap-2">
+                    <span>⚙️</span> Regras de Retenção, TTL & Expurgo Automático
+                  </h4>
+                  <p class="text-xs text-base-content/60 mt-0.5">Defina o ciclo de vida dos dados no Hot DB antes da cópia para o Data Warehouse.</p>
+                </div>
+                <button @click="showNotification('Regras de retenção atualizadas com sucesso!', 'success')" class="btn btn-sm btn-outline btn-primary font-bold text-xs gap-1">
+                  <span>💾</span> Salvar Regras
+                </button>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- Input Dias de Retenção -->
+                <div class="form-control space-y-1.5">
+                  <label class="label p-0">
+                    <span class="label-text font-bold text-xs">Dias de Retenção no Hot DB</span>
+                    <span class="label-text-alt text-primary font-mono font-bold" x-text="`${dataManagement.retentionDays} dias`">30 dias</span>
+                  </label>
+                  <div class="join w-full">
+                    <input 
+                      type="number" 
+                      x-model="dataManagement.retentionDays" 
+                      min="7" 
+                      max="180" 
+                      class="input input-sm input-bordered join-item w-full font-mono text-xs focus:border-primary" 
+                    />
+                    <span class="btn btn-sm join-item bg-base-200 border-base-300 text-xs font-semibold">Dias</span>
+                  </div>
+                  <p class="text-[11px] text-base-content/60">Conversas com mais de <span x-text="dataManagement.retentionDays"></span> dias sem interação serão elegíveis para o ETL D-1.</p>
+                </div>
+
+                <!-- Toggle 1: Manter Ativas -->
+                <div class="form-control bg-base-200/50 p-3.5 rounded-xl border border-base-300 justify-between">
+                  <label class="cursor-pointer label p-0 items-start gap-3">
+                    <div class="space-y-0.5">
+                      <span class="label-text font-bold text-xs text-base-content block">Reter Leads em Negociação</span>
+                      <span class="label-text-alt text-[11px] text-base-content/60 block leading-tight">
+                        Mantém conversas de leads com status "Em Negociação" ou "BANT Qualificado" no Hot DB indefinidamente.
+                      </span>
+                    </div>
+                    <input type="checkbox" x-model="dataManagement.keepActiveLeadsInHot" class="toggle toggle-primary toggle-sm shrink-0" />
+                  </label>
+                </div>
+
+                <!-- Toggle 2: Expurgo / Vacuum -->
+                <div class="form-control bg-base-200/50 p-3.5 rounded-xl border border-base-300 justify-between">
+                  <label class="cursor-pointer label p-0 items-start gap-3">
+                    <div class="space-y-0.5">
+                      <span class="label-text font-bold text-xs text-base-content block">Expurgo Automático (DELETE + VACUUM)</span>
+                      <span class="label-text-alt text-[11px] text-base-content/60 block leading-tight">
+                        Libera espaço no arquivo local `.db` executando o de-fragmentador `VACUUM` após migração confirmada no DW.
+                      </span>
+                    </div>
+                    <input type="checkbox" x-model="dataManagement.autoVacuum" class="toggle toggle-secondary toggle-sm shrink-0" />
+                  </label>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- TABELA DE MONITORAMENTO DE JOBS DE SINCRONIZAÇÃO -->
+            <div class="card bg-base-100 border border-base-300 shadow-sm overflow-hidden space-y-4 p-5">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h4 class="font-extrabold text-base text-base-content flex items-center gap-2">
+                    <span>📜</span> Histórico de Execuções do Pipeline ETL & Jobs de Manutenção
+                  </h4>
+                  <p class="text-xs text-base-content/60">Registros dos últimos 5 jobs automáticos e manuais disparados no sistema.</p>
+                </div>
+                <span class="badge badge-sm badge-outline font-mono text-[11px]" x-text="`${dataManagement.syncJobs.length} Jobs Registrados`"></span>
+              </div>
+
+              <div class="overflow-x-auto">
+                <table class="table table-zebra w-full text-xs">
+                  <thead>
+                    <tr class="bg-base-200/60 text-base-content/70">
+                      <th>Data / Hora</th>
+                      <th>Tipo de Job</th>
+                      <th>Registros Processados</th>
+                      <th>Status</th>
+                      <th>Duração</th>
+                      <th class="text-right">Ação</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template x-for="job in dataManagement.syncJobs" :key="job.id">
+                      <tr class="hover">
+                        <td class="font-mono text-base-content font-semibold whitespace-nowrap" x-text="job.datetime"></td>
+                        <td class="font-bold text-primary" x-text="job.type"></td>
+                        <td class="font-mono text-base-content" x-text="`${job.records.toLocaleString()} registros`"></td>
+                        <td>
+                          <span 
+                            class="badge badge-xs font-bold" 
+                            :class="job.status.includes('Sucesso') || job.status.includes('Concluído') ? 'badge-success' : 'badge-warning'" 
+                            x-text="job.status">
+                          </span>
+                        </td>
+                        <td class="font-mono text-base-content/70" x-text="job.duration"></td>
+                        <td class="text-right">
+                          <button @click="showNotification(`Detalhes do job ${job.id}: ${job.records} registros processados em ${job.duration}.`, 'info')" class="btn btn-xs btn-ghost text-base-content/60 hover:text-primary">
+                            🔍 Log
+                          </button>
+                        </td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ==================== SUB-VISÃO 2: HISTÓRICO DE CONVERSAS & COLD SEARCH (dataTab === 'conversation_history') ==================== -->
+          <div x-show="dataTab === 'conversation_history'" x-transition:enter="transition ease-out duration-200" class="space-y-6">
+
+            <!-- Header & Description -->
+            <div class="card bg-base-100 border border-base-300 shadow-sm p-6 space-y-4">
+              <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-2xl">🔍</span>
+                    <h3 class="text-xl font-extrabold text-base-content">Histórico de Conversas & Cold Search</h3>
+                    <span class="badge badge-secondary font-bold text-xs">Supabase DW</span>
+                  </div>
+                  <p class="text-xs text-base-content/70 mt-1">
+                    Busque em mensagens arquivadas no Cold Storage através de <strong class="text-base-content">Busca Exata (Full-Text Search)</strong> ou <strong class="text-base-content">Busca Semântica por Contexto (pgvector)</strong>.
+                  </p>
+                </div>
+
+                <!-- Badge de Indicador do Modo Ativo -->
+                <div class="bg-base-200 p-2.5 rounded-xl border border-base-300 flex items-center gap-2 shrink-0">
+                  <span class="text-xs font-semibold text-base-content/70">Modo de Indexação:</span>
+                  <span 
+                    class="badge badge-sm font-bold gap-1"
+                    :class="dataManagement.searchMode === 'fts' ? 'badge-primary' : 'badge-secondary'">
+                    <span x-text="dataManagement.searchMode === 'fts' ? '🔍 PostgreSQL FTS (tsvector)' : '🧠 pgvector Embeddings (1536d)'"></span>
+                  </span>
+                </div>
+              </div>
+
+              <!-- CONTROLES DE BUSCA INTELIGENTE -->
+              <div class="space-y-3 bg-base-200/50 p-4 rounded-xl border border-base-300">
+                
+                <!-- Linha 1: Input de Busca + Seletor de Modo -->
+                <div class="flex flex-col md:flex-row items-stretch md:items-center gap-3">
+                  
+                  <!-- Input de Texto -->
+                  <div class="relative flex-1">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-base-content/40 text-xs">
+                      <span x-text="dataManagement.searchMode === 'fts' ? '🔍' : '🧠'"></span>
+                    </span>
+                    <input 
+                      type="text" 
+                      x-model="dataManagement.searchQuery" 
+                      :placeholder="dataManagement.searchMode === 'fts' ? 'Buscar termo exato nas transcrições (ex: plano premium, contrato, homologação)...' : 'Descreva o contexto desejado (ex: leads que pediram desconto ou duvidas sobre integracao)...'" 
+                      class="input input-sm input-bordered w-full pl-9 text-xs bg-base-100 focus:border-primary font-medium"
+                    />
+                  </div>
+
+                  <!-- Seletor de Modo (FTS vs Semântica) -->
+                  <div class="join shrink-0 self-center">
+                    <button 
+                      @click="dataManagement.searchMode = 'fts'" 
+                      :class="dataManagement.searchMode === 'fts' ? 'btn-primary font-bold' : 'btn-ghost bg-base-100 text-base-content/70'"
+                      class="btn btn-sm join-item text-xs gap-1">
+                      <span>🔍</span> Texto Exato (FTS)
+                    </button>
+                    <button 
+                      @click="dataManagement.searchMode = 'semantic'" 
+                      :class="dataManagement.searchMode === 'semantic' ? 'btn-secondary font-bold' : 'btn-ghost bg-base-100 text-base-content/70'"
+                      class="btn btn-sm join-item text-xs gap-1">
+                      <span>🧠</span> Semântica (pgvector)
+                    </button>
+                  </div>
+
+                </div>
+
+                <!-- Explicação Visual do Modo Selecionado -->
+                <div class="text-[11px] px-1 flex items-center justify-between text-base-content/60">
+                  <span x-show="dataManagement.searchMode === 'fts'">
+                    💡 <strong>FTS (Full-Text Search):</strong> Utiliza o índice `tsvector` do PostgreSQL para busca rápida por palavras-chave exatas.
+                  </span>
+                  <span x-show="dataManagement.searchMode === 'semantic'">
+                    💡 <strong>Busca Semântica (pgvector):</strong> Converte a consulta em embedding e calcula similaridade de cosseno com histórico arquivado.
+                  </span>
+                  <span class="font-mono text-primary font-semibold" x-text="`${filteredSearchResults.length} conversas encontradas`"></span>
+                </div>
+
+                <!-- Linha 2: Filtros Avançados -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-base-300">
+                  
+                  <!-- Filtro Período -->
+                  <div class="form-control">
+                    <label class="label py-0.5"><span class="label-text-alt font-bold text-[10px] text-base-content/70">Período de Arquivamento</span></label>
+                    <select x-model="dataManagement.searchPeriod" class="select select-xs select-bordered w-full text-xs bg-base-100">
+                      <option value="6m">Últimos 6 meses</option>
+                      <option value="1y">Último ano</option>
+                      <option value="all">Todo o histórico arquivado</option>
+                    </select>
+                  </div>
+
+                  <!-- Filtro Canal -->
+                  <div class="form-control">
+                    <label class="label py-0.5"><span class="label-text-alt font-bold text-[10px] text-base-content/70">Canal de Origem</span></label>
+                    <select x-model="dataManagement.searchChannel" class="select select-xs select-bordered w-full text-xs bg-base-100">
+                      <option value="all">Todos os Canais</option>
+                      <option value="WhatsApp">WhatsApp</option>
+                      <option value="E-mail">E-mail</option>
+                      <option value="Telefone">Telefone</option>
+                    </select>
+                  </div>
+
+                  <!-- Filtro SDR Responsável -->
+                  <div class="form-control">
+                    <label class="label py-0.5"><span class="label-text-alt font-bold text-[10px] text-base-content/70">SDR / Atendente</span></label>
+                    <select x-model="dataManagement.searchSdr" class="select select-xs select-bordered w-full text-xs bg-base-100">
+                      <option value="all">Todos os Atendentes</option>
+                      <option value="ai">Somente Agentes IA</option>
+                      <option value="human">Somente Atendimento Humano</option>
+                    </select>
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- LISTA DE THREADS ARQUIVADAS ENCONTRADAS -->
+            <div class="space-y-3">
+              
+              <template x-for="item in filteredSearchResults" :key="item.id">
+                <div class="card bg-base-100 border border-base-300 shadow-sm p-5 hover:border-primary/50 transition-all space-y-3">
+                  
+                  <!-- Header do Card -->
+                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-base-200 pb-3">
+                    <div class="flex items-center gap-3">
+                      <div class="w-10 h-10 rounded-full bg-base-200 border border-base-300 font-extrabold text-base flex items-center justify-center text-primary shrink-0 shadow-inner">
+                        <span x-text="item.leadName.charAt(0)"></span>
+                      </div>
+                      <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                          <h4 class="font-extrabold text-sm text-base-content" x-text="item.leadName"></h4>
+                          <span class="badge badge-xs font-bold" :class="item.channel === 'WhatsApp' ? 'badge-success' : 'badge-neutral'" x-text="item.channel"></span>
+                          <span class="badge badge-outline badge-xs font-mono font-bold text-[10px] text-info">
+                            ❄️ Cold Storage - Supabase DW
+                          </span>
+                        </div>
+                        <p class="text-[11px] text-base-content/60" x-text="`${item.company} • Data do Arquivamento: ${item.date}`"></p>
+                      </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 shrink-0">
+                      <span class="badge badge-ghost text-[10px] font-mono" x-text="`${item.messageCount} msgs`"></span>
+                      <span class="badge badge-xs badge-info font-bold" x-text="item.sentiment"></span>
+                    </div>
+                  </div>
+
+                  <!-- Snippet de Correspondência (Match) -->
+                  <div class="bg-base-200/50 p-3 rounded-lg border border-base-300 text-xs space-y-1">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-base-content/50 block">Trecho de Correspondência Encontrado:</span>
+                    <p class="italic text-base-content/80 font-mono text-[11px]" x-text="item.matchSnippet"></p>
+                  </div>
+
+                  <!-- Resumo da IA & Ações -->
+                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                    <p class="text-xs text-base-content/70 flex items-center gap-1.5 flex-1 min-w-0">
+                      <span>🧠</span> <strong class="text-base-content">Resumo IA:</strong> 
+                      <span class="truncate" x-text="item.summary"></span>
+                    </p>
+
+                    <div class="flex items-center gap-1.5 shrink-0">
+                      <button @click="openColdChatModal(item)" class="btn btn-xs btn-primary font-bold gap-1">
+                        <span>👁️</span> Ver Transcrição
+                      </button>
+                      <button @click="restoreLeadToHotDb(item)" class="btn btn-xs btn-outline btn-accent font-bold gap-1" title="Injeta o lead novamente no Turso local">
+                        <span>🔄</span> Restaurar ao Hot DB
+                      </button>
+                      <div class="dropdown dropdown-end">
+                        <button tabindex="0" class="btn btn-xs btn-ghost text-base-content/70">
+                          <span>📥</span> Exportar ▼
+                        </button>
+                        <ul tabindex="0" class="dropdown-content z-[50] menu p-1 shadow-lg bg-base-200 border border-base-300 rounded-box w-36 text-xs">
+                          <li><a @click="exportTranscript(item, 'PDF')">📄 Arquivo PDF</a></li>
+                          <li><a @click="exportTranscript(item, 'JSON')"><span>{ }</span> Dados JSON</a></li>
+                          <li><a @click="exportTranscript(item, 'CSV')">📊 Planilha CSV</a></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </template>
+
+              <div x-show="filteredSearchResults.length === 0" class="card bg-base-100 border border-base-300 p-8 text-center space-y-2">
+                <span class="text-3xl">🔍</span>
+                <h4 class="font-bold text-base text-base-content">Nenhuma conversa encontrada no Cold Storage</h4>
+                <p class="text-xs text-base-content/60 max-w-md mx-auto">Ajuste os termos da busca ou troque entre o modo FTS e Busca Semântica.</p>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- ==================== SUB-VISÃO 3: BACKUPS, REPLICAS & DESASTRE (dataTab === 'backup_restore') ==================== -->
+          <div x-show="dataTab === 'backup_restore'" x-transition:enter="transition ease-out duration-200" class="space-y-6">
+
+            <!-- Header Banner & Embedded Replicas Status Widget -->
+            <div class="card bg-base-100 border border-base-300 shadow-sm p-6 space-y-5">
+              <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="space-y-1">
+                  <div class="flex items-center gap-2">
+                    <span class="text-2xl">💾</span>
+                    <h3 class="text-xl font-extrabold text-base-content">Backups, Embedded Replicas & Disaster Recovery</h3>
+                    <span class="badge badge-primary font-bold text-xs">Turso Cloud Sync</span>
+                  </div>
+                  <p class="text-xs text-base-content/70">
+                    Gestão de snapshots locais `.db.gz`, réplicas incorporadas sincronizadas e simulação de recuperação de desastres.
+                  </p>
+                </div>
+
+                <button @click="createBackupSnapshotOnDemand()" class="btn btn-primary btn-sm font-bold text-xs gap-2 shadow-md shadow-primary/20 shrink-0">
+                  <span>💾</span> Criar Snapshot de Backup Agora
+                </button>
+              </div>
+
+              <!-- WIDGET DE SAÚDE DAS EMBEDDED REPLICAS (TURSO CLOUD SYNC) -->
+              <div class="bg-base-200/60 p-4 rounded-xl border border-base-300 grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-success/10 text-success flex items-center justify-center font-bold text-lg shrink-0">
+                    🌐
+                  </div>
+                  <div>
+                    <span class="text-[10px] text-base-content/60 font-semibold block uppercase tracking-wider">Replicação Turso Cloud</span>
+                    <div class="flex items-center gap-1.5 text-xs font-extrabold text-base-content">
+                      <span class="w-2 h-2 rounded-full bg-success animate-pulse"></span>
+                      <span>Sincronizado em Tempo Real</span>
+                    </div>
+                    <span class="text-[10px] text-success font-mono">0 ms de atraso de replicação</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-3 border-t md:border-t-0 md:border-l border-base-300 pt-3 md:pt-0 md:pl-4">
+                  <div class="w-10 h-10 rounded-lg bg-info/10 text-info flex items-center justify-center font-bold text-lg shrink-0">
+                    🔒
+                  </div>
+                  <div>
+                    <span class="text-[10px] text-base-content/60 font-semibold block uppercase tracking-wider">Engine Local & Integridade</span>
+                    <div class="text-xs font-bold text-base-content">SQLite WAL Mode (libSQL)</div>
+                    <span class="text-[10px] text-base-content/70 font-mono">Checksum SHA-256 Validado</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-3 border-t md:border-t-0 md:border-l border-base-300 pt-3 md:pt-0 md:pl-4">
+                  <div class="w-10 h-10 rounded-lg bg-secondary/10 text-secondary flex items-center justify-center font-bold text-lg shrink-0">
+                    🛡️
+                  </div>
+                  <div>
+                    <span class="text-[10px] text-base-content/60 font-semibold block uppercase tracking-wider">Frequência de Backup</span>
+                    <div class="text-xs font-bold text-base-content">Snapshot Automático D-1</div>
+                    <span class="text-[10px] text-base-content/70 font-mono">Retenção de 30 dias</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- TABELA DE SNAPSHOTS & BACKUPS LOCAIS -->
+            <div class="card bg-base-100 border border-base-300 shadow-sm overflow-hidden p-5 space-y-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h4 class="font-extrabold text-base text-base-content flex items-center gap-2">
+                    <span>📦</span> Histórico de Snapshots de Backup (.db.gz)
+                  </h4>
+                  <p class="text-xs text-base-content/60">Lista de cópias de segurança geradas automaticamente e sob demanda.</p>
+                </div>
+                <span class="badge badge-sm badge-secondary font-mono font-bold" x-text="`${dataManagement.backups.length} Snapshots`"></span>
+              </div>
+
+              <div class="overflow-x-auto">
+                <table class="table table-zebra w-full text-xs">
+                  <thead>
+                    <tr class="bg-base-200/60 text-base-content/70">
+                      <th>Nome do Arquivo Snapshot</th>
+                      <th>Tamanho</th>
+                      <th>Tipo</th>
+                      <th>Data / Hora</th>
+                      <th>Checksum SHA-256</th>
+                      <th class="text-right">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template x-for="bak in dataManagement.backups" :key="bak.id">
+                      <tr class="hover">
+                        <td class="font-mono font-bold text-primary whitespace-nowrap">
+                          <div class="flex items-center gap-2">
+                            <span>📄</span>
+                            <span x-text="bak.filename"></span>
+                          </div>
+                        </td>
+                        <td class="font-mono font-bold text-base-content whitespace-nowrap" x-text="bak.size"></td>
+                        <td>
+                          <span 
+                            class="badge badge-xs font-bold" 
+                            :class="bak.type.includes('Automático') ? 'badge-primary' : 'badge-secondary'" 
+                            x-text="bak.type">
+                          </span>
+                        </td>
+                        <td class="font-mono text-base-content/80 whitespace-nowrap" x-text="bak.date"></td>
+                        <td class="font-mono text-[10px] text-base-content/60 max-w-[120px] truncate" x-text="bak.checksum" :title="bak.checksum"></td>
+                        <td class="text-right space-x-1 whitespace-nowrap">
+                          <button @click="showNotification(`Download de ${bak.filename} iniciado!`, 'info')" class="btn btn-xs btn-outline btn-neutral font-bold" title="Fazer Download">
+                            ⬇️ Download
+                          </button>
+                          <button @click="startRestoreSimulation(bak)" class="btn btn-xs btn-primary font-bold gap-1" title="Simular Restore">
+                            🔄 Simular Restore
+                          </button>
+                          <button @click="deleteBackup(bak.id)" class="btn btn-xs btn-ghost text-error font-bold" title="Excluir Snapshot">
+                            🗑️
+                          </button>
+                        </td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
+            </div>
 
           </div>
 
@@ -11818,6 +12730,165 @@
     </div>
   </div>
 
+  <!-- ==================== MODAL DE SIMULAÇÃO DE DISASTER RECOVERY & RESTORE ==================== -->
+  <div 
+    x-show="showRestoreModal" 
+    x-transition:enter="transition ease-out duration-200" 
+    x-transition:enter-start="opacity-0" 
+    x-transition:enter-end="opacity-100" 
+    class="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    
+    <div class="bg-base-100 border border-base-300 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden space-y-4 p-6 relative">
+      <div class="flex items-center justify-between border-b border-base-200 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">🚨</span>
+          <h3 class="font-extrabold text-base text-base-content">Simulação de Disaster Recovery & Restore Test</h3>
+        </div>
+        <button @click="showRestoreModal = false" :disabled="isRestoring" class="btn btn-xs btn-circle btn-ghost text-base-content/70">✕</button>
+      </div>
+
+      <div class="space-y-3">
+        <div class="bg-base-200 p-3.5 rounded-xl border border-base-300 text-xs space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="text-base-content/70 font-semibold">Snapshot Alvo:</span>
+            <span class="font-mono font-bold text-primary" x-text="selectedBackupToRestore?.filename"></span>
+          </div>
+          <div class="flex items-center justify-between text-[11px]">
+            <span class="text-base-content/60">Checksum SHA-256:</span>
+            <span class="font-mono text-base-content/80" x-text="selectedBackupToRestore?.checksum"></span>
+          </div>
+        </div>
+
+        <!-- Barra de Progresso Dinâmica -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-bold text-base-content" x-text="isRestoring ? 'Simulando restauração...' : 'Processo Concluído'"></span>
+            <span class="font-mono font-extrabold text-primary" x-text="`${restoreProgress}%`"></span>
+          </div>
+          <div class="w-full bg-base-200 rounded-full h-3 overflow-hidden">
+            <div class="bg-primary h-3 rounded-full transition-all duration-300" :style="`width: ${restoreProgress}%`"></div>
+          </div>
+        </div>
+
+        <!-- Terminal / Logs em Tempo Real -->
+        <div class="bg-neutral text-neutral-content p-4 rounded-xl font-mono text-[11px] h-48 overflow-y-auto space-y-1.5 shadow-inner border border-neutral-content/10">
+          <template x-for="(log, idx) in restoreLogs" :key="idx">
+            <div class="leading-tight flex items-start gap-1.5" :class="log.includes('Concluída') || log.includes('SUCESSO') ? 'text-success font-bold' : (log.includes('Erro') ? 'text-error' : 'text-emerald-400')">
+              <span class="select-none text-neutral-content/40">&gt;</span>
+              <span x-text="log"></span>
+            </div>
+          </template>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-base-200">
+        <button 
+          @click="showRestoreModal = false" 
+          :disabled="isRestoring" 
+          class="btn btn-sm font-bold text-xs" 
+          :class="restoreProgress === 100 ? 'btn-success' : 'btn-ghost'">
+          <span x-text="restoreProgress === 100 ? '✅ Concluir & Fechar' : 'Cancelar'"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL DE INSPEÇÃO COMPLETA DE CHAT COLD STORAGE ==================== -->
+  <div 
+    x-show="showColdChatModal" 
+    x-transition:enter="transition ease-out duration-200" 
+    x-transition:enter-start="opacity-0" 
+    x-transition:enter-end="opacity-100" 
+    class="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    
+    <div class="bg-base-100 border border-base-300 rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden space-y-4 p-6 relative flex flex-col max-h-[85vh]">
+      <!-- Header -->
+      <div class="flex items-center justify-between border-b border-base-200 pb-3 shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-secondary text-secondary-content font-bold flex items-center justify-center text-base shadow-sm">
+            <span x-text="selectedColdChat?.leadName?.charAt(0)"></span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="font-extrabold text-base text-base-content" x-text="selectedColdChat?.leadName"></h3>
+              <span class="badge badge-xs badge-info font-bold">Cold DB</span>
+            </div>
+            <p class="text-xs text-base-content/60" x-text="`${selectedColdChat?.company} • Canal: ${selectedColdChat?.channel} • ${selectedColdChat?.date}`"></p>
+          </div>
+        </div>
+        <button @click="showColdChatModal = false" class="btn btn-xs btn-circle btn-ghost text-base-content/70">✕</button>
+      </div>
+
+      <!-- IA Summary & Sentiment Box -->
+      <div class="bg-base-200/70 p-3.5 rounded-xl border border-base-300 space-y-1.5 shrink-0 text-xs">
+        <div class="flex items-center justify-between">
+          <span class="font-bold text-base-content flex items-center gap-1.5">
+            <span>🧠</span> Resumo Analítico da IA:
+          </span>
+          <span class="badge badge-xs badge-success font-bold" x-text="`Sentimento: ${selectedColdChat?.sentiment}`"></span>
+        </div>
+        <p class="text-base-content/80 text-[11px] leading-relaxed" x-text="selectedColdChat?.summary"></p>
+      </div>
+
+      <!-- Chat Messages Stream (Scrollable) -->
+      <div class="flex-1 overflow-y-auto space-y-3 p-3 bg-base-200/30 rounded-xl border border-base-300">
+        <!-- Msg 1 (Lead) -->
+        <div class="chat chat-start">
+          <div class="chat-header text-[10px] text-base-content/60 mb-0.5">
+            <span x-text="selectedColdChat?.leadName"></span> <time class="text-[9px] opacity-70">14:02</time>
+          </div>
+          <div class="chat-bubble chat-bubble-neutral text-xs leading-relaxed" x-text="selectedColdChat?.matchSnippet || 'Olá, gostaria de saber mais informações sobre os planos.'"></div>
+        </div>
+
+        <!-- Msg 2 (AI SDR) -->
+        <div class="chat chat-end">
+          <div class="chat-header text-[10px] text-primary font-bold mb-0.5">
+            <span x-text="selectedColdChat?.sdr || 'Agente IA (SDR-01)'"></span> <time class="text-[9px] text-base-content/60">14:03</time>
+          </div>
+          <div class="chat-bubble chat-bubble-primary text-xs leading-relaxed">
+            Com certeza! Nosso plano Premium inclui atendimento 24/7 com inteligência artificial, suporte multi-canal e integração com CRM. Gostaria de agendar uma apresentação rápida?
+          </div>
+        </div>
+
+        <!-- Msg 3 (Lead) -->
+        <div class="chat chat-start">
+          <div class="chat-header text-[10px] text-base-content/60 mb-0.5">
+            <span x-text="selectedColdChat?.leadName"></span> <time class="text-[9px] opacity-70">14:05</time>
+          </div>
+          <div class="chat-bubble chat-bubble-neutral text-xs leading-relaxed">
+            Perfeito. Podemos agendar para a próxima terça-feira às 10h?
+          </div>
+        </div>
+
+        <!-- Msg 4 (AI SDR) -->
+        <div class="chat chat-end">
+          <div class="chat-header text-[10px] text-primary font-bold mb-0.5">
+            <span x-text="selectedColdChat?.sdr || 'Agente IA (SDR-01)'"></span> <time class="text-[9px] text-base-content/60">14:05</time>
+          </div>
+          <div class="chat-bubble chat-bubble-primary text-xs leading-relaxed">
+            Horário reservado com sucesso! Enviei a confirmação para o seu e-mail.
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions Footer -->
+      <div class="flex items-center justify-between pt-2 border-t border-base-200 shrink-0">
+        <div class="flex items-center gap-2">
+          <button @click="restoreLeadToHotDb(selectedColdChat)" class="btn btn-sm btn-accent font-bold text-xs gap-1.5">
+            <span>🔄</span> Restaurar ao Hot DB
+          </button>
+          <button @click="exportTranscript(selectedColdChat, 'PDF')" class="btn btn-sm btn-outline btn-neutral font-bold text-xs gap-1">
+            <span>📄</span> Baixar PDF
+          </button>
+        </div>
+
+        <button @click="showColdChatModal = false" class="btn btn-sm btn-ghost font-bold text-xs">
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ==================== ALPINE.JS STATE & LOGIC ==================== -->
   <script>
     function dashboardApp() {
@@ -12624,11 +13695,58 @@
 
         // NAVIGATION CONTROLS & SUB-VIEWS
         activeTab: 'dashboard',
+        sidebarCollapsed: false,
+        mobileSidebarOpen: false,
+        inboxTab: 'multichannel',
         commandCenterTab: 'overview', // Sub-visões: 'overview', 'live_feed', 'copilot', 'handoffs'
         leadsView: 'kanban', // Sub-visões do Pipeline de Leads: 'kanban', 'list', 'merge'
         leadDrawerTab: 'overview', // Sub-abas do Lead Profile Drawer: 'overview', 'memory', 'timeline', 'chat'
+        dataTab: 'tiering_retention', // Sub-visões: 'tiering_retention', 'conversation_history', 'backup_restore'
         timeframe: 'week', // 'today', 'week', 'month'
         executorFilter: 'all', // 'all', 'ai', 'human'
+
+        // ESTADO DE GESTÃO DE DADOS, BACKUP & HISTÓRICO (ADR-002 / ADR-015 / ADR-016)
+        dataManagement: {
+          hotStorage: { sizeMb: 142.5, maxMb: 500, activeConversations: 1240, readLatencyMs: 3.8, status: 'healthy' },
+          coldStorage: { sizeGb: 12.8, totalArchivedMessages: 450200, pgvectorActive: true, ftsActive: true, provider: 'Supabase (PostgreSQL 16)' },
+          etlJob: { lastRun: '2026-07-27 02:00:00', recordsProcessed: 14250, nextRun: '2026-07-28 02:00:00', status: 'completed' },
+          retentionDays: 30,
+          keepActiveLeadsInHot: true,
+          autoVacuum: true,
+          searchMode: 'fts', // 'fts' ou 'semantic'
+          searchQuery: '',
+          searchChannel: 'all',
+          searchSdr: 'all',
+          searchPeriod: '6m',
+          searchResults: [
+            { id: 'hist_101', leadName: 'Dr. Roberto Alves', company: 'Clínica Sorriso', channel: 'WhatsApp', date: '2026-03-14', messageCount: 42, matchSnippet: '...gostaria de agendar a demonstração sobre o plano premium...', sentiment: 'Positivo (88%)', sdr: 'Agente IA (SDR-01)', summary: 'Lead interessado no plano Premium. Agendamento pré-confirmado para demonstração técnica.' },
+            { id: 'hist_102', leadName: 'Mariana Lima', company: 'Imóveis Prime', channel: 'WhatsApp', date: '2026-02-20', messageCount: 28, matchSnippet: '...fechamos a proposta conforme enviado no contrato...', sentiment: 'Neutro/Positivo (75%)', sdr: 'Agente IA (SDR-02)', summary: 'Fechamento de proposta comercial enviado. Solicitada minuta de contrato.' },
+            { id: 'hist_103', leadName: 'Carlos Eduardo Santos', company: 'TechSolutions Ltda', channel: 'E-mail', date: '2025-11-10', messageCount: 15, matchSnippet: '...solicito envio de documentação de homologação de segurança...', sentiment: 'Neutro (60%)', sdr: 'Fernando Silva (Humano)', summary: 'Solicitação de requisitos de segurança de TI e conformidade LGPD.' },
+            { id: 'hist_104', leadName: 'Juliana Paes', company: 'Estética & Saúde', channel: 'WhatsApp', date: '2025-08-05', messageCount: 54, matchSnippet: '...dúvidas quanto aos valores de licença por unidade adicional...', sentiment: 'Positivo (92%)', sdr: 'Agente IA (SDR-01)', summary: 'Dúvidas sobre expansão multi-unidades esclarecidas com envio de tabela.' }
+          ],
+          syncJobs: [
+            { id: 'job_001', datetime: '2026-07-27 02:00', type: 'ETL D-1 (Hot -> Cold)', records: 14250, status: 'Sucesso', duration: '1m 42s' },
+            { id: 'job_002', datetime: '2026-07-26 02:00', type: 'ETL D-1 (Hot -> Cold)', records: 13890, status: 'Sucesso', duration: '1m 38s' },
+            { id: 'job_003', datetime: '2026-07-25 02:00', type: 'ETL D-1 (Hot -> Cold)', records: 15120, status: 'Sucesso', duration: '1m 50s' },
+            { id: 'job_004', datetime: '2026-07-24 03:15', type: 'Vacuum & Defrag Local', records: 4500, status: 'Concluído', duration: '45s' },
+            { id: 'job_005', datetime: '2026-07-24 02:00', type: 'ETL D-1 (Hot -> Cold)', records: 12900, status: 'Alerta (Retry OK)', duration: '2m 10s' }
+          ],
+          backups: [
+            { id: 'bak_01', filename: 'rsdr_snapshot_2026-07-27_0200.db.gz', size: '138.4 MB', type: 'Automático D-1', date: '2026-07-27 02:00', checksum: 'a8f9c2d1e4f5a6b7c8d9e0f1a2b3c4d5' },
+            { id: 'bak_02', filename: 'rsdr_snapshot_2026-07-26_0200.db.gz', size: '136.1 MB', type: 'Automático D-1', date: '2026-07-26 02:00', checksum: 'b7e8d3c2b1a0f9e8d7c6b5a4f3e2d1c0' },
+            { id: 'bak_03', filename: 'rsdr_snapshot_2026-07-25_0200.db.gz', size: '133.8 MB', type: 'Automático D-1', date: '2026-07-25 02:00', checksum: 'c9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4' },
+            { id: 'bak_04', filename: 'rsdr_manual_pre_migration_2026-07-20.db.gz', size: '125.0 MB', type: 'Manual On-Demand', date: '2026-07-20 16:45', checksum: 'd0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5' }
+          ]
+        },
+
+        // MODAIS DE GESTÃO DE DADOS & HISTÓRICO
+        showRestoreModal: false,
+        restoreProgress: 0,
+        restoreLogs: [],
+        isRestoring: false,
+        selectedBackupToRestore: null,
+        showColdChatModal: false,
+        selectedColdChat: null,
         
         // --- ESTADOS DE MAXIMIZAÇÃO DE MODAIS (AMPLIAR MODAL) ---
         isExecuteMaximized: false,
@@ -13837,12 +14955,93 @@
           type: 'success'
         },
 
+        navCategories: [
+          {
+            title: '📍 OPERAÇÃO & ATENDIMENTO',
+            items: [
+              { id: 'leads', activeId: 'pipeline', label: 'Pipeline & Leads', icon: '📊', badge: '142' },
+              { id: 'dashboard', activeId: 'dhs', label: 'Central de Controle / DHS', icon: '🎯' },
+              { id: 'inbox', activeId: 'inbox', label: 'Inbox de Atendimento', icon: '💬', badge: '3', badgeColor: 'badge-error' }
+            ]
+          },
+          {
+            title: '🤖 INTELIGÊNCIA & AUTOMAÇÃO',
+            items: [
+              { id: 'cadences', activeId: 'cadences', label: 'Cadências & Agentes IA', icon: '⚡' },
+              { id: 'memory', activeId: 'brain', label: 'Memória & Revenue Brain', icon: '🧠' }
+            ]
+          },
+          {
+            title: '⚙️ INFRAESTRUTURA DE DADOS',
+            items: [
+              { 
+                id: 'data_management', 
+                activeId: 'data_management', 
+                label: 'Gestão de Dados & Histórico', 
+                icon: '🗄️', 
+                badge: 'NOVO', 
+                badgeColor: 'badge-primary',
+                statusDot: true,
+                subItems: [
+                  { id: 'tiering_retention', label: 'Tiering D-1 & Retenção' },
+                  { id: 'conversation_history', label: 'Cold Search & Histórico' },
+                  { id: 'backup_restore', label: 'Backups & Restauração' }
+                ]
+              }
+            ]
+          },
+          {
+            title: '🎨 PERSONALIZAÇÃO & MARCA',
+            items: [
+              { id: 'theme_studio', activeId: 'theme_studio', label: 'Studio de Temas White-Label', icon: '🎨' }
+            ]
+          },
+          {
+            title: '🏢 ADMINISTRAÇÃO TENANT',
+            items: [
+              { id: 'settings', activeId: 'settings', label: 'Configurações Tenant', icon: '⚙️' },
+              { id: 'billing', activeId: 'billing', label: 'Planos, Faturamento & Cotas', icon: '💳' }
+            ]
+          }
+        ],
+
+        isTabActive(tabId) {
+          if (tabId === 'leads' || tabId === 'pipeline') return this.activeTab === 'leads' || this.activeTab === 'pipeline';
+          if (tabId === 'dashboard' || tabId === 'dhs') return this.activeTab === 'dashboard' || this.activeTab === 'dhs';
+          if (tabId === 'memory' || tabId === 'brain') return this.activeTab === 'memory' || this.activeTab === 'brain';
+          if (tabId === 'theme_studio') return this.activeTab === 'theme_studio' || (this.activeTab === 'settings' && this.settingsTab === 'theme_manager');
+          if (tabId === 'billing') return this.activeTab === 'billing' || (this.activeTab === 'settings' && (this.settingsTab === 'billing_usage' || this.settingsTab === 'invoices_billing'));
+          return this.activeTab === tabId;
+        },
+
+        selectTab(tabId) {
+          if (tabId === 'pipeline') {
+            this.activeTab = 'leads';
+          } else if (tabId === 'dhs') {
+            this.activeTab = 'dashboard';
+          } else if (tabId === 'brain') {
+            this.activeTab = 'memory';
+          } else if (tabId === 'theme_studio') {
+            this.activeTab = 'settings';
+            this.settingsTab = 'theme_manager';
+          } else if (tabId === 'billing') {
+            this.activeTab = 'settings';
+            this.settingsTab = 'billing_usage';
+          } else {
+            this.activeTab = tabId;
+          }
+          if (window.innerWidth < 1024) {
+            this.mobileSidebarOpen = false;
+          }
+        },
+
         navItems: [
           { id: 'dashboard', label: 'Command Center', icon: '🎯' },
           { id: 'leads', label: 'Pipeline de Leads', icon: '👥', badge: '142' },
           { id: 'cadences', label: 'Cadências & Agentes', icon: '⚡' },
           { id: 'memory', label: 'AI Memory & Brain', icon: '🧠' },
           { id: 'settings', label: 'Configurações Tenant', icon: '⚙️' },
+          { id: 'data_management', label: 'Banco de Dados', icon: '🗄️' },
         ],
 
         // KANBAN FUNNEL STAGES CONFIGURATION
@@ -16290,6 +17489,113 @@
           this.showCancelSubscriptionModal = false;
           this.showManageSubscriptionsModal = false;
           this.showNotification('A sua assinatura foi cancelada. O acesso permanecerá liberado até 15/08/2026.', 'info');
+        },
+
+        get filteredSearchResults() {
+          if (!this.dataManagement || !this.dataManagement.searchResults) return [];
+          const q = (this.dataManagement.searchQuery || '').toLowerCase().trim();
+          const ch = this.dataManagement.searchChannel;
+          const sdrFilter = this.dataManagement.searchSdr;
+
+          return this.dataManagement.searchResults.filter(item => {
+            if (ch !== 'all' && item.channel !== ch) return false;
+            if (sdrFilter === 'ai' && !item.sdr.includes('IA')) return false;
+            if (sdrFilter === 'human' && item.sdr.includes('IA')) return false;
+
+            if (q === '') return true;
+            return item.leadName.toLowerCase().includes(q) ||
+                   item.company.toLowerCase().includes(q) ||
+                   item.matchSnippet.toLowerCase().includes(q) ||
+                   item.summary.toLowerCase().includes(q);
+          });
+        },
+
+        runEtlPipelineOnDemand() {
+          const nowStr = new Date().toISOString().replace('T', ' ').substring(0, 16);
+          const newJob = {
+            id: 'job_' + Date.now().toString().slice(-4),
+            datetime: nowStr,
+            type: 'ETL D-1 (Manual On-Demand)',
+            records: 1450,
+            status: 'Sucesso',
+            duration: '12s'
+          };
+          this.dataManagement.syncJobs.unshift(newJob);
+          this.dataManagement.etlJob.lastRun = nowStr;
+          this.dataManagement.etlJob.recordsProcessed += 1450;
+          this.showNotification('⚡ Job ETL D-1 manual concluído com sucesso! 1.450 registros migrados para o Cold Storage.', 'success');
+        },
+
+        createBackupSnapshotOnDemand() {
+          const now = new Date();
+          const dateFormatted = now.toISOString().split('T')[0];
+          const timeFormatted = now.toTimeString().split(' ')[0].substring(0, 5).replace(':', '');
+          const filename = `rsdr_snapshot_manual_${dateFormatted}_${timeFormatted}.db.gz`;
+          const checksum = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10) + 'f8a9b0c1d2e3f4a5';
+          
+          const newBackup = {
+            id: 'bak_' + Date.now().toString().slice(-4),
+            filename: filename,
+            size: `${(this.dataManagement.hotStorage.sizeMb * 0.96).toFixed(1)} MB`,
+            type: 'Manual On-Demand',
+            date: `${dateFormatted} ${now.toTimeString().substring(0, 5)}`,
+            checksum: checksum
+          };
+
+          this.dataManagement.backups.unshift(newBackup);
+          this.showNotification(`💾 Snapshot de backup manual '${filename}' criado com sucesso! Checksum SHA-256 verificado.`, 'success');
+        },
+
+        startRestoreSimulation(backup) {
+          this.selectedBackupToRestore = backup;
+          this.showRestoreModal = true;
+          this.isRestoring = true;
+          this.restoreProgress = 0;
+          this.restoreLogs = [];
+
+          const steps = [
+            { pct: 15, log: `[02:14:01] 🟢 Iniciando simulação de Disaster Recovery para ${backup.filename}...` },
+            { pct: 35, log: `[02:14:02] 🔍 Verificando integridade e Checksum SHA-256 (${backup.checksum.substring(0, 16)}...)... OK` },
+            { pct: 60, log: `[02:14:03] 📦 Descompactando snapshot .db.gz e montando engine Turso libSQL local...` },
+            { pct: 85, log: `[02:14:05] ⚙️ Validando índices FTS e vetores pgvector em 450.200 mensagens arquivadas...` },
+            { pct: 100, log: `[02:14:06] ✅ Restauração simulada concluída com SUCESSO! 0 inconsistências detectadas.` }
+          ];
+
+          let stepIdx = 0;
+          const interval = setInterval(() => {
+            if (stepIdx < steps.length) {
+              const currentStep = steps[stepIdx];
+              this.restoreProgress = currentStep.pct;
+              this.restoreLogs.push(currentStep.log);
+              stepIdx++;
+            } else {
+              clearInterval(interval);
+              this.isRestoring = false;
+              this.showNotification(`🚨 Simulação de restore concluída com sucesso para ${backup.filename}!`, 'success');
+            }
+          }, 700);
+        },
+
+        openColdChatModal(chat) {
+          this.selectedColdChat = chat;
+          this.showColdChatModal = true;
+        },
+
+        restoreLeadToHotDb(chat) {
+          if (!chat) return;
+          this.showColdChatModal = false;
+          this.dataManagement.hotStorage.activeConversations++;
+          this.showNotification(`🔄 Lead '${chat.leadName}' restaurado com sucesso do Cold Storage para o Hot DB (Turso)! Atendimento ativado.`, 'success');
+        },
+
+        exportTranscript(chat, format) {
+          if (!chat) return;
+          this.showNotification(`📥 Transcrição de '${chat.leadName}' exportada com sucesso em formato ${format}!`, 'info');
+        },
+
+        deleteBackup(backupId) {
+          this.dataManagement.backups = this.dataManagement.backups.filter(b => b.id !== backupId);
+          this.showNotification('🗑️ Snapshot de backup removido com sucesso.', 'info');
         },
 
         showNotification(message, type = 'success') {
