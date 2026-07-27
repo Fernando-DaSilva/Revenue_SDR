@@ -3222,11 +3222,97 @@
                         </div>
                       </div>
                       <div class="flex items-center gap-2 shrink-0">
+                        <button type="button" @click="resetBrandConfig()" class="btn btn-xs btn-ghost text-base-content/70 hover:text-error font-bold gap-1">
+                          <span x-html="getLucideSVG('trash-2', { strokeWidth: 2, class: 'w-3 h-3' })"></span> Resetar
+                        </button>
                         <button type="button" @click="saveBrandConfig()" class="btn btn-xs btn-primary font-extrabold text-xs gap-1 shadow-sm">
                           <span x-html="getLucideSVG('save', { strokeWidth: 2, class: 'w-3.5 h-3.5' })"></span> Salvar Brand
-                
-                <!-- ABA 1: MARCA & INTERAÇÃO -->
-                <div x-show="themeActiveTab === 'marca'" class="space-y-4 text-xs">
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Grid de Opções de Branding -->
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    
+                    <!-- Card 1: Nome, Versão & Modo No-Brand -->
+                    <div class="p-4 bg-base-200/50 rounded-2xl border border-base-300 space-y-4">
+                      <h4 class="font-extrabold text-xs text-base-content flex items-center gap-2 border-b border-base-300 pb-2">
+                        <span x-html="getLucideSVG('type', { strokeWidth: 2, class: 'w-4 h-4 text-primary' })"></span> Nome do Sistema & Modo No-Brand
+                      </h4>
+
+                      <div class="space-y-3">
+                        <div>
+                          <label class="label font-bold text-xs">Nome do Sistema (Brand Name)</label>
+                          <input type="text" x-model="brandConfig.systemName" class="input input-xs input-bordered w-full font-bold text-xs" placeholder="Revenue SDR">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                          <div>
+                            <label class="label font-bold text-xs">Versão do Sistema</label>
+                            <input type="text" x-model="brandConfig.systemVersion" class="input input-xs input-bordered w-full font-mono text-xs" placeholder="OS v0.2.0">
+                          </div>
+                          <div>
+                            <label class="label font-bold text-xs">Tagline Secundária</label>
+                            <input type="text" x-model="brandConfig.systemTagline" class="input input-xs input-bordered w-full text-xs" placeholder="COMMERCIAL AGENT OS">
+                          </div>
+                        </div>
+
+                        <!-- Toggle Modo No-Brand -->
+                        <div class="p-3 bg-base-100 rounded-xl border border-base-300 flex items-center justify-between shadow-2xs">
+                          <div>
+                            <span class="font-bold text-xs text-base-content block">Modo No-Brand (Sem Marca)</span>
+                            <span class="text-[10px] text-base-content/60 block">Oculta nome, logo e versão para revenda 100% neutra.</span>
+                          </div>
+                          <input type="checkbox" x-model="brandConfig.isNoBrand" class="toggle toggle-warning toggle-sm" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Card 2: Logo Principal & Tiny Logo -->
+                    <div class="p-4 bg-base-200/50 rounded-2xl border border-base-300 space-y-4">
+                      <h4 class="font-extrabold text-xs text-base-content flex items-center gap-2 border-b border-base-300 pb-2">
+                        <span x-html="getLucideSVG('zap', { strokeWidth: 2, class: 'w-4 h-4 text-primary' })"></span> Logotipos (Normal & Tiny Sidebar)
+                      </h4>
+
+                      <div class="space-y-3">
+                        <!-- Logo Icon vs Image -->
+                        <div>
+                          <label class="label font-bold text-xs">Tipo de Logo Principal</label>
+                          <div class="flex items-center gap-2">
+                            <label class="label cursor-pointer gap-1 text-xs">
+                              <input type="radio" x-model="brandConfig.logoType" value="icon" class="radio radio-xs radio-primary">
+                              <span>Ícone Lucide</span>
+                            </label>
+                            <label class="label cursor-pointer gap-1 text-xs">
+                              <input type="radio" x-model="brandConfig.logoType" value="image" class="radio radio-xs radio-primary">
+                              <span>Imagem Customizada (URL / Upload)</span>
+                            </label>
+                          </div>
+                        </div>
+
+                        <div x-show="brandConfig.logoType === 'icon'">
+                          <label class="label font-bold text-xs">Ícone Lucide do Logo</label>
+                          <select x-model="brandConfig.logoIcon" class="select select-xs select-bordered w-full font-semibold">
+                            <option value="zap">Zap (Raio / Energético - Padrão)</option>
+                            <option value="rocket">Rocket (Foguete / Growth)</option>
+                            <option value="bot">Bot (Agente IA)</option>
+                            <option value="brain">Brain (Inteligência)</option>
+                            <option value="target">Target (Alvo / Commercial)</option>
+                            <option value="building-2">Building (Enterprise)</option>
+                          </select>
+                        </div>
+
+                        <div x-show="brandConfig.logoType === 'image'" class="space-y-2">
+                          <label class="label font-bold text-xs">URL da Imagem do Logo</label>
+                          <input type="text" x-model="brandConfig.logoUrl" class="input input-xs input-bordered w-full font-mono text-xs" placeholder="https://exemplo.com/logo.png">
+                          <input type="file" @change="handleLogoImageUpload($event, 'logoUrl')" accept="image/*" class="file-input file-input-xs file-input-bordered w-full" />
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="p-3 bg-base-200/50 rounded-xl border border-base-300 space-y-2">
                       <label class="font-bold flex items-center justify-between">
@@ -7725,6 +7811,7 @@
           <span>💾</span> Salvar Mapeamento CRM
         </button>
       </div>
+    </div>
   </dialog>
 
   <!-- ==================== MODAL: EDITAR PAPEL RBAC ==================== -->
