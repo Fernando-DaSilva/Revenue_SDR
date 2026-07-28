@@ -251,13 +251,13 @@
                 </button>
                 <ul tabindex="0" class="dropdown-content z-[100] menu p-2 shadow-2xl bg-base-200 border border-base-300 rounded-box w-80 mt-2 space-y-1.5 opacity-100 backdrop-blur-none">
                   <li class="menu-title text-[10px] uppercase font-bold text-base-content/50 px-2 py-1 flex items-center justify-between">
-                    <span>Perfil de Escolhas (Presets & Custom)</span>
+                    <span>Perfil de Escolhas (Seletor Final)</span>
                     <span class="badge badge-xs badge-primary font-mono font-bold" x-text="`${savedThemes.length} Temas`"></span>
                   </li>
                   <template x-for="theme in savedThemes" :key="theme.id">
                     <li>
                       <button 
-                        @click="setThemePreset(theme.id)"
+                        @click="selectThemeFromMenu(theme.id)"
                         :class="activePreset === theme.id ? 'active font-bold bg-primary/10 text-primary' : ''"
                         class="flex items-center justify-between py-2 text-xs min-w-0">
                         <div class="flex items-center gap-2 min-w-0 flex-1">
@@ -12671,155 +12671,36 @@
     </div>
   </dialog>
 
-  <!-- ==================== SUB-TELA DEDICADA DE PREVIEW INTERATIVO & FLUXO DE APROVAÇÃO (ÁREA 3) ==================== -->
+  <!-- ==================== STICKY BANNER DE PREVIEW DE VALIDAÇÃO NO SISTEMA REAL ==================== -->
   <div 
     x-show="isPreviewMode" 
-    x-transition:enter="transition ease-out duration-300"
-    x-transition:enter-start="opacity-0 scale-95"
-    x-transition:enter-end="opacity-100 scale-100"
-    x-transition:leave="transition ease-in duration-200"
-    x-transition:leave-start="opacity-100 scale-100"
-    x-transition:leave-end="opacity-0 scale-95"
-    class="fixed inset-0 z-[999] bg-base-300/90 backdrop-blur-md overflow-y-auto flex flex-col"
-    :style="`background-color: ${draftTokens['--color-background'] || '#0F172A'}; color: ${draftTokens['--color-text-main'] || '#F9FAFB'};`">
-
-    <!-- STICKY APPROVAL BANNER FIXO NO TOPO -->
-    <div class="sticky top-0 z-50 bg-base-100/95 backdrop-blur-md border-b border-primary/30 p-4 shadow-xl flex flex-wrap items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <span class="badge badge-warning font-black text-xs px-3 py-2 animate-pulse gap-1.5 shadow-sm">
-          <span>⚠️</span> MODO PREVIEW DE RASCUNHO DE TEMA (VIRTUAL SANDBOX)
-        </span>
-        <span class="text-xs text-base-content/70 hidden md:inline">
-          Modificações visíveis apenas nesta simulação. Escolha Aprovar para publicar.
-        </span>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <button @click="rejectChanges()" class="btn btn-sm btn-error text-error-content font-bold text-xs gap-1.5 shadow-md">
-          <span>❌</span> Rejeitar Alterações
-        </button>
-        <button @click="isPreviewMode = false" class="btn btn-sm btn-ghost font-bold text-xs gap-1">
-          <span>✏️</span> Voltar ao Editor
-        </button>
-        <button @click="showApprovalModal = true" class="btn btn-sm btn-success text-success-content font-extrabold text-xs gap-2 shadow-lg shadow-success/30">
-          <span>✅</span> Aprovar e Criar Novo Tema
-        </button>
-      </div>
+    x-transition:enter="transition ease-out duration-300 transform"
+    x-transition:enter-start="-translate-y-full opacity-0"
+    x-transition:enter-end="translate-y-0 opacity-100"
+    x-transition:leave="transition ease-in duration-200 transform"
+    x-transition:leave-start="translate-y-0 opacity-100"
+    x-transition:leave-end="-translate-y-full opacity-0"
+    class="fixed top-0 left-0 right-0 z-[9999] bg-base-100/95 backdrop-blur-md border-b-2 border-primary p-3 shadow-2xl flex flex-wrap items-center justify-between gap-3">
+    
+    <div class="flex items-center gap-3">
+      <span class="badge badge-warning font-black text-xs px-3 py-2 animate-pulse gap-1.5 shadow-sm">
+        <span>⚠️</span> MODO PREVIEW DO STUDIO DE TEMAS
+      </span>
+      <span class="text-xs font-semibold text-base-content/80 hidden md:inline">
+        Testando rascunho de variáveis no <strong>sistema real</strong>. Navegue por qualquer aba para validar a experiência antes de salvar.
+      </span>
     </div>
 
-    <!-- CANVAS DE SIMULAÇÃO COMPLETA DO APPLICATION WITH DRAFT VARS -->
-    <div class="p-6 max-w-7xl mx-auto w-full space-y-6 flex-1">
-      
-      <!-- Mock Topbar -->
-      <div class="p-4 rounded-2xl border flex items-center justify-between shadow-md"
-        :style="`background-color: ${draftTokens['--color-navbar-bg']}; border-color: ${draftTokens['--color-border']}; color: ${draftTokens['--color-navbar-text']};`">
-        <div class="flex items-center gap-3">
-          <img :src="brandingMedia.logoLight" alt="Logo" class="h-7 object-contain">
-          <span class="font-extrabold text-sm" x-text="activeTenant.name"></span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="badge font-bold text-xs" :style="`background-color: ${draftTokens['--color-primary']}; color: white;`">Preview Canvas</span>
-        </div>
-      </div>
-
-      <!-- Mock Grid Dashboard & Table -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <!-- Mock Metric Card 1 -->
-        <div class="p-5 rounded-2xl border shadow-sm space-y-2"
-          :style="`background-color: ${draftTokens['--color-surface']}; border-color: ${draftTokens['--color-border']};`">
-          <span class="text-xs font-semibold text-muted opacity-70">Total Leads Qualificados</span>
-          <h3 class="text-2xl font-black" :style="`color: ${draftTokens['--color-text-main']};`">1,482</h3>
-          <span class="badge badge-success text-[10px] font-bold">+18.4% vs mês anterior</span>
-        </div>
-
-        <!-- Mock Metric Card 2 -->
-        <div class="p-5 rounded-2xl border shadow-sm space-y-2"
-          :style="`background-color: ${draftTokens['--color-surface']}; border-color: ${draftTokens['--color-border']};`">
-          <span class="text-xs font-semibold text-muted opacity-70">Reuniões Agendadas</span>
-          <h3 class="text-2xl font-black" :style="`color: ${draftTokens['--color-primary']};`">342</h3>
-          <span class="badge badge-info text-[10px] font-bold">Taxa 23% Conversão</span>
-        </div>
-
-        <!-- Mock Metric Card 3 -->
-        <div class="p-5 rounded-2xl border shadow-sm space-y-2"
-          :style="`background-color: ${draftTokens['--color-surface']}; border-color: ${draftTokens['--color-border']};`">
-          <span class="text-xs font-semibold text-muted opacity-70">Autonomia dos Agentes IA</span>
-          <h3 class="text-2xl font-black" :style="`color: ${draftTokens['--color-secondary']};`">94.8%</h3>
-          <span class="badge badge-warning text-[10px] font-bold">Zero Hand-off Crítico</span>
-        </div>
-
-        <!-- Mock Metric Card 4 -->
-        <div class="p-5 rounded-2xl border shadow-sm space-y-2"
-          :style="`background-color: ${draftTokens['--color-surface']}; border-color: ${draftTokens['--color-border']};`">
-          <span class="text-xs font-semibold text-muted opacity-70">MRR Adicionado</span>
-          <h3 class="text-2xl font-black" :style="`color: ${draftTokens['--color-accent']};`">R$ 148.500</h3>
-          <span class="badge badge-accent text-[10px] font-bold">Meta Q3 Atingida</span>
-        </div>
-      </div>
-
-      <!-- Mock Table & Sidebar Simulation -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div class="lg:col-span-3 p-4 rounded-2xl border space-y-3"
-          :style="`background-color: ${draftTokens['--color-sidebar-bg']}; border-color: ${draftTokens['--color-border']}; color: ${draftTokens['--color-sidebar-text']};`">
-          <strong class="text-xs uppercase font-extrabold block opacity-60">Navegação Sidebar</strong>
-          <div class="space-y-1">
-            <div class="p-2.5 rounded-xl font-bold text-xs flex items-center gap-2" :style="`background-color: ${draftTokens['--color-sidebar-active']}; color: white;`">
-              <span>📊</span> Dashboard Command Center
-            </div>
-            <div class="p-2.5 rounded-xl text-xs flex items-center gap-2 opacity-80">
-              <span>🎯</span> Pipeline de Leads (Kanban)
-            </div>
-            <div class="p-2.5 rounded-xl text-xs flex items-center gap-2 opacity-80">
-              <span>🤖</span> Agentes Executores
-            </div>
-            <div class="p-2.5 rounded-xl text-xs flex items-center gap-2 opacity-80">
-              <span>💳</span> Assinatura & Billing
-            </div>
-          </div>
-        </div>
-
-        <div class="lg:col-span-9 p-6 rounded-2xl border space-y-4"
-          :style="`background-color: ${draftTokens['--color-surface']}; border-color: ${draftTokens['--color-border']};`">
-          <div class="flex items-center justify-between border-b pb-3" :style="`border-color: ${draftTokens['--color-border']};`">
-            <h4 class="font-extrabold text-sm" :style="`color: ${draftTokens['--color-text-main']};`">Simulação de Tabela de Leads</h4>
-            <div class="flex gap-2">
-              <button class="btn btn-xs font-bold text-white" :style="`background-color: ${draftTokens['--color-primary']};`">Botão Primário</button>
-              <button class="btn btn-xs font-bold text-white" :style="`background-color: ${draftTokens['--color-secondary']};`">Botão Secundário</button>
-            </div>
-          </div>
-
-          <div class="overflow-x-auto">
-            <table class="table table-xs w-full">
-              <thead>
-                <tr :style="`color: ${draftTokens['--color-text-muted']};`">
-                  <th>Lead / Empresa</th>
-                  <th>Status Lead</th>
-                  <th>SDR Responsável</th>
-                  <th>Pontuação BANT</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody :style="`color: ${draftTokens['--color-text-main']};`">
-                <tr class="border-b" :style="`border-color: ${draftTokens['--color-border']};`">
-                  <td class="font-bold">Dra. Amanda Silva (Clínica Dermato)</td>
-                  <td><span class="badge badge-success text-[10px] font-bold">Qualificado BANT</span></td>
-                  <td>Agente IA (SDR-01)</td>
-                  <td class="font-mono font-bold text-success">94/100</td>
-                  <td><button class="btn btn-xs btn-outline btn-primary">Ver Perfil</button></td>
-                </tr>
-                <tr class="border-b" :style="`border-color: ${draftTokens['--color-border']};`">
-                  <td class="font-bold">Ricardo Santos (Grupo Imobiliário)</td>
-                  <td><span class="badge badge-warning text-[10px] font-bold">Em Qualificação</span></td>
-                  <td>Agente IA (SDR-02)</td>
-                  <td class="font-mono font-bold text-warning">72/100</td>
-                  <td><button class="btn btn-xs btn-outline btn-primary">Ver Perfil</button></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
+    <div class="flex items-center gap-2">
+      <button @click="rejectChanges()" class="btn btn-xs sm:btn-sm btn-error text-error-content font-bold text-xs gap-1 shadow-sm">
+        <span>❌</span> Rejeitar Alterações
+      </button>
+      <button @click="isPreviewMode = false" class="btn btn-xs sm:btn-sm btn-ghost font-bold text-xs gap-1">
+        <span>✏️</span> Voltar ao Editor
+      </button>
+      <button @click="showApprovalModal = true" class="btn btn-xs sm:btn-sm btn-success text-success-content font-extrabold text-xs gap-1.5 shadow-md">
+        <span>✅</span> Aprovar e Salvar Tema
+      </button>
     </div>
   </div>
 
@@ -13676,9 +13557,18 @@
           reader.readAsDataURL(file);
         },
 
+        selectThemeFromMenu(themeId) {
+          this.isPreviewMode = false;
+          this.setThemePreset(themeId);
+          if (document.activeElement && typeof document.activeElement.blur === 'function') {
+            document.activeElement.blur();
+          }
+        },
+
         setThemePreset(themeId) {
           const found = this.savedThemes.find(t => t.id === themeId);
           if (!found) return;
+          this.isPreviewMode = false;
           this.activePreset = found.id;
           this.currentTheme = found.id;
           if (found.id.includes('sakura')) document.documentElement.setAttribute('data-theme', 'sakura');
