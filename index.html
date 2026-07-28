@@ -251,13 +251,13 @@
                 </button>
                 <ul tabindex="0" class="dropdown-content z-[100] menu p-2 shadow-2xl bg-base-200 border border-base-300 rounded-box w-80 mt-2 space-y-1.5 opacity-100 backdrop-blur-none">
                   <li class="menu-title text-[10px] uppercase font-bold text-base-content/50 px-2 py-1 flex items-center justify-between">
-                    <span>Perfil de Escolhas (Presets & Custom)</span>
+                    <span>Perfil de Escolhas (Seletor Final)</span>
                     <span class="badge badge-xs badge-primary font-mono font-bold" x-text="`${savedThemes.length} Temas`"></span>
                   </li>
                   <template x-for="theme in savedThemes" :key="theme.id">
                     <li>
                       <button 
-                        @click="setThemePreset(theme.id)"
+                        @click="selectThemeFromMenu(theme.id)"
                         :class="activePreset === theme.id ? 'active font-bold bg-primary/10 text-primary' : ''"
                         class="flex items-center justify-between py-2 text-xs min-w-0">
                         <div class="flex items-center gap-2 min-w-0 flex-1">
@@ -431,7 +431,7 @@
               @click="settingsTab = 'organization'" 
               :class="settingsTab === 'organization' ? 'btn-primary font-bold shadow-xs' : 'btn-ghost text-base-content/70 hover:text-base-content'"
               class="btn btn-xs gap-1.5 text-xs whitespace-nowrap shrink-0">
-              <span>🏢</span> Perfil & Branding
+              <span>🏢</span> Identidade Empresarial
             </button>
 
             <button 
@@ -2965,60 +2965,50 @@
                 </div>
               </div>
 
-              <!-- Painel de Branding White-Label (5 cols) -->
+              <!-- Card 2: Nomes do Sistema, Taglines & White-Label (5 cols) -->
               <div class="lg:col-span-5 card bg-base-100 border border-base-300 shadow-sm p-6 space-y-5">
                 <div class="border-b border-base-300 pb-3 flex items-center justify-between">
                   <div>
                     <h3 class="font-extrabold text-sm flex items-center gap-2">
-                      <span>🎨</span> Presets de Temas White-Label
+                      <span>🏷️</span> Nomes do Sistema & White-Label
                     </h3>
-                    <p class="text-[11px] text-base-content/60">Escolha um preset com preview instantâneo no protótipo</p>
+                    <p class="text-[11px] text-base-content/60">Configurações de nome público, versão e taglines</p>
                   </div>
-                  <button @click="settingsTab = 'theme_manager'" class="btn btn-xs btn-primary btn-outline font-bold text-[10px] gap-1">
-                    <span>🎨</span> Studio →
-                  </button>
+                  <span class="badge badge-warning font-bold text-[9px]">White-Label</span>
                 </div>
 
-                <!-- Featured Callout Card to Theme Manager -->
-                <div class="p-3.5 bg-gradient-to-r from-primary/15 via-base-200 to-base-200 rounded-xl border border-primary/30 shadow-xs space-y-2 relative overflow-hidden">
-                  <div class="flex items-start justify-between gap-3 relative z-10">
-                    <div class="flex items-center gap-2.5">
-                      <div class="w-8 h-8 rounded-lg bg-primary text-primary-content flex items-center justify-center text-sm shadow-md font-bold shrink-0">
-                        🎨
-                      </div>
-                      <div>
-                        <h4 class="font-extrabold text-xs text-base-content">Studio Completo de Temas</h4>
-                        <p class="text-[10px] text-base-content/70 leading-tight">Crie temas customizados, edite 18+ tokens CSS e exporte presets.</p>
-                      </div>
+                <div class="space-y-3.5 text-xs">
+                  <div>
+                    <label class="label font-bold text-xs">Nome do Sistema (Brand Name)</label>
+                    <input type="text" x-model="brandConfig.systemName" class="input input-sm input-bordered w-full font-bold text-xs" placeholder="Revenue SDR">
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-2">
+                    <div>
+                      <label class="label font-bold text-xs">Versão do Sistema</label>
+                      <input type="text" x-model="brandConfig.systemVersion" class="input input-sm input-bordered w-full font-mono text-xs" placeholder="OS v0.2.0">
+                    </div>
+                    <div>
+                      <label class="label font-bold text-xs">Tagline Secundária</label>
+                      <input type="text" x-model="brandConfig.systemTagline" class="input input-sm input-bordered w-full text-xs" placeholder="COMMERCIAL AGENT OS">
                     </div>
                   </div>
-                  <button @click="settingsTab = 'theme_manager'" class="btn btn-xs btn-primary w-full font-bold gap-1 shadow-sm mt-1">
-                    <span>⚡</span> Abrir Studio Gerenciador de Temas →
-                  </button>
-                </div>
 
-                <!-- Presets Cards Visual Selector -->
-                <div class="grid grid-cols-1 gap-2.5">
-                  <template x-for="theme in themes" :key="theme.id">
-                    <div 
-                      @click="setTheme(theme.id); orgForm.primaryColor = theme.color;"
-                      :class="currentTheme === theme.id ? 'border-primary bg-primary/5 ring-2 ring-primary/30' : 'border-base-300 hover:border-base-content/30 bg-base-200/50'"
-                      class="p-3 rounded-xl border cursor-pointer transition-all flex items-center justify-between">
-                      <div class="flex items-center gap-3">
-                        <div class="w-7 h-7 rounded-lg shadow-sm border border-base-content/10 flex items-center justify-center font-bold text-white text-xs" :style="`background-color: ${theme.color}`">
-                          🎨
-                        </div>
-                        <div>
-                          <span class="font-extrabold text-xs text-base-content block" x-text="theme.name"></span>
-                          <span class="text-[10px] text-base-content/60" x-text="`Cor Hex: ${theme.color}`"></span>
-                        </div>
-                      </div>
-                      <div class="flex items-center gap-2">
-                        <span class="badge badge-sm font-bold text-[10px]" :style="`background-color: ${theme.color}; color: white;`">Primary</span>
-                        <span x-show="currentTheme === theme.id" class="badge badge-primary font-bold text-[10px]">Ativo ✓</span>
-                      </div>
+                  <!-- Toggle Modo No-Brand -->
+                  <div class="p-3 bg-base-200/50 rounded-xl border border-base-300 flex items-center justify-between shadow-2xs">
+                    <div>
+                      <span class="font-bold text-xs text-base-content block">Modo No-Brand (Sem Marca)</span>
+                      <span class="text-[10px] text-base-content/60 block">Oculta nome, logo e versão para revenda neutra.</span>
                     </div>
-                  </template>
+                    <input type="checkbox" x-model="brandConfig.isNoBrand" class="toggle toggle-warning toggle-sm" />
+                  </div>
+
+                  <!-- Callout Link to Theme Studio Visual Identity -->
+                  <div class="pt-2 border-t border-base-200">
+                    <button @click="settingsTab = 'theme_manager'; themeActiveTab = 'identidade_visual'" class="btn btn-xs btn-outline btn-primary w-full font-bold gap-1 shadow-2xs">
+                      <span>🎨</span> Editar Códigos de Cores & Identidade Visual →
+                    </button>
+                  </div>
                 </div>
 
               </div>
@@ -3087,7 +3077,7 @@
             <!-- Breadcrumbs Navigation -->
             <div class="flex items-center gap-2 text-xs font-medium text-base-content/60">
               <button @click="settingsTab = 'organization'" class="hover:text-primary transition-colors flex items-center gap-1">
-                <span>🏢</span> Configurações Tenant (Perfil & Branding)
+                <span>🏢</span> Configurações Tenant (Identidade Empresarial)
               </button>
               <span>/</span>
               <span class="text-base-content font-bold flex items-center gap-1">
@@ -3189,15 +3179,11 @@
                   </button>
                 </div>
 
-                <!-- Tabs Navegação Token Categorias & Branding -->
+                <!-- Tabs Navegação Token Categorias & Identidades -->
                 <div class="flex items-center gap-1 bg-base-200/80 p-1 rounded-xl border border-base-300 overflow-x-auto">
-                  <button type="button" @click="themeActiveTab = 'branding'" :class="themeActiveTab === 'branding' ? 'btn-primary font-bold shadow-xs ring-2 ring-primary/40' : 'btn-ghost text-base-content/70'" class="btn btn-xs gap-1 text-[11px]">
-                    <span x-html="getLucideSVG('layers', { strokeWidth: 2, class: 'w-3.5 h-3.5 text-warning' })"></span>
-                    <span class="font-extrabold">Branding & Logotipos</span>
-                    <span class="badge badge-xs badge-warning font-bold text-[9px]">White-Label</span>
-                  </button>
-                  <button type="button" @click="themeActiveTab = 'marca'" :class="themeActiveTab === 'marca' ? 'btn-primary font-bold shadow-xs' : 'btn-ghost text-base-content/70'" class="btn btn-xs gap-1 text-[11px]">
-                    <span x-html="getLucideSVG('palette', { strokeWidth: 2, class: 'w-3.5 h-3.5' })"></span> Marca & Interação
+                  <button type="button" @click="themeActiveTab = 'identidade_visual'" :class="(themeActiveTab === 'identidade_visual' || themeActiveTab === 'marca') ? 'btn-primary font-bold shadow-xs' : 'btn-ghost text-base-content/70'" class="btn btn-xs gap-1 text-[11px]">
+                    <span x-html="getLucideSVG('palette', { strokeWidth: 2, class: 'w-3.5 h-3.5' })"></span>
+                    <span class="font-extrabold">Identidade Visual</span>
                   </button>
                   <button type="button" @click="themeActiveTab = 'superficies'" :class="themeActiveTab === 'superficies' ? 'btn-primary font-bold shadow-xs' : 'btn-ghost text-base-content/70'" class="btn btn-xs gap-1 text-[11px]">
                     <span x-html="getLucideSVG('layout-grid', { strokeWidth: 2, class: 'w-3.5 h-3.5' })"></span> Superfícies & Layout
@@ -3221,118 +3207,71 @@
 
                 <!-- CONTEÚDO DAS ABAS -->
                 
-                <!-- ABA 0: BRANDING, LOGOTIPOS, NOME, VERSÃO & MODO NO-BRAND -->
-                <div x-show="themeActiveTab === 'branding'" class="space-y-5 text-xs">
+                <!-- ABA 1: IDENTIDADE VISUAL (CÓDIGOS DE CORES, INTERAÇÃO & CSS TOKENS) -->
+                <div x-show="themeActiveTab === 'identidade_visual' || themeActiveTab === 'marca'" class="space-y-5 text-xs">
                   
-                  <!-- Banner Configuração de Brand -->
+                  <!-- Banner Configuração de Identidade Visual -->
                   <div class="p-4 bg-gradient-to-r from-primary/10 via-base-100 to-base-100 border border-primary/20 rounded-2xl shadow-2xs space-y-3 relative overflow-hidden">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10">
                       <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-xl bg-primary/20 text-primary border border-primary/30 flex items-center justify-center shadow-inner shrink-0"
-                             x-html="getLucideSVG('layers', { strokeWidth: 2, class: 'w-5 h-5' })">
+                             x-html="getLucideSVG('palette', { strokeWidth: 2, class: 'w-5 h-5' })">
                         </div>
                         <div>
                           <div class="flex items-center gap-2 mb-0.5">
-                            <h4 class="font-extrabold text-xs text-base-content">Branding, Logotipos & Identidade White-Label</h4>
-                            <span class="badge font-bold text-[9px]" :class="brandConfig.isNoBrand ? 'badge-warning' : 'badge-success'" x-text="brandConfig.isNoBrand ? 'Modo No-Brand (Sem Marca)' : 'Brand Ativo: ' + (brandConfig.systemName || 'Revenue SDR')"></span>
+                            <h4 class="font-extrabold text-xs text-base-content">Identidade Visual & Cores da Marca (Design Tokens CSS)</h4>
+                            <span class="badge badge-primary font-bold text-[9px]">CSS Tokens & Logotipos</span>
                           </div>
                           <p class="text-[11px] text-base-content/60">
-                            Configure logo principal, tiny logo, nome do sistema, versão e alterne para o modo Sem Marca (No-Brand).
+                            Configure logotipos da marca (ícone ou imagem), código de cores principais, secundárias, destaques, hovers e anel visual de foco para acessibilidade.
                           </p>
                         </div>
                       </div>
-                      <div class="flex items-center gap-2 shrink-0">
-                        <button type="button" @click="resetBrandConfig()" class="btn btn-xs btn-ghost text-base-content/70 hover:text-error font-bold gap-1">
-                          <span x-html="getLucideSVG('trash-2', { strokeWidth: 2, class: 'w-3 h-3' })"></span> Resetar
-                        </button>
-                        <button type="button" @click="saveBrandConfig()" class="btn btn-xs btn-primary font-extrabold text-xs gap-1 shadow-sm">
-                          <span x-html="getLucideSVG('save', { strokeWidth: 2, class: 'w-3.5 h-3.5' })"></span> Salvar Brand
-                        </button>
+                    </div>
+                  </div>
+
+                  <!-- Card: Logotipos (Normal & Tiny Sidebar) -->
+                  <div class="p-4 bg-base-200/50 rounded-2xl border border-base-300 space-y-4">
+                    <h4 class="font-extrabold text-xs text-base-content flex items-center gap-2 border-b border-base-300 pb-2">
+                      <span x-html="getLucideSVG('zap', { strokeWidth: 2, class: 'w-4 h-4 text-primary' })"></span> Logotipos (Normal & Tiny Sidebar)
+                    </h4>
+
+                    <div class="space-y-3">
+                      <!-- Logo Icon vs Image -->
+                      <div>
+                        <label class="label font-bold text-xs">Tipo de Logo Principal</label>
+                        <div class="flex items-center gap-2">
+                          <label class="label cursor-pointer gap-1 text-xs">
+                            <input type="radio" x-model="brandConfig.logoType" value="icon" class="radio radio-xs radio-primary">
+                            <span>Ícone Lucide</span>
+                          </label>
+                          <label class="label cursor-pointer gap-1 text-xs">
+                            <input type="radio" x-model="brandConfig.logoType" value="image" class="radio radio-xs radio-primary">
+                            <span>Imagem Customizada (URL / Upload)</span>
+                          </label>
+                        </div>
+                      </div>
+
+                      <div x-show="brandConfig.logoType === 'icon'">
+                        <label class="label font-bold text-xs">Ícone Lucide do Logo</label>
+                        <select x-model="brandConfig.logoIcon" class="select select-xs select-bordered w-full font-semibold">
+                          <option value="zap">Zap (Raio / Energético - Padrão)</option>
+                          <option value="rocket">Rocket (Foguete / Growth)</option>
+                          <option value="bot">Bot (Agente IA)</option>
+                          <option value="brain">Brain (Inteligência)</option>
+                          <option value="target">Target (Alvo / Commercial)</option>
+                          <option value="building-2">Building (Enterprise)</option>
+                        </select>
+                      </div>
+
+                      <div x-show="brandConfig.logoType === 'image'" class="space-y-2">
+                        <label class="label font-bold text-xs">URL da Imagem do Logo</label>
+                        <input type="text" x-model="brandConfig.logoUrl" class="input input-xs input-bordered w-full font-mono text-xs" placeholder="https://exemplo.com/logo.png">
+                        <input type="file" @change="handleLogoImageUpload($event, 'logoUrl')" accept="image/*" class="file-input file-input-xs file-input-bordered w-full" />
                       </div>
                     </div>
                   </div>
 
-                  <!-- Grid de Opções de Branding -->
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    
-                    <!-- Card 1: Nome, Versão & Modo No-Brand -->
-                    <div class="p-4 bg-base-200/50 rounded-2xl border border-base-300 space-y-4">
-                      <h4 class="font-extrabold text-xs text-base-content flex items-center gap-2 border-b border-base-300 pb-2">
-                        <span x-html="getLucideSVG('type', { strokeWidth: 2, class: 'w-4 h-4 text-primary' })"></span> Nome do Sistema & Modo No-Brand
-                      </h4>
-
-                      <div class="space-y-3">
-                        <div>
-                          <label class="label font-bold text-xs">Nome do Sistema (Brand Name)</label>
-                          <input type="text" x-model="brandConfig.systemName" class="input input-xs input-bordered w-full font-bold text-xs" placeholder="Revenue SDR">
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-2">
-                          <div>
-                            <label class="label font-bold text-xs">Versão do Sistema</label>
-                            <input type="text" x-model="brandConfig.systemVersion" class="input input-xs input-bordered w-full font-mono text-xs" placeholder="OS v0.2.0">
-                          </div>
-                          <div>
-                            <label class="label font-bold text-xs">Tagline Secundária</label>
-                            <input type="text" x-model="brandConfig.systemTagline" class="input input-xs input-bordered w-full text-xs" placeholder="COMMERCIAL AGENT OS">
-                          </div>
-                        </div>
-
-                        <!-- Toggle Modo No-Brand -->
-                        <div class="p-3 bg-base-100 rounded-xl border border-base-300 flex items-center justify-between shadow-2xs">
-                          <div>
-                            <span class="font-bold text-xs text-base-content block">Modo No-Brand (Sem Marca)</span>
-                            <span class="text-[10px] text-base-content/60 block">Oculta nome, logo e versão para revenda 100% neutra.</span>
-                          </div>
-                          <input type="checkbox" x-model="brandConfig.isNoBrand" class="toggle toggle-warning toggle-sm" />
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Card 2: Logo Principal & Tiny Logo -->
-                    <div class="p-4 bg-base-200/50 rounded-2xl border border-base-300 space-y-4">
-                      <h4 class="font-extrabold text-xs text-base-content flex items-center gap-2 border-b border-base-300 pb-2">
-                        <span x-html="getLucideSVG('zap', { strokeWidth: 2, class: 'w-4 h-4 text-primary' })"></span> Logotipos (Normal & Tiny Sidebar)
-                      </h4>
-
-                      <div class="space-y-3">
-                        <!-- Logo Icon vs Image -->
-                        <div>
-                          <label class="label font-bold text-xs">Tipo de Logo Principal</label>
-                          <div class="flex items-center gap-2">
-                            <label class="label cursor-pointer gap-1 text-xs">
-                              <input type="radio" x-model="brandConfig.logoType" value="icon" class="radio radio-xs radio-primary">
-                              <span>Ícone Lucide</span>
-                            </label>
-                            <label class="label cursor-pointer gap-1 text-xs">
-                              <input type="radio" x-model="brandConfig.logoType" value="image" class="radio radio-xs radio-primary">
-                              <span>Imagem Customizada (URL / Upload)</span>
-                            </label>
-                          </div>
-                        </div>
-
-                        <div x-show="brandConfig.logoType === 'icon'">
-                          <label class="label font-bold text-xs">Ícone Lucide do Logo</label>
-                          <select x-model="brandConfig.logoIcon" class="select select-xs select-bordered w-full font-semibold">
-                            <option value="zap">Zap (Raio / Energético - Padrão)</option>
-                            <option value="rocket">Rocket (Foguete / Growth)</option>
-                            <option value="bot">Bot (Agente IA)</option>
-                            <option value="brain">Brain (Inteligência)</option>
-                            <option value="target">Target (Alvo / Commercial)</option>
-                            <option value="building-2">Building (Enterprise)</option>
-                          </select>
-                        </div>
-
-                        <div x-show="brandConfig.logoType === 'image'" class="space-y-2">
-                          <label class="label font-bold text-xs">URL da Imagem do Logo</label>
-                          <input type="text" x-model="brandConfig.logoUrl" class="input input-xs input-bordered w-full font-mono text-xs" placeholder="https://exemplo.com/logo.png">
-                          <input type="file" @change="handleLogoImageUpload($event, 'logoUrl')" accept="image/*" class="file-input file-input-xs file-input-bordered w-full" />
-                        </div>
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="p-3 bg-base-200/50 rounded-xl border border-base-300 space-y-2">
                       <label class="font-bold flex items-center justify-between">
@@ -4394,64 +4333,7 @@
 
               </div>
 
-              <!-- Coluna 12: Branding & Ativos de Mídia (Área 4) -->
-              <div class="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="card bg-base-100 border border-base-300 shadow-sm p-6 space-y-4">
-                  <div class="border-b border-base-300 pb-3">
-                    <h3 class="font-extrabold text-sm flex items-center gap-2">
-                      <span>🖼️</span> Branding & Ativos de Mídia
-                    </h3>
-                    <p class="text-[11px] text-base-content/60">Logotipos para temas claro/escuro e favicon do subdomínio</p>
-                  </div>
 
-                  <div class="space-y-4 text-xs">
-                    <div>
-                      <label class="label font-bold text-xs">Logo Principal (Modo Claro)</label>
-                      <input type="text" x-model="brandingMedia.logoLight" class="input input-xs input-bordered w-full font-mono mb-2" placeholder="https://...">
-                      <div class="p-2 bg-base-200 rounded-lg border border-base-300 flex items-center justify-center h-12">
-                        <img :src="brandingMedia.logoLight" alt="Logo Light" class="max-h-8 object-contain">
-                      </div>
-                    </div>
-
-                    <div>
-                      <label class="label font-bold text-xs">Logo Principal (Modo Escuro)</label>
-                      <input type="text" x-model="brandingMedia.logoDark" class="input input-xs input-bordered w-full font-mono mb-2" placeholder="https://...">
-                      <div class="p-2 bg-slate-900 rounded-lg border border-base-300 flex items-center justify-center h-12">
-                        <img :src="brandingMedia.logoDark || brandingMedia.logoLight" alt="Logo Dark" class="max-h-8 object-contain">
-                      </div>
-                    </div>
-
-                    <div>
-                      <label class="label font-bold text-xs">Favicon / Logo Reduzido</label>
-                      <input type="text" x-model="brandingMedia.faviconUrl" class="input input-xs input-bordered w-full font-mono mb-2" placeholder="https://...">
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Rodapé Customizado -->
-                <div class="card bg-base-100 border border-base-300 shadow-sm p-6 space-y-4">
-                  <div class="border-b border-base-300 pb-3">
-                    <h3 class="font-extrabold text-sm flex items-center gap-2">
-                      <span>🏷️</span> Rodapé & Direitos Autorais
-                    </h3>
-                  </div>
-
-                  <div class="space-y-3 text-xs">
-                    <div class="flex items-center justify-between">
-                      <div>
-                        <strong class="font-bold text-xs text-base-content block">Remover Chancela "Powered by"</strong>
-                        <span class="text-[10px] text-base-content/60">Oculta o selo do Revenue SDR OS</span>
-                      </div>
-                      <input type="checkbox" x-model="brandingMedia.hideWatermark" class="toggle toggle-primary toggle-sm" />
-                    </div>
-
-                    <div>
-                      <label class="label font-bold text-xs">Texto do Rodapé / Copyright</label>
-                      <input type="text" x-model="brandingMedia.footerCopyright" class="input input-xs input-bordered w-full font-medium">
-                    </div>
-                  </div>
-                </div>
-              </div>
 
             </div>
 
@@ -5655,8 +5537,6 @@
 
           </div>
 
-          </div>
-
         </div>
 
         <!-- ==================== TAB: GESTÃO DE DADOS, BACKUP & HISTÓRICO (activeTab === 'data_management') ==================== -->
@@ -6804,6 +6684,8 @@
     </div>
 
   </div>
+      </main>
+    </div>
 
   <!-- ==================== MODAL: CONFIRMAÇÃO DE EXECUÇÃO COPILOT ("To execute") ==================== -->
   <dialog class="modal" :open="showExecuteModal" :class="{ 'modal-open': showExecuteModal }">
@@ -12789,155 +12671,36 @@
     </div>
   </dialog>
 
-  <!-- ==================== SUB-TELA DEDICADA DE PREVIEW INTERATIVO & FLUXO DE APROVAÇÃO (ÁREA 3) ==================== -->
+  <!-- ==================== STICKY BANNER DE PREVIEW DE VALIDAÇÃO NO SISTEMA REAL ==================== -->
   <div 
     x-show="isPreviewMode" 
-    x-transition:enter="transition ease-out duration-300"
-    x-transition:enter-start="opacity-0 scale-95"
-    x-transition:enter-end="opacity-100 scale-100"
-    x-transition:leave="transition ease-in duration-200"
-    x-transition:leave-start="opacity-100 scale-100"
-    x-transition:leave-end="opacity-0 scale-95"
-    class="fixed inset-0 z-[999] bg-base-300/90 backdrop-blur-md overflow-y-auto flex flex-col"
-    :style="`background-color: ${draftTokens['--color-background'] || '#0F172A'}; color: ${draftTokens['--color-text-main'] || '#F9FAFB'};`">
-
-    <!-- STICKY APPROVAL BANNER FIXO NO TOPO -->
-    <div class="sticky top-0 z-50 bg-base-100/95 backdrop-blur-md border-b border-primary/30 p-4 shadow-xl flex flex-wrap items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <span class="badge badge-warning font-black text-xs px-3 py-2 animate-pulse gap-1.5 shadow-sm">
-          <span>⚠️</span> MODO PREVIEW DE RASCUNHO DE TEMA (VIRTUAL SANDBOX)
-        </span>
-        <span class="text-xs text-base-content/70 hidden md:inline">
-          Modificações visíveis apenas nesta simulação. Escolha Aprovar para publicar.
-        </span>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <button @click="rejectChanges()" class="btn btn-sm btn-error text-error-content font-bold text-xs gap-1.5 shadow-md">
-          <span>❌</span> Rejeitar Alterações
-        </button>
-        <button @click="isPreviewMode = false" class="btn btn-sm btn-ghost font-bold text-xs gap-1">
-          <span>✏️</span> Voltar ao Editor
-        </button>
-        <button @click="showApprovalModal = true" class="btn btn-sm btn-success text-success-content font-extrabold text-xs gap-2 shadow-lg shadow-success/30">
-          <span>✅</span> Aprovar e Criar Novo Tema
-        </button>
-      </div>
+    x-transition:enter="transition ease-out duration-300 transform"
+    x-transition:enter-start="-translate-y-full opacity-0"
+    x-transition:enter-end="translate-y-0 opacity-100"
+    x-transition:leave="transition ease-in duration-200 transform"
+    x-transition:leave-start="translate-y-0 opacity-100"
+    x-transition:leave-end="-translate-y-full opacity-0"
+    class="fixed top-0 left-0 right-0 z-[9999] bg-base-100/95 backdrop-blur-md border-b-2 border-primary p-3 shadow-2xl flex flex-wrap items-center justify-between gap-3">
+    
+    <div class="flex items-center gap-3">
+      <span class="badge badge-warning font-black text-xs px-3 py-2 animate-pulse gap-1.5 shadow-sm">
+        <span>⚠️</span> MODO PREVIEW DO STUDIO DE TEMAS
+      </span>
+      <span class="text-xs font-semibold text-base-content/80 hidden md:inline">
+        Testando rascunho de variáveis no <strong>sistema real</strong>. Navegue por qualquer aba para validar a experiência antes de salvar.
+      </span>
     </div>
 
-    <!-- CANVAS DE SIMULAÇÃO COMPLETA DO APPLICATION WITH DRAFT VARS -->
-    <div class="p-6 max-w-7xl mx-auto w-full space-y-6 flex-1">
-      
-      <!-- Mock Topbar -->
-      <div class="p-4 rounded-2xl border flex items-center justify-between shadow-md"
-        :style="`background-color: ${draftTokens['--color-navbar-bg']}; border-color: ${draftTokens['--color-border']}; color: ${draftTokens['--color-navbar-text']};`">
-        <div class="flex items-center gap-3">
-          <img :src="brandingMedia.logoLight" alt="Logo" class="h-7 object-contain">
-          <span class="font-extrabold text-sm" x-text="activeTenant.name"></span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="badge font-bold text-xs" :style="`background-color: ${draftTokens['--color-primary']}; color: white;`">Preview Canvas</span>
-        </div>
-      </div>
-
-      <!-- Mock Grid Dashboard & Table -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <!-- Mock Metric Card 1 -->
-        <div class="p-5 rounded-2xl border shadow-sm space-y-2"
-          :style="`background-color: ${draftTokens['--color-surface']}; border-color: ${draftTokens['--color-border']};`">
-          <span class="text-xs font-semibold text-muted opacity-70">Total Leads Qualificados</span>
-          <h3 class="text-2xl font-black" :style="`color: ${draftTokens['--color-text-main']};`">1,482</h3>
-          <span class="badge badge-success text-[10px] font-bold">+18.4% vs mês anterior</span>
-        </div>
-
-        <!-- Mock Metric Card 2 -->
-        <div class="p-5 rounded-2xl border shadow-sm space-y-2"
-          :style="`background-color: ${draftTokens['--color-surface']}; border-color: ${draftTokens['--color-border']};`">
-          <span class="text-xs font-semibold text-muted opacity-70">Reuniões Agendadas</span>
-          <h3 class="text-2xl font-black" :style="`color: ${draftTokens['--color-primary']};`">342</h3>
-          <span class="badge badge-info text-[10px] font-bold">Taxa 23% Conversão</span>
-        </div>
-
-        <!-- Mock Metric Card 3 -->
-        <div class="p-5 rounded-2xl border shadow-sm space-y-2"
-          :style="`background-color: ${draftTokens['--color-surface']}; border-color: ${draftTokens['--color-border']};`">
-          <span class="text-xs font-semibold text-muted opacity-70">Autonomia dos Agentes IA</span>
-          <h3 class="text-2xl font-black" :style="`color: ${draftTokens['--color-secondary']};`">94.8%</h3>
-          <span class="badge badge-warning text-[10px] font-bold">Zero Hand-off Crítico</span>
-        </div>
-
-        <!-- Mock Metric Card 4 -->
-        <div class="p-5 rounded-2xl border shadow-sm space-y-2"
-          :style="`background-color: ${draftTokens['--color-surface']}; border-color: ${draftTokens['--color-border']};`">
-          <span class="text-xs font-semibold text-muted opacity-70">MRR Adicionado</span>
-          <h3 class="text-2xl font-black" :style="`color: ${draftTokens['--color-accent']};`">R$ 148.500</h3>
-          <span class="badge badge-accent text-[10px] font-bold">Meta Q3 Atingida</span>
-        </div>
-      </div>
-
-      <!-- Mock Table & Sidebar Simulation -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div class="lg:col-span-3 p-4 rounded-2xl border space-y-3"
-          :style="`background-color: ${draftTokens['--color-sidebar-bg']}; border-color: ${draftTokens['--color-border']}; color: ${draftTokens['--color-sidebar-text']};`">
-          <strong class="text-xs uppercase font-extrabold block opacity-60">Navegação Sidebar</strong>
-          <div class="space-y-1">
-            <div class="p-2.5 rounded-xl font-bold text-xs flex items-center gap-2" :style="`background-color: ${draftTokens['--color-sidebar-active']}; color: white;`">
-              <span>📊</span> Dashboard Command Center
-            </div>
-            <div class="p-2.5 rounded-xl text-xs flex items-center gap-2 opacity-80">
-              <span>🎯</span> Pipeline de Leads (Kanban)
-            </div>
-            <div class="p-2.5 rounded-xl text-xs flex items-center gap-2 opacity-80">
-              <span>🤖</span> Agentes Executores
-            </div>
-            <div class="p-2.5 rounded-xl text-xs flex items-center gap-2 opacity-80">
-              <span>💳</span> Assinatura & Billing
-            </div>
-          </div>
-        </div>
-
-        <div class="lg:col-span-9 p-6 rounded-2xl border space-y-4"
-          :style="`background-color: ${draftTokens['--color-surface']}; border-color: ${draftTokens['--color-border']};`">
-          <div class="flex items-center justify-between border-b pb-3" :style="`border-color: ${draftTokens['--color-border']};`">
-            <h4 class="font-extrabold text-sm" :style="`color: ${draftTokens['--color-text-main']};`">Simulação de Tabela de Leads</h4>
-            <div class="flex gap-2">
-              <button class="btn btn-xs font-bold text-white" :style="`background-color: ${draftTokens['--color-primary']};`">Botão Primário</button>
-              <button class="btn btn-xs font-bold text-white" :style="`background-color: ${draftTokens['--color-secondary']};`">Botão Secundário</button>
-            </div>
-          </div>
-
-          <div class="overflow-x-auto">
-            <table class="table table-xs w-full">
-              <thead>
-                <tr :style="`color: ${draftTokens['--color-text-muted']};`">
-                  <th>Lead / Empresa</th>
-                  <th>Status Lead</th>
-                  <th>SDR Responsável</th>
-                  <th>Pontuação BANT</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody :style="`color: ${draftTokens['--color-text-main']};`">
-                <tr class="border-b" :style="`border-color: ${draftTokens['--color-border']};`">
-                  <td class="font-bold">Dra. Amanda Silva (Clínica Dermato)</td>
-                  <td><span class="badge badge-success text-[10px] font-bold">Qualificado BANT</span></td>
-                  <td>Agente IA (SDR-01)</td>
-                  <td class="font-mono font-bold text-success">94/100</td>
-                  <td><button class="btn btn-xs btn-outline btn-primary">Ver Perfil</button></td>
-                </tr>
-                <tr class="border-b" :style="`border-color: ${draftTokens['--color-border']};`">
-                  <td class="font-bold">Ricardo Santos (Grupo Imobiliário)</td>
-                  <td><span class="badge badge-warning text-[10px] font-bold">Em Qualificação</span></td>
-                  <td>Agente IA (SDR-02)</td>
-                  <td class="font-mono font-bold text-warning">72/100</td>
-                  <td><button class="btn btn-xs btn-outline btn-primary">Ver Perfil</button></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
+    <div class="flex items-center gap-2">
+      <button @click="rejectChanges()" class="btn btn-xs sm:btn-sm btn-error text-error-content font-bold text-xs gap-1 shadow-sm">
+        <span>❌</span> Rejeitar Alterações
+      </button>
+      <button @click="isPreviewMode = false" class="btn btn-xs sm:btn-sm btn-ghost font-bold text-xs gap-1">
+        <span>✏️</span> Voltar ao Editor
+      </button>
+      <button @click="showApprovalModal = true" class="btn btn-xs sm:btn-sm btn-success text-success-content font-extrabold text-xs gap-1.5 shadow-md">
+        <span>✅</span> Aprovar e Salvar Tema
+      </button>
     </div>
   </div>
 
@@ -13326,7 +13089,7 @@
         isPreviewMode: false,
         showApprovalModal: false,
         newThemeName: '',
-        themeActiveTab: 'marca',
+        themeActiveTab: 'identidade_visual',
         fullCSSText: '',
         cssValidationStatus: {
           isValid: true,
@@ -13794,9 +13557,18 @@
           reader.readAsDataURL(file);
         },
 
+        selectThemeFromMenu(themeId) {
+          this.isPreviewMode = false;
+          this.setThemePreset(themeId);
+          if (document.activeElement && typeof document.activeElement.blur === 'function') {
+            document.activeElement.blur();
+          }
+        },
+
         setThemePreset(themeId) {
           const found = this.savedThemes.find(t => t.id === themeId);
           if (!found) return;
+          this.isPreviewMode = false;
           this.activePreset = found.id;
           this.currentTheme = found.id;
           if (found.id.includes('sakura')) document.documentElement.setAttribute('data-theme', 'sakura');
@@ -13841,7 +13613,7 @@
  * DESIGN TOKENS DEFINIDOS VIA INTERFACE (Marca até Status)
  * ========================================================= */
 :root {
-  /* 🎨 Marca & Interação */
+  /* 🎨 Identidade Visual */
   --color-primary: ${t['--color-primary'] || '#8B5CF6'};
   --color-primary-hover: ${t['--color-primary-hover'] || '#7C3AED'};
   --color-primary-light: ${t['--color-primary-light'] || 'rgba(139, 92, 246, 0.15)'};
@@ -15611,7 +15383,7 @@
                 label: 'Configurações Tenant', 
                 icon: '⚙️',
                 subItems: [
-                  { id: 'organization', label: 'Perfil & Branding' },
+                  { id: 'organization', label: 'Identidade Empresarial' },
                   { id: 'theme_manager', label: 'Temas White-Label' },
                   { id: 'users_team', label: 'Equipe & RBAC' },
                   { id: 'channels_integrations', label: 'Canais & CRM' },
@@ -18262,5 +18034,6 @@
       }
     }
   </script>
+  </div>
 </body>
 </html>
