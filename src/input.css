@@ -3,28 +3,114 @@
 @import "tailwindcss/utilities";
 
 @layer utilities {
-  /* Glassmorphic Cards */
+  /* Premium Glassmorphic Component System */
   .glass-card {
-    background: rgba(255, 255, 255, 0.65);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.45) 100%);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07), inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
   }
 
-  [data-theme="obsidian"] .glass-card {
-    background: rgba(15, 23, 42, 0.7);
+  /* Obsidian Night Dark Glassmorphism */
+  [data-theme="obsidian"] .glass-card,
+  [data-theme="obsidian"] .glass-panel {
+    background: linear-gradient(135deg, rgba(26, 35, 56, 0.65) 0%, rgba(11, 15, 25, 0.8) 100%);
+    backdrop-filter: blur(20px) saturate(190%);
+    -webkit-backdrop-filter: blur(20px) saturate(190%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.6), 
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.15),
+                0 0 20px -5px rgba(168, 85, 247, 0.1);
+  }
+
+  [data-theme="obsidian"] .glass-hover:hover {
+    background: linear-gradient(135deg, rgba(34, 46, 74, 0.75) 0%, rgba(17, 24, 39, 0.85) 100%);
+    border-color: rgba(168, 85, 247, 0.35);
+    box-shadow: 0 12px 48px -10px rgba(0, 0, 0, 0.7), 
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.25),
+                0 0 25px -2px rgba(168, 85, 247, 0.25);
+    transform: translateY(-2px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  [data-theme="obsidian"] .glass-nav {
+    background: rgba(11, 15, 25, 0.82);
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  [data-theme="obsidian"] .glass-modal {
+    background: linear-gradient(145deg, rgba(20, 27, 44, 0.9) 0%, rgba(11, 15, 25, 0.95) 100%);
+    backdrop-filter: blur(28px) saturate(200%);
+    -webkit-backdrop-filter: blur(28px) saturate(200%);
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.85),
+                0 0 40px 0 rgba(168, 85, 247, 0.18),
+                inset 0 1px 1px 0 rgba(255, 255, 255, 0.2);
+  }
+
+  [data-theme="obsidian"] .glass-input {
+    background: rgba(15, 23, 42, 0.6);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: #F8FAFC;
+    transition: all 0.2s ease-in-out;
   }
 
-  /* Glow Effects */
+  [data-theme="obsidian"] .glass-input:focus {
+    background: rgba(15, 23, 42, 0.85);
+    border-color: rgba(168, 85, 247, 0.6);
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+    outline: none;
+  }
+
+  [data-theme="obsidian"] .glass-badge {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(34, 211, 238, 0.15) 100%);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    box-shadow: 0 2px 10px rgba(168, 85, 247, 0.15);
+  }
+
+  /* Glow Effects & Ambient Lighting */
   .glow-primary {
-    box-shadow: 0 0 25px -5px var(--fallback-p, hsl(var(--p) / 0.3));
+    box-shadow: 0 0 25px -5px var(--fallback-p, hsl(var(--p) / 0.35));
   }
 
   .glow-secondary {
-    box-shadow: 0 0 25px -5px var(--fallback-s, hsl(var(--s) / 0.3));
+    box-shadow: 0 0 25px -5px var(--fallback-s, hsl(var(--s) / 0.35));
+  }
+
+  .glow-obsidian-violet {
+    box-shadow: 0 0 35px -5px rgba(168, 85, 247, 0.45);
+  }
+
+  .glow-obsidian-cyan {
+    box-shadow: 0 0 35px -5px rgba(34, 211, 238, 0.45);
+  }
+
+  /* Ambient Glass Orbs */
+  .glass-ambient-orb-violet {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.25) 0%, rgba(139, 92, 246, 0) 70%);
+    filter: blur(50px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .glass-ambient-orb-cyan {
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, rgba(34, 211, 238, 0.2) 0%, rgba(6, 182, 212, 0) 70%);
+    filter: blur(45px);
+    pointer-events: none;
+    z-index: 0;
   }
 
   /* Custom subtle pulse */

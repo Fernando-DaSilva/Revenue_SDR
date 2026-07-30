@@ -882,8 +882,8 @@
                           <button @click="openLeadDrawer(act)" class="btn btn-xs btn-ghost gap-1 text-primary font-bold text-[10px]" title="Raio-X do Lead">
                             <span>👁️</span> Raio-X
                           </button>
-                          <button @click="takeoverLead(act)" class="btn btn-xs btn-outline btn-secondary text-[10px] font-bold" title="Assumir Conversa">
-                            <span>👤</span> Assumir
+                          <button @click="openAssignmentModal(act)" class="btn btn-xs btn-outline font-bold text-[10px] gap-1" :class="act.isAi ? 'btn-secondary' : 'btn-primary'" :title="act.isAi ? 'Transferir para Vendedor Humano' : 'Devolver para Agente SDR IA'">
+                            <span x-text="act.isAi ? '👤 Transferir' : '🤖 Transferir'"></span>
                           </button>
                         </div>
                       </td>
@@ -1163,7 +1163,7 @@
                         <div class="space-y-2">
                           <div class="flex items-center justify-between text-[10px]">
                             <span class="badge badge-xs font-bold gap-1" :class="lead.isAi ? 'badge-primary' : 'badge-neutral'">
-                              <span x-text="lead.isAi ? '🤖 SDR-01 IA' : '👤 SDR Humano'"></span>
+                              <span x-text="lead.isAi ? (lead.executor || '🤖 SDR-01 IA') : (lead.executor || '👤 SDR Humano')"></span>
                             </span>
                             <span class="text-base-content/50 font-mono" x-text="lead.lastInteraction"></span>
                           </div>
@@ -1304,7 +1304,7 @@
 
                         <!-- Executor -->
                         <td>
-                          <span class="badge badge-xs font-bold" :class="lead.isAi ? 'badge-primary' : 'badge-neutral'" x-text="lead.isAi ? '🤖 SDR-01 IA' : '👤 SDR Humano'"></span>
+                          <span class="badge badge-xs font-bold" :class="lead.isAi ? 'badge-primary' : 'badge-neutral'" x-text="lead.isAi ? (lead.executor || '🤖 SDR-01 IA') : (lead.executor || '👤 SDR Humano')"></span>
                         </td>
 
                         <!-- Last Interaction -->
@@ -1316,8 +1316,8 @@
                             <button @click="openLeadDrawer(lead)" class="btn btn-xs btn-ghost gap-1 text-primary font-bold text-[10px]" title="Abrir Raio-X & Memory Brain">
                               <span>👁️</span> Detalhes
                             </button>
-                            <button @click="takeoverLead(lead)" class="btn btn-xs btn-outline btn-secondary text-[10px] font-bold" title="Transferir para Humano">
-                              <span>👤</span> Takeover
+                            <button @click="openAssignmentModal(lead)" class="btn btn-xs btn-outline font-bold text-[10px] gap-1" :class="lead.isAi ? 'btn-secondary' : 'btn-primary'" :title="lead.isAi ? 'Transferir para Vendedor Humano' : 'Devolver para Agente SDR IA'">
+                              <span x-text="lead.isAi ? '👤 Transferir' : '🤖 Transferir'"></span>
                             </button>
                           </div>
                         </td>
@@ -1467,66 +1467,37 @@
               <!-- Search & Filters -->
               <div class="p-3 border-b border-base-300 space-y-2">
                 <div class="relative">
-                  <input type="text" placeholder="Buscar por lead ou empresa..." class="input input-sm input-bordered w-full pl-8 text-xs">
+                  <input type="text" x-model="chatSearchQuery" placeholder="Buscar por lead ou empresa..." class="input input-sm input-bordered w-full pl-8 text-xs">
                   <span class="absolute left-2.5 top-2 text-xs opacity-50">🔍</span>
                 </div>
                 <div class="flex items-center gap-1 overflow-x-auto text-xs pb-1">
-                  <button class="btn btn-xs btn-primary font-bold">Todos</button>
-                  <button class="btn btn-xs btn-ghost text-base-content/70">WhatsApp</button>
-                  <button class="btn btn-xs btn-ghost text-base-content/70">Email</button>
-                  <button class="btn btn-xs btn-ghost text-error">🚨 Handoff</button>
+                  <button @click="chatFilterChannel = 'all'" :class="chatFilterChannel === 'all' ? 'btn-primary font-bold' : 'btn-ghost text-base-content/70'" class="btn btn-xs">Todos</button>
+                  <button @click="chatFilterChannel = 'whatsapp'" :class="chatFilterChannel === 'whatsapp' ? 'btn-primary font-bold' : 'btn-ghost text-base-content/70'" class="btn btn-xs">WhatsApp</button>
+                  <button @click="chatFilterChannel = 'email'" :class="chatFilterChannel === 'email' ? 'btn-primary font-bold' : 'btn-ghost text-base-content/70'" class="btn btn-xs">Email</button>
+                  <button @click="chatFilterChannel = 'handoff'" :class="chatFilterChannel === 'handoff' ? 'btn-error font-bold text-error-content' : 'btn-ghost text-error'" class="btn btn-xs">🚨 Handoff</button>
                 </div>
               </div>
 
               <!-- Conversations List -->
               <div class="flex-1 overflow-y-auto divide-y divide-base-300/50">
-                <!-- Lead Item 1 -->
-                <div class="p-3 hover:bg-base-300/50 cursor-pointer bg-primary/10 border-l-4 border-primary transition-colors">
-                  <div class="flex items-center justify-between mb-1">
-                    <div class="flex items-center gap-2">
-                      <span class="badge badge-xs badge-success gap-1">WhatsApp</span>
-                      <span class="font-bold text-xs truncate">Dr. Roberto Alves</span>
+                <template x-for="conv in filteredChatConversations" :key="conv.id">
+                  <div @click="selectChat(conv.id)" 
+                       :class="activeChatId === conv.id ? 'bg-primary/10 border-l-4 border-primary' : 'hover:bg-base-300/50'"
+                       class="p-3 cursor-pointer transition-colors">
+                    <div class="flex items-center justify-between mb-1">
+                      <div class="flex items-center gap-2">
+                        <span class="badge badge-xs gap-1" :class="conv.channelClass" x-text="conv.channel"></span>
+                        <span class="font-bold text-xs truncate" x-text="conv.name"></span>
+                      </div>
+                      <span class="text-[10px] text-base-content/60" x-text="conv.time"></span>
                     </div>
-                    <span class="text-[10px] text-base-content/60">14:32</span>
-                  </div>
-                  <p class="text-xs text-base-content/80 truncate">Gostaria de agendar a demonstração sobre o plano premium...</p>
-                  <div class="flex items-center justify-between mt-2 text-[10px]">
-                    <span class="badge badge-xs badge-outline">SDR-01 IA</span>
-                    <span class="text-success font-semibold">🟢 Qualificado SQL</span>
-                  </div>
-                </div>
-
-                <!-- Lead Item 2 -->
-                <div class="p-3 hover:bg-base-300/50 cursor-pointer transition-colors">
-                  <div class="flex items-center justify-between mb-1">
-                    <div class="flex items-center gap-2">
-                      <span class="badge badge-xs badge-success gap-1">WhatsApp</span>
-                      <span class="font-bold text-xs truncate">Mariana Costa</span>
+                    <p class="text-xs text-base-content/80 truncate" x-text="conv.lastMsg"></p>
+                    <div class="flex items-center justify-between mt-2 text-[10px]">
+                      <span class="badge badge-xs" :class="conv.sdrBadgeClass" x-text="conv.sdrAgent"></span>
+                      <span class="font-semibold" :class="conv.statusClass" x-text="conv.status"></span>
                     </div>
-                    <span class="text-[10px] text-base-content/60">14:15</span>
                   </div>
-                  <p class="text-xs text-base-content/80 truncate">Qual o tempo de implementação da solução?</p>
-                  <div class="flex items-center justify-between mt-2 text-[10px]">
-                    <span class="badge badge-xs badge-warning animate-pulse">Alerta Handoff</span>
-                    <span class="text-warning font-semibold">🟡 Aguardando Operador</span>
-                  </div>
-                </div>
-
-                <!-- Lead Item 3 -->
-                <div class="p-3 hover:bg-base-300/50 cursor-pointer transition-colors">
-                  <div class="flex items-center justify-between mb-1">
-                    <div class="flex items-center gap-2">
-                      <span class="badge badge-xs badge-info gap-1">E-mail</span>
-                      <span class="font-bold text-xs truncate">Carlos Eduardo</span>
-                    </div>
-                    <span class="text-[10px] text-base-content/60">13:40</span>
-                  </div>
-                  <p class="text-xs text-base-content/80 truncate">Solicito envio da minuta de contrato para homologação...</p>
-                  <div class="flex items-center justify-between mt-2 text-[10px]">
-                    <span class="badge badge-xs badge-outline">SDR-02 IA</span>
-                    <span class="text-info font-semibold">🔵 Em Negociação</span>
-                  </div>
-                </div>
+                </template>
               </div>
             </div>
 
@@ -1536,11 +1507,11 @@
               <div class="p-3 bg-base-100 border-b border-base-300 flex items-center justify-between">
                 <div class="flex items-center gap-3">
                   <div class="avatar placeholder">
-                    <div class="bg-primary text-primary-content rounded-full w-9 h-9 font-bold text-xs">RA</div>
+                    <div class="bg-primary text-primary-content rounded-full w-9 h-9 font-bold text-xs flex items-center justify-center" x-text="activeChat.initials"></div>
                   </div>
                   <div>
-                    <h4 class="font-bold text-sm">Dr. Roberto Alves</h4>
-                    <p class="text-[11px] text-base-content/60">Hospital São Lucas • +55 11 98765-4321</p>
+                    <h4 class="font-bold text-sm" x-text="activeChat.name"></h4>
+                    <p class="text-[11px] text-base-content/60" x-text="`${activeChat.company} • ${activeChat.phone}`"></p>
                   </div>
                 </div>
                 <div class="flex items-center gap-2">
@@ -1552,33 +1523,22 @@
 
               <!-- Chat Messages Scroll -->
               <div class="flex-1 overflow-y-auto p-4 space-y-3 bg-base-300/20">
-                <!-- Lead Msg -->
-                <div class="chat chat-start">
-                  <div class="chat-header text-[10px] text-base-content/60 mb-0.5">Dr. Roberto Alves • 14:28</div>
-                  <div class="chat-bubble chat-bubble-neutral text-xs">Olá! Gostaria de entender melhor como funciona a qualificação de leads via WhatsApp.</div>
-                </div>
-
-                <!-- AI Msg -->
-                <div class="chat chat-end">
-                  <div class="chat-header text-[10px] text-base-content/60 mb-0.5">Agente IA (Sofia SDR) • 14:29</div>
-                  <div class="chat-bubble chat-bubble-primary text-xs">Olá Dr. Roberto! Nossa IA SDR conversa de forma 100% natural, aplica a metodologia BANT em tempo real e agenda a demonstração diretamente na agenda dos seus vendedores. Gostaria de agendar 15 minutos hoje?</div>
-                </div>
-
-                <!-- Lead Msg -->
-                <div class="chat chat-start">
-                  <div class="chat-header text-[10px] text-base-content/60 mb-0.5">Dr. Roberto Alves • 14:32</div>
-                  <div class="chat-bubble chat-bubble-neutral text-xs">Perfeito. Vocês têm horário disponível hoje às 16h30?</div>
-                </div>
+                <template x-for="(msg, idx) in activeChat.messages" :key="idx">
+                  <div class="chat" :class="msg.isAi ? 'chat-end' : (msg.isHumanOperator ? 'chat-end' : 'chat-start')">
+                    <div class="chat-header text-[10px] text-base-content/60 mb-0.5" x-text="`${msg.sender} • ${msg.time}`"></div>
+                    <div class="chat-bubble text-xs" :class="msg.isAi ? 'chat-bubble-primary' : (msg.isHumanOperator ? 'chat-bubble-warning' : 'chat-bubble-neutral')" x-text="msg.text"></div>
+                  </div>
+                </template>
               </div>
 
               <!-- Chat Input Area -->
               <div class="p-3 bg-base-100 border-t border-base-300 space-y-2">
-                <div class="flex items-center gap-2">
-                  <input type="text" placeholder="Digite uma resposta manual (intervém sobre a IA)..." class="input input-sm input-bordered flex-1 text-xs">
-                  <button class="btn btn-sm btn-primary font-bold">Enviar</button>
-                </div>
+                <form @submit.prevent="sendChatMessage()" class="flex items-center gap-2">
+                  <input type="text" x-model="chatNewMessage" placeholder="Digite uma resposta manual (intervém sobre a IA)..." class="input input-sm input-bordered flex-1 text-xs">
+                  <button type="submit" class="btn btn-sm btn-primary font-bold">Enviar</button>
+                </form>
                 <div class="flex items-center justify-between text-[10px] text-base-content/60">
-                  <span>Modo IA: <strong>Ativo (SDR-01)</strong></span>
+                  <span>Modo IA: <strong x-text="activeChat.aiMode"></strong></span>
                   <span class="cursor-pointer hover:underline text-primary">Usar Resposta Rápida (Template)</span>
                 </div>
               </div>
@@ -1588,30 +1548,30 @@
             <div class="lg:col-span-3 bg-base-200 border border-base-300 rounded-2xl p-4 space-y-4 overflow-y-auto">
               <div class="text-center pb-3 border-b border-base-300">
                 <div class="avatar placeholder mb-2">
-                  <div class="bg-secondary text-secondary-content rounded-full w-12 h-12 font-extrabold text-base">RA</div>
+                  <div class="bg-secondary text-secondary-content rounded-full w-12 h-12 font-extrabold text-base flex items-center justify-center mx-auto" x-text="activeChat.initials"></div>
                 </div>
-                <h3 class="font-extrabold text-sm">Dr. Roberto Alves</h3>
-                <p class="text-xs text-base-content/70">Diretor Médico @ Hospital São Lucas</p>
-                <span class="badge badge-success badge-sm font-bold mt-2">Score BANT: 94/100</span>
+                <h3 class="font-extrabold text-sm" x-text="activeChat.name"></h3>
+                <p class="text-xs text-base-content/70" x-text="activeChat.role"></p>
+                <span class="badge badge-success badge-sm font-bold mt-2" x-text="`Score BANT: ${activeChat.bantScore}`"></span>
               </div>
 
               <!-- Quick Details -->
               <div class="space-y-2 text-xs">
                 <div class="flex justify-between py-1 border-b border-base-300/40">
                   <span class="text-base-content/60">Canal:</span>
-                  <span class="font-semibold">WhatsApp Official</span>
+                  <span class="font-semibold" x-text="activeChat.channelDetail"></span>
                 </div>
                 <div class="flex justify-between py-1 border-b border-base-300/40">
                   <span class="text-base-content/60">Orçamento:</span>
-                  <span class="font-semibold">R$ 45k/mês</span>
+                  <span class="font-semibold" x-text="activeChat.budget"></span>
                 </div>
                 <div class="flex justify-between py-1 border-b border-base-300/40">
                   <span class="text-base-content/60">Cadência:</span>
-                  <span class="font-semibold">Inbound High Intent</span>
+                  <span class="font-semibold" x-text="activeChat.cadence"></span>
                 </div>
                 <div class="flex justify-between py-1 border-b border-base-300/40">
                   <span class="text-base-content/60">Etapa Funil:</span>
-                  <span class="font-semibold text-primary">Reunião Agendada</span>
+                  <span class="font-semibold text-primary" x-text="activeChat.funnelStage"></span>
                 </div>
               </div>
 
@@ -1619,7 +1579,7 @@
               <div class="space-y-2 pt-2">
                 <button @click="showScheduleMeetingModal = true" class="btn btn-xs btn-block btn-primary font-bold">📅 Agendar Reunião Demo</button>
                 <button @click="showChangeStageModal = true" class="btn btn-xs btn-block btn-outline btn-secondary font-bold">🔄 Alterar Etapa do Lead</button>
-                <button @click="openLeadDrawer(leadsList[0])" class="btn btn-xs btn-block btn-ghost font-bold">📋 Ver Prontuário Completo</button>
+                <button @click="openLeadDrawer(leadsList.find(l => l.id === activeChat.leadId) || leadsList[0])" class="btn btn-xs btn-block btn-ghost font-bold">📋 Ver Prontuário Completo</button>
               </div>
             </div>
           </div>
@@ -6432,8 +6392,8 @@
         <button @click="openLeadJourney(selectedLead)" class="btn btn-xs btn-primary font-bold gap-1 shadow-xs" title="Ver Jornada Executiva SLA">
           <span>🗺️</span> Jornada SLA
         </button>
-        <button @click="takeoverLead(selectedLead)" class="btn btn-xs btn-outline btn-secondary font-bold gap-1">
-          <span>👤</span> Takeover Humano
+        <button @click="openAssignmentModal(selectedLead)" class="btn btn-xs btn-outline font-bold gap-1" :class="selectedLead?.isAi ? 'btn-secondary' : 'btn-primary'" :title="selectedLead?.isAi ? 'Transferir para Vendedor Humano (Takeover Humano)' : 'Devolver para Agente IA Autônomo (Takeover IA)'">
+          <span x-text="selectedLead?.isAi ? '👤 Transferir' : '🤖 Transferir'"></span>
         </button>
         <button @click="closeLeadDrawer()" class="btn btn-sm btn-circle btn-ghost text-base font-bold">✕</button>
       </div>
@@ -6504,11 +6464,11 @@
           </h4>
           <div class="flex items-center justify-between text-xs p-3 bg-base-200 rounded-lg border border-base-300">
             <div class="flex items-center gap-2">
-              <span class="badge badge-sm font-bold" :class="selectedLead?.isAi ? 'badge-primary' : 'badge-neutral'" x-text="selectedLead?.isAi ? '🤖 SDR-01 IA' : '👤 SDR Humano'"></span>
-              <span class="text-base-content/70">Ativo processando cadência</span>
+              <span class="badge badge-sm font-bold" :class="selectedLead?.isAi ? 'badge-primary' : 'badge-neutral'" x-text="selectedLead?.isAi ? (selectedLead?.executor || '🤖 SDR-01 IA') : (selectedLead?.executor || '👤 SDR Humano')"></span>
+              <span class="text-base-content/70" x-text="selectedLead?.isAi ? 'Cadência IA Autônoma Ativa' : 'Atendimento Humano em Andamento'"></span>
             </div>
-            <button @click="takeoverLead(selectedLead)" class="btn btn-xs btn-primary font-bold">
-              Solicitar Takeover
+            <button @click="openAssignmentModal(selectedLead)" class="btn btn-xs font-bold gap-1" :class="selectedLead?.isAi ? 'btn-secondary' : 'btn-primary'">
+              <span x-text="selectedLead?.isAi ? '👤 Transferir' : '🤖 Transferir'"></span>
             </button>
           </div>
         </div>
@@ -10817,25 +10777,25 @@
     </div>
   </dialog>
 
-  <!-- ==================== MODAL 2: ASSUMIR CONVERSA NO WHATSAPP ==================== -->
-  <dialog class="modal" :open="showWhatsAppTakeoverModal" :class="{ 'modal-open': showWhatsAppTakeoverModal }">
-    <div class="modal-box max-w-2xl bg-base-100 border border-base-300 shadow-2xl p-0 overflow-hidden rounded-2xl transition-all duration-300"
-         :class="isWhatsAppTakeoverMaximized ? 'max-w-[96vw] w-[96vw] min-h-[90vh]' : 'max-w-2xl w-full'">
+  <!-- ==================== MODAL 2: CENTRAL DE TRANSBORDO & ATRIBUIÇÃO DE ATENDIMENTO ==================== -->
+  <dialog class="modal" :open="showAssignmentModal || showWhatsAppTakeoverModal" :class="{ 'modal-open': showAssignmentModal || showWhatsAppTakeoverModal }">
+    <div class="modal-box max-w-3xl bg-base-100 border border-base-300 shadow-2xl p-0 overflow-hidden rounded-2xl transition-all duration-300"
+         :class="isWhatsAppTakeoverMaximized ? 'max-w-[96vw] w-[96vw] min-h-[90vh]' : 'max-w-3xl w-full'">
       <!-- Header -->
-      <div class="bg-gradient-to-r from-success/15 via-base-200 to-base-200 p-5 border-b border-base-300 flex items-center justify-between">
+      <div class="bg-gradient-to-r from-primary/15 via-base-200 to-base-200 p-5 border-b border-base-300 flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-success text-success-content flex items-center justify-center font-bold text-lg shadow-md shadow-success/30">
-            💬
+          <div class="w-10 h-10 rounded-xl bg-primary text-primary-content flex items-center justify-center font-bold text-lg shadow-md shadow-primary/30">
+            ⚡
           </div>
           <div>
-            <h3 class="font-extrabold text-base tracking-tight" x-text="`Transbordo e Assumir WhatsApp: ${selectedLeadJourney?.name || 'Lead'}`"></h3>
+            <h3 class="font-extrabold text-base tracking-tight" x-text="`Central de Atribuição & Handoff: ${selectedLeadJourney?.leadName || selectedLeadJourney?.name || assignmentForm.selectedLead?.leadName || assignmentForm.selectedLead?.name || 'Lead'}`"></h3>
             <div class="flex items-center gap-2 mt-0.5">
-              <span class="badge badge-xs badge-success font-bold flex items-center gap-1">
-                <span>🤖 IA Ativa</span>
-                <span>➔</span>
-                <span>👤 Humano</span>
+              <span class="badge badge-xs font-bold flex items-center gap-1" :class="(selectedLeadJourney?.isAi ?? assignmentForm.selectedLead?.isAi) ? 'badge-primary' : 'badge-neutral'">
+                <span x-text="(selectedLeadJourney?.isAi ?? assignmentForm.selectedLead?.isAi) ? '🤖 SDR IA Ativa' : '👤 Atendimento Humano'"></span>
               </span>
-              <span class="text-xs text-base-content/60" x-text="`Canal: ${selectedLeadJourney?.channel || 'WhatsApp'}`"></span>
+              <span class="text-xs text-base-content/60">
+                Executor Atual: <strong class="text-base-content" x-text="selectedLeadJourney?.executor || assignmentForm.selectedLead?.executor || 'SDR-01 IA'"></strong>
+              </span>
             </div>
           </div>
         </div>
@@ -10852,106 +10812,269 @@
               Restaurar
             </span>
           </button>
-          <button @click="showWhatsAppTakeoverModal = false" class="btn btn-sm btn-circle btn-ghost text-base-content/70">✕</button>
+          <button @click="showAssignmentModal = false; showWhatsAppTakeoverModal = false;" class="btn btn-sm btn-circle btn-ghost text-base-content/70">✕</button>
         </div>
       </div>
 
-      <!-- Body -->
-      <div class="p-6 space-y-5 max-h-[80vh] overflow-y-auto">
-        <!-- AI Handover Briefing Card -->
-        <div class="p-4 rounded-xl bg-base-200/70 border border-base-300 space-y-3">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-black text-primary uppercase tracking-wider flex items-center gap-1.5">
-              <span>🤖</span> Síntese de Contexto para Transbordo (AI Handover)
-            </span>
-            <span class="badge badge-xs badge-outline">SLA: &lt; 5 min</span>
-          </div>
+      <!-- Navigation Sub-Tabs -->
+      <div class="bg-base-200/60 border-b border-base-300 px-6 pt-2 flex items-center gap-2">
+        <button 
+          @click="assignmentTab = 'human'; assignmentForm.targetType = 'human'" 
+          :class="assignmentTab === 'human' ? 'border-secondary text-secondary font-extrabold bg-base-100' : 'border-transparent text-base-content/60 hover:text-base-content'"
+          class="py-2.5 px-4 border-b-2 text-xs gap-2 flex items-center rounded-t-lg transition-all">
+          <span>👤</span> Transferir para Humano (Takeover)
+        </button>
+        <button 
+          @click="assignmentTab = 'ai'; assignmentForm.targetType = 'ai'" 
+          :class="assignmentTab === 'ai' ? 'border-primary text-primary font-extrabold bg-base-100' : 'border-transparent text-base-content/60 hover:text-base-content'"
+          class="py-2.5 px-4 border-b-2 text-xs gap-2 flex items-center rounded-t-lg transition-all">
+          <span>🤖</span> Devolver / Enviar para Agente IA
+        </button>
+        <button 
+          @click="assignmentTab = 'history'" 
+          :class="assignmentTab === 'history' ? 'border-accent text-accent font-extrabold bg-base-100' : 'border-transparent text-base-content/60 hover:text-base-content'"
+          class="py-2.5 px-4 border-b-2 text-xs gap-2 flex items-center rounded-t-lg transition-all">
+          <span>📜</span> Trilha de Auditoria
+          <span class="badge badge-xs badge-neutral" x-text="(selectedLeadJourney?.assignmentAuditLog || assignmentForm.selectedLead?.assignmentAuditLog || []).length"></span>
+        </button>
+      </div>
 
-          <ul class="space-y-1.5 text-xs text-base-content/80 list-disc list-inside font-medium">
-            <li>Lead demonstrou forte interesse mas possui objeção sobre prazo de implementação.</li>
-            <li>BANT preliminar coletado: Orçamento R$ 10k-18k/mês, Decisor confirmado.</li>
-            <li>Solicitou resposta sobre integração nativa com CRM existente.</li>
-          </ul>
+      <!-- Body Container -->
+      <div class="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1 border-t border-base-300/60">
-            <div>
-              <label class="block text-[11px] font-bold text-base-content/70 mb-1">Motivo do Transbordo</label>
-              <select x-model="whatsappTakeoverForm.reason" class="select select-xs select-bordered w-full text-xs">
-                <option value="Objeção de Preço">Objeção de Preço / Orçamento</option>
-                <option value="Solicitação Humana">Solicitação de Atendimento Humano</option>
-                <option value="Dúvida Técnica">Dúvida Técnica Avançada</option>
-                <option value="Interesse Alto">Interesse Alto em Fechamento</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block text-[11px] font-bold text-base-content/70 mb-1">Pausa da IA Autônoma</label>
-              <select x-model="whatsappTakeoverForm.pauseAiMode" class="select select-xs select-bordered w-full text-xs">
-                <option value="24h">Pausar IA por 24 horas</option>
-                <option value="definitive">Pausar Definitivamente para este Lead</option>
-                <option value="copilot">Manter IA em Modo Co-Piloto (Sugestões)</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- Live Chat Preview & Quick Message Input -->
-        <div class="space-y-3">
-          <span class="text-xs font-bold text-base-content/80 block">Histórico Recente (WhatsApp Live Stream)</span>
-          
-          <div class="bg-base-200/50 rounded-xl p-3.5 border border-base-300 space-y-2.5 max-h-40 overflow-y-auto text-xs">
-            <div class="chat chat-start">
-              <div class="chat-header text-[10px] text-base-content/60">Lead</div>
-              <div class="chat-bubble bg-base-100 text-base-content border border-base-300 text-xs py-1.5 px-3">
-                Vocês têm integração com o meu ERP atual? E qual o prazo de Setup?
+        <!-- ABA 1: TRANSFERIR PARA HUMANO (TAKEOVER) -->
+        <div x-show="assignmentTab === 'human'" class="space-y-4">
+          <div class="p-3.5 rounded-xl bg-secondary/10 border border-secondary/20 flex items-center justify-between">
+            <div class="flex items-center gap-2 text-xs">
+              <span class="text-secondary font-bold text-base">👤</span>
+              <div>
+                <span class="font-extrabold text-base-content block">Modo Takeover Humano Selecionado</span>
+                <span class="text-base-content/70">A inteligência autônoma será pausada para permitir atendimento direto por um executivo de vendas.</span>
               </div>
-              <div class="chat-footer text-[10px] opacity-60">10:14</div>
             </div>
-
-            <div class="chat chat-end">
-              <div class="chat-header text-[10px] text-base-content/60">🤖 SDR Bot Sofia</div>
-              <div class="chat-bubble bg-primary text-primary-content text-xs py-1.5 px-3">
-                Sim! Temos conectores nativos para os principais ERPs e APIs REST. Vou chamar nosso especialista humano para detalhar o seu caso!
-              </div>
-              <div class="chat-footer text-[10px] opacity-60">10:14</div>
-            </div>
+            <span class="badge badge-secondary font-bold text-[10px] shrink-0 whitespace-nowrap">Transferir</span>
           </div>
 
-          <!-- Quick Templates -->
-          <div class="space-y-1.5">
-            <span class="text-[11px] font-semibold text-base-content/70 block">⚡ Respostas Rápidas (Clique para inserir):</span>
-            <div class="flex items-center gap-1.5 flex-wrap">
-              <button type="button" 
-                @click="whatsappTakeoverForm.initialMessage = `Olá ${selectedLeadJourney?.name || 'Lead'}, sou Fernando Silva, especialista do Revenue SDR OS! Assumi o atendimento para te dar suporte total. Como posso ajudar?`" 
-                class="btn btn-xs btn-outline btn-neutral font-normal text-[11px]">
-                👋 Saudação Inicial
-              </button>
-              <button type="button" 
-                @click="whatsappTakeoverForm.initialMessage = `Oi ${selectedLeadJourney?.name || 'Lead'}, vi sua dúvida sobre integração e prazos. Nosso setup leva menos de 48h! Podemos alinhar 10 minutos hoje?`" 
-                class="btn btn-xs btn-outline btn-neutral font-normal text-[11px]">
-                ⚙️ Tira-Dúvidas Setup
-              </button>
-              <button type="button" 
-                @click="whatsappTakeoverForm.initialMessage = `Olá! Sou o executivo de contas responsável. Gostaria de entender melhor suas necessidades para enviar uma proposta personalizada.`" 
-                class="btn btn-xs btn-outline btn-neutral font-normal text-[11px]">
-                💼 Proposta Comercial
-              </button>
-            </div>
-          </div>
-
-          <!-- Input Textarea -->
+          <!-- Selection List: Vendedores / SDRs Humanos -->
           <div>
-            <label class="block text-xs font-bold text-base-content/80 mb-1">Mensagem de Entrada do SDR Humano</label>
-            <textarea x-model="whatsappTakeoverForm.initialMessage" rows="3" class="textarea textarea-bordered w-full text-xs" placeholder="Digite a mensagem para enviar no WhatsApp do lead..."></textarea>
+            <label class="block text-xs font-bold text-base-content mb-2 flex items-center justify-between">
+              <span>Selecione o Executivo de Vendas Humano:</span>
+              <span class="text-[10px] text-base-content/50 font-normal">Disponibilidade em tempo real</span>
+            </label>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+              <template x-for="human in availableHumans" :key="human.id">
+                <div @click="assignmentForm.selectedHuman = human.name + ' (' + human.role + ')'"
+                     :class="assignmentForm.selectedHuman.includes(human.name) ? 'border-secondary bg-secondary/10 ring-2 ring-secondary/30' : 'border-base-300 bg-base-100 hover:border-base-400'"
+                     class="p-3 rounded-xl border cursor-pointer transition-all flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-base-200 flex items-center justify-center text-lg font-bold">
+                      <span x-text="human.avatar"></span>
+                    </div>
+                    <div>
+                      <span class="font-bold text-xs block text-base-content" x-text="human.name"></span>
+                      <span class="text-[10px] text-base-content/60 block" x-text="human.role"></span>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <span class="badge badge-xs font-semibold" :class="human.status === 'online' ? 'badge-success' : (human.status === 'busy' ? 'badge-warning' : 'badge-neutral')" x-text="human.status"></span>
+                    <span class="text-[10px] text-base-content/50 block mt-0.5" x-text="human.workload"></span>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </div>
+
+          <!-- Audit & Reason Form Controls -->
+          <div class="p-4 rounded-xl bg-base-200/50 border border-base-300 space-y-3">
+            <div class="text-xs font-extrabold text-base-content flex items-center gap-1.5 border-b border-base-300/60 pb-2">
+              <span>🛡️</span> Registro Obrigatório de Auditoria de Atribuição
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-bold text-base-content/80 mb-1">Quem assina/autoriza a alteração?</label>
+                <select x-model="assignmentForm.assignedBy" class="select select-xs select-bordered w-full text-xs font-semibold">
+                  <template x-for="user in auditUsers" :key="user">
+                    <option :value="user" x-text="user"></option>
+                  </template>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-bold text-base-content/80 mb-1">Motivo do Transbordo Humano</label>
+                <select x-model="assignmentForm.reason" class="select select-xs select-bordered w-full text-xs">
+                  <option value="Solicitação de Atendimento Humano">Solicitação de Atendimento Humano (Direct Lead)</option>
+                  <option value="Objeção de Preço / Negociação">Objeção de Preço / Negociação Especial</option>
+                  <option value="Dúvida Técnica Avançada">Dúvida Técnica / Customização</option>
+                  <option value="Interesse Alto em Fechamento">Interesse Alto em Fechamento (SQL Hotline)</option>
+                  <option value="Acompanhamento VIP por Closer">Acompanhamento VIP por Closer Responsável</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+              <div>
+                <label class="block text-[11px] font-bold text-base-content/80 mb-1">Comportamento da IA Autônoma</label>
+                <select x-model="assignmentForm.pauseAiMode" class="select select-xs select-bordered w-full text-xs">
+                  <option value="24h">Pausar IA Autônoma por 24 horas</option>
+                  <option value="definitive">Pausar Definitivamente para este Lead</option>
+                  <option value="copilot">Manter IA em Modo Co-Piloto (Sugestões apenas)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-bold text-base-content/80 mb-1">Notificação de Passagem de Bastão</label>
+                <div class="flex items-center gap-2 mt-1 text-xs">
+                  <input type="checkbox" checked class="checkbox checkbox-xs checkbox-primary" id="notifySlack">
+                  <label for="notifySlack" class="text-base-content/80 font-medium">Alertar canal #vendas no Slack & Push SDR</label>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-bold text-base-content/80 mb-1">Mensagem Inicial / Briefing para o Lead no WhatsApp</label>
+              <textarea x-model="assignmentForm.initialMessage" rows="2" class="textarea textarea-bordered w-full text-xs" placeholder="Ex: Olá! Sou Fernando Silva, Closer sênior. Assumi o seu atendimento para apresentar nossa proposta comercial personalizada..."></textarea>
+            </div>
           </div>
         </div>
+
+        <!-- ABA 2: DEVOLVER PARA AGENTE IA (HANDOVER) -->
+        <div x-show="assignmentTab === 'ai'" class="space-y-4">
+          <div class="p-3.5 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-between">
+            <div class="flex items-center gap-2 text-xs">
+              <span class="text-primary font-bold text-base">🤖</span>
+              <div>
+                <span class="font-extrabold text-base-content block">Devolução para Agente IA SDR Selecionada</span>
+                <span class="text-base-content/70">O atendimento será retornado ao agente virtual autônomo para continuidade da cadência inteligente.</span>
+              </div>
+            </div>
+            <span class="badge badge-primary font-bold text-[10px]">Autonomia IA</span>
+          </div>
+
+          <!-- Selection List: Agentes IA SDR Virtuais -->
+          <div>
+            <label class="block text-xs font-bold text-base-content mb-2 flex items-center justify-between">
+              <span>Selecione qual Agente SDR IA assumirá o atendimento:</span>
+              <span class="text-[10px] text-primary font-semibold">4 Agentes Disponíveis</span>
+            </label>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+              <template x-for="agent in availableAiAgents" :key="agent.id">
+                <div @click="assignmentForm.selectedAiAgent = agent.name + ' (' + agent.role + ')'"
+                     :class="assignmentForm.selectedAiAgent.includes(agent.name) ? 'border-primary bg-primary/10 ring-2 ring-primary/30' : 'border-base-300 bg-base-100 hover:border-base-400'"
+                     class="p-3 rounded-xl border cursor-pointer transition-all flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-primary/20 text-primary flex items-center justify-center text-lg font-bold">
+                      <span x-text="agent.avatar"></span>
+                    </div>
+                    <div>
+                      <span class="font-bold text-xs block text-base-content" x-text="agent.name"></span>
+                      <span class="text-[10px] text-base-content/60 block" x-text="agent.role"></span>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <span class="badge badge-xs badge-primary font-bold" x-text="agent.autonomy"></span>
+                    <span class="text-[10px] text-base-content/50 block mt-0.5" x-text="agent.speed"></span>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </div>
+
+          <!-- Audit & Reason Form Controls (IA) -->
+          <div class="p-4 rounded-xl bg-base-200/50 border border-base-300 space-y-3">
+            <div class="text-xs font-extrabold text-base-content flex items-center gap-1.5 border-b border-base-300/60 pb-2">
+              <span>🛡️</span> Registro de Auditoria para Automação IA
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-bold text-base-content/80 mb-1">Quem autoriza o retorno para a IA?</label>
+                <select x-model="assignmentForm.assignedBy" class="select select-xs select-bordered w-full text-xs font-semibold">
+                  <template x-for="user in auditUsers" :key="user">
+                    <option :value="user" x-text="user"></option>
+                  </template>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-bold text-base-content/80 mb-1">Motivo do Retorno para IA</label>
+                <select x-model="assignmentForm.reason" class="select select-xs select-bordered w-full text-xs">
+                  <option value="Dúvida Resolvida por Vendedor">Dúvida Técnica Resolvida pelo Vendedor</option>
+                  <option value="Retorno à Cadência Nutrição">Retorno à Cadência de Nutrição Automática</option>
+                  <option value="Lead Ausente - Reengajamento IA">Lead Ausente (Sem resposta) - Reengajamento Autônomo</option>
+                  <option value="Qualificação BANT Contínua">Continuar Qualificação BANT via IA</option>
+                  <option value="Agendamento Confirmado - Lembretes IA">Agendamento Realizado - Envio de Lembretes Automáticos</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-bold text-base-content/80 mb-1">Instrução / Contexto para a Memória do Agente SDR IA</label>
+              <textarea x-model="assignmentForm.notes" rows="2" class="textarea textarea-bordered w-full text-xs" placeholder="Ex: Vendedor alinhou os requisitos de prazo. Retornando para IA agendar o melhor horário de demonstração..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- ABA 3: TRILHA DE AUDITORIA (AUDIT LOG) -->
+        <div x-show="assignmentTab === 'history'" class="space-y-4">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-extrabold text-base-content flex items-center gap-1.5">
+              <span>🛡️</span> Histórico de Atribuições e Transbordos (Audit Trail)
+            </h4>
+            <span class="text-[11px] text-base-content/60 font-mono">Registro Imutável em Log</span>
+          </div>
+
+          <div class="border border-base-300 rounded-xl overflow-hidden bg-base-100 shadow-xs">
+            <table class="table table-xs w-full">
+              <thead class="bg-base-200 text-base-content/70">
+                <tr>
+                  <th>Audit ID</th>
+                  <th>Data & Hora</th>
+                  <th>Responsável (Auditor)</th>
+                  <th>De ➔ Para</th>
+                  <th>Motivo</th>
+                  <th>Observações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="log in (selectedLeadJourney?.assignmentAuditLog || assignmentForm.selectedLead?.assignmentAuditLog || [])" :key="log.id">
+                  <tr class="hover">
+                    <td class="font-mono text-[10px] font-bold text-primary" x-text="log.id"></td>
+                    <td class="text-[11px] text-base-content/70 whitespace-nowrap" x-text="log.timestamp"></td>
+                    <td>
+                      <span class="font-bold text-[11px] text-base-content" x-text="log.assignedBy"></span>
+                    </td>
+                    <td>
+                      <div class="flex items-center gap-1 text-[10px]">
+                        <span class="badge badge-xs badge-ghost font-mono" x-text="log.previousExecutor"></span>
+                        <span>➔</span>
+                        <span class="badge badge-xs font-bold" :class="log.targetType === 'ai' ? 'badge-primary' : 'badge-neutral'" x-text="log.newExecutor"></span>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="badge badge-xs badge-outline text-[10px]" x-text="log.reason"></span>
+                    </td>
+                    <td class="text-[11px] text-base-content/70 truncate max-w-xs" :title="log.notes" x-text="log.notes"></td>
+                  </tr>
+                </template>
+                <tr x-show="!(selectedLeadJourney?.assignmentAuditLog?.length || assignmentForm.selectedLead?.assignmentAuditLog?.length)">
+                  <td colspan="6" class="text-center py-6 text-xs text-base-content/50">
+                    Nenhum histórico de atribuição registrado anteriormente para este lead.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
 
       <!-- Footer -->
       <div class="p-4 bg-base-200/80 border-t border-base-300 flex items-center justify-between">
-        <button @click="showWhatsAppTakeoverModal = false" class="btn btn-sm btn-ghost">Cancelar</button>
-        <button @click="executeWhatsAppTakeover()" class="btn btn-sm btn-success text-success-content font-bold gap-2 shadow-md">
-          <span>🚀</span> Assumir Conversa e Enviar Mensagem
+        <button @click="showAssignmentModal = false; showWhatsAppTakeoverModal = false;" class="btn btn-sm btn-ghost">Cancelar</button>
+        <button @click="executeAssignmentChange()" class="btn btn-sm font-bold gap-2 shadow-md"
+                :class="assignmentTab === 'ai' ? 'btn-primary text-primary-content' : 'btn-secondary text-secondary-content'">
+          <span>🚀</span> Confirmar Atribuição e Gravar Auditoria
         </button>
       </div>
     </div>
@@ -13204,38 +13327,38 @@
             id: 'obsidian_night',
             name: 'Obsidian Night (Default)',
             isPreset: true,
-            color: '#8B5CF6',
+            color: '#A855F7',
             tokens: {
-              '--color-primary': '#8B5CF6',
-              '--color-primary-hover': '#7C3AED',
-              '--color-primary-light': 'rgba(139, 92, 246, 0.15)',
-              '--color-secondary': '#06B6D4',
-              '--color-secondary-hover': '#0891B2',
-              '--color-accent': '#F43F5E',
-              '--color-ring-focus': 'rgba(139, 92, 246, 0.5)',
-              '--color-background': '#0F172A',
-              '--color-surface': '#1E293B',
-              '--color-surface-hover': '#334155',
-              '--color-sidebar-bg': '#020617',
+              '--color-primary': '#A855F7',
+              '--color-primary-hover': '#9333EA',
+              '--color-primary-light': 'rgba(168, 85, 247, 0.18)',
+              '--color-secondary': '#22D3EE',
+              '--color-secondary-hover': '#06B6D4',
+              '--color-accent': '#FF2E93',
+              '--color-ring-focus': 'rgba(168, 85, 247, 0.5)',
+              '--color-background': '#0B0F19',
+              '--color-surface': 'rgba(26, 35, 56, 0.65)',
+              '--color-surface-hover': 'rgba(34, 46, 74, 0.75)',
+              '--color-sidebar-bg': 'rgba(11, 15, 25, 0.85)',
               '--color-sidebar-text': '#94A3B8',
-              '--color-sidebar-active': '#8B5CF6',
-              '--color-navbar-bg': '#1E293B',
+              '--color-sidebar-active': '#A855F7',
+              '--color-navbar-bg': 'rgba(11, 15, 25, 0.82)',
               '--color-navbar-text': '#F8FAFC',
-              '--color-text-main': '#F9FAFB',
+              '--color-text-main': '#F8FAFC',
               '--color-text-muted': '#9CA3AF',
-              '--color-text-inverse': '#0F172A',
+              '--color-text-inverse': '#0B0F19',
               '--font-family-sans': "'Inter', sans-serif",
               '--font-family-heading': "'Inter', sans-serif",
-              '--color-border': '#334155',
-              '--color-border-subtle': '#1E293B',
-              '--radius-sm': '6px',
-              '--radius-md': '10px',
-              '--radius-lg': '16px',
-              '--shadow-card': '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
-              '--color-success': '#10B981',
-              '--color-warning': '#F59E0B',
-              '--color-danger': '#EF4444',
-              '--color-info': '#3B82F6',
+              '--color-border': 'rgba(255, 255, 255, 0.12)',
+              '--color-border-subtle': 'rgba(255, 255, 255, 0.08)',
+              '--radius-sm': '8px',
+              '--radius-md': '12px',
+              '--radius-lg': '18px',
+              '--shadow-card': '0 10px 40px -10px rgba(0, 0, 0, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.15)',
+              '--color-success': '#34D399',
+              '--color-warning': '#FBBF24',
+              '--color-danger': '#FB7185',
+              '--color-info': '#38BDF8',
               custom_css_override: ''
             }
           },
@@ -14040,6 +14163,99 @@
         timeframe: 'week', // 'today', 'week', 'month'
         executorFilter: 'all', // 'all', 'ai', 'human'
 
+        // MULTICHANNEL LIVE CHAT INBOX STATE
+        activeChatId: 'conv-1',
+        chatSearchQuery: '',
+        chatFilterChannel: 'all',
+        chatNewMessage: '',
+        chatConversations: [
+          {
+            id: 'conv-1',
+            leadId: 1001,
+            name: 'Dr. Roberto Alves',
+            initials: 'RA',
+            company: 'Hospital São Lucas',
+            phone: '+55 11 98765-4321',
+            role: 'Diretor Médico @ Hospital São Lucas',
+            channel: 'WhatsApp',
+            channelClass: 'badge-success',
+            channelDetail: 'WhatsApp Official',
+            time: '14:32',
+            lastMsg: 'Gostaria de agendar a demonstração sobre o plano premium...',
+            sdrAgent: 'SDR-01 IA',
+            sdrBadgeClass: 'badge-outline',
+            status: '🟢 Qualificado SQL',
+            statusClass: 'text-success',
+            bantScore: '94/100',
+            budget: 'R$ 45k/mês',
+            cadence: 'Inbound High Intent',
+            funnelStage: 'Reunião Agendada',
+            aiMode: 'Ativo (SDR-01)',
+            messages: [
+              { sender: 'Dr. Roberto Alves', time: '14:28', isAi: false, isHumanOperator: false, text: 'Olá! Gostaria de entender melhor como funciona a qualificação de leads via WhatsApp.' },
+              { sender: 'Agente IA (Sofia SDR)', time: '14:29', isAi: true, isHumanOperator: false, text: 'Olá Dr. Roberto! Nossa IA SDR conversa de forma 100% natural, aplica a metodologia BANT em tempo real e agenda a demonstração diretamente na agenda dos seus vendedores. Gostaria de agendar 15 minutos hoje?' },
+              { sender: 'Dr. Roberto Alves', time: '14:32', isAi: false, isHumanOperator: false, text: 'Perfeito. Vocês têm horário disponível hoje às 16h30?' }
+            ]
+          },
+          {
+            id: 'conv-2',
+            leadId: 1002,
+            name: 'Mariana Costa',
+            initials: 'MC',
+            company: 'Clinik Odontologia',
+            phone: '+55 11 97123-8899',
+            role: 'Gestora Comercial @ Clinik Odontologia',
+            channel: 'WhatsApp',
+            channelClass: 'badge-success',
+            channelDetail: 'WhatsApp Official',
+            time: '14:15',
+            lastMsg: 'Qual o tempo de implementação da solução?',
+            sdrAgent: 'Alerta Handoff',
+            sdrBadgeClass: 'badge-warning animate-pulse',
+            status: '🟡 Aguardando Operador',
+            statusClass: 'text-warning',
+            bantScore: '76/100',
+            budget: 'R$ 15k/mês',
+            cadence: 'Inbound Express',
+            funnelStage: 'Qualificação BANT',
+            aiMode: 'Handoff Solicitado',
+            messages: [
+              { sender: 'Mariana Costa', time: '14:10', isAi: false, isHumanOperator: false, text: 'Olá! Vi a demonstração do sistema. Quanto tempo leva o processo de implantação completa para um time de 10 vendedores?' },
+              { sender: 'Agente IA (Sofia SDR)', time: '14:12', isAi: true, isHumanOperator: false, text: 'Olá Mariana! O onboarding padrão leva entre 24 a 48 horas, com integração nativa ao seu CRM e treinamento guiado para a equipe.' },
+              { sender: 'Mariana Costa', time: '14:15', isAi: false, isHumanOperator: false, text: 'Qual o tempo de implementação da solução? Gostaria de entender mais sobre as integrações customizadas.' },
+              { sender: 'Agente IA (Sofia SDR)', time: '14:16', isAi: true, isHumanOperator: false, text: 'Entendido! Estou acionando o transbordo para um especialista humano da nossa equipe. Um momento por favor.' }
+            ]
+          },
+          {
+            id: 'conv-3',
+            leadId: 1003,
+            name: 'Carlos Eduardo',
+            initials: 'CE',
+            company: 'Imobiliária Prime',
+            phone: '+55 21 99887-1122',
+            role: 'CEO & Fundador @ Imobiliária Prime',
+            channel: 'E-mail',
+            channelClass: 'badge-info',
+            channelDetail: 'E-mail Corporativo',
+            time: '13:40',
+            lastMsg: 'Solicito envio da minuta de contrato para homologação...',
+            sdrAgent: 'SDR-02 IA',
+            sdrBadgeClass: 'badge-outline',
+            status: '🔵 Em Negociação',
+            statusClass: 'text-info',
+            bantScore: '85/100',
+            budget: 'R$ 30k/mês',
+            cadence: 'Outbound Enterprise',
+            funnelStage: 'Proposta & Contrato',
+            aiMode: 'Ativo (SDR-02)',
+            messages: [
+              { sender: 'Carlos Eduardo', time: '13:20', isAi: false, isHumanOperator: false, text: 'Prezados, revisamos a proposta comercial e gostaríamos de prosseguir para a fase contratual.' },
+              { sender: 'Agente IA (Max SDR)', time: '13:25', isAi: true, isHumanOperator: false, text: 'Olá Carlos Eduardo! Excelente notícia. Já preparei os termos de acordo com o plano Enterprise aprovado. Como prefere receber os documentos?' },
+              { sender: 'Carlos Eduardo', time: '13:40', isAi: false, isHumanOperator: false, text: 'Solicito envio da minuta de contrato para homologação do nosso departamento jurídico.' }
+            ]
+          }
+        ],
+
         // ESTADO DE GESTÃO DE DADOS, BACKUP & HISTÓRICO (ADR-002 / ADR-015 / ADR-016)
         dataManagement: {
           hotStorage: { sizeMb: 142.5, maxMb: 500, activeConversations: 1240, readLatencyMs: 3.8, status: 'healthy' },
@@ -14131,9 +14347,47 @@
         // --- ESTADO DOS MODAIS DAS AÇÕES RÁPIDAS DE DECISÃO ---
         showScheduleMeetingModal: false,
         showWhatsAppTakeoverModal: false,
+        showAssignmentModal: false,
+        assignmentTab: 'human', // 'human' | 'ai' | 'history'
         showRestartCadenceModal: false,
         showChangeStageModal: false,
         changeStageTab: 'stage', // 'stage' | 'disqualify'
+
+        // Central de Atribuição (Humano <-> IA) & Auditoria
+        assignmentForm: {
+          selectedLead: null,
+          targetType: 'human',
+          selectedHuman: 'Fernando Silva (Closer Senior)',
+          selectedAiAgent: 'SDR-01 IA (Prospecção & Ingestão)',
+          assignedBy: 'Fernando Silva (Gestor de Vendas)',
+          reason: 'Solicitação de Atendimento Humano',
+          pauseAiMode: '24h',
+          notes: '',
+          initialMessage: ''
+        },
+
+        availableHumans: [
+          { id: 'h-1', name: 'Fernando Silva', role: 'Closer Senior', avatar: '👤', status: 'online', workload: '4 leads ativos' },
+          { id: 'h-2', name: 'Lucas SDR', role: 'SDR Humano - Outbound', avatar: '👨‍💼', status: 'online', workload: '2 leads ativos' },
+          { id: 'h-3', name: 'Mariana Costa', role: 'SDR Humano - Inbound', avatar: '👩‍💼', status: 'busy', workload: '6 leads ativos' },
+          { id: 'h-4', name: 'Carlos Santos', role: 'Account Executive', avatar: '👔', status: 'online', workload: '1 lead ativo' },
+          { id: 'h-5', name: 'Ana Lima', role: 'Gerente de Contas', avatar: '👩‍💻', status: 'offline', workload: '0 leads ativos' }
+        ],
+
+        availableAiAgents: [
+          { id: 'ai-1', name: 'SDR-01 IA', role: 'Prospecção & Ingestão 24/7', avatar: '🤖', autonomy: '100% Autônomo', speed: '< 2s SLA' },
+          { id: 'ai-2', name: 'SDR-02 IA', role: 'Qualificação & BANT Avançado', avatar: '🧠', autonomy: 'Modo Co-Piloto', speed: '< 5s SLA' },
+          { id: 'ai-3', name: 'SDR-03 IA', role: 'Agendamento & Conversão SQL', avatar: '📅', autonomy: '100% Autônomo', speed: '< 1s SLA' },
+          { id: 'ai-4', name: 'SDR-04 IA', role: 'Recuperação & Reativação de Inativos', avatar: '⚡', autonomy: 'Autônomo com Regras', speed: '< 3s SLA' }
+        ],
+
+        auditUsers: [
+          'Fernando Silva (Gestor de Vendas)',
+          'Camila Rocha (Team Lead Inbound)',
+          'Ricardo Souza (Diretor de Operações)',
+          'Lucas SDR (SDR Humano)',
+          'Admin do Sistema'
+        ],
 
         // Formulários Reativos das Ações
         scheduleForm: {
@@ -15993,6 +16247,49 @@
           return s ? s.name : 'Outro';
         },
 
+        get activeChat() {
+          return this.chatConversations.find(c => c.id === this.activeChatId) || this.chatConversations[0];
+        },
+
+        selectChat(id) {
+          this.activeChatId = id;
+        },
+
+        sendChatMessage() {
+          if (!this.chatNewMessage.trim()) return;
+          const chat = this.activeChat;
+          if (chat) {
+            const now = new Date();
+            const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            chat.messages.push({
+              sender: 'Operador Humano',
+              time: timeStr,
+              isAi: false,
+              isHumanOperator: true,
+              text: this.chatNewMessage.trim()
+            });
+            chat.lastMsg = this.chatNewMessage.trim();
+            chat.time = timeStr;
+            this.chatNewMessage = '';
+          }
+        },
+
+        get filteredChatConversations() {
+          return this.chatConversations.filter(c => {
+            if (this.chatFilterChannel === 'whatsapp' && c.channel.toLowerCase() !== 'whatsapp') return false;
+            if (this.chatFilterChannel === 'email' && c.channel.toLowerCase() !== 'e-mail' && c.channel.toLowerCase() !== 'email') return false;
+            if (this.chatFilterChannel === 'handoff' && !c.sdrAgent.includes('Handoff') && !c.status.includes('Aguardando')) return false;
+            if (this.chatSearchQuery.trim()) {
+              const q = this.chatSearchQuery.toLowerCase().trim();
+              const matchName = c.name.toLowerCase().includes(q);
+              const matchCompany = c.company.toLowerCase().includes(q);
+              const matchMsg = c.lastMsg.toLowerCase().includes(q);
+              if (!matchName && !matchCompany && !matchMsg) return false;
+            }
+            return true;
+          });
+        },
+
         get filteredLeadsList() {
           return this.leadsList.filter(lead => {
             if (this.leadStageFilter !== 'all' && lead.stageId !== parseInt(this.leadStageFilter)) return false;
@@ -16114,11 +16411,110 @@
           }
         },
 
-        takeoverLead(lead) {
+        openAssignmentModal(lead) {
           if (!lead) return;
-          lead.isAi = false;
-          lead.executor = 'SDR Humano';
-          this.showNotification(`👤 SDR Humano assumiu o atendimento de ${lead.leadName || lead.name}!`, 'success');
+          this.selectedLeadJourney = lead;
+          this.assignmentForm.selectedLead = lead;
+
+          if (!lead.assignmentAuditLog) {
+            lead.assignmentAuditLog = [
+              {
+                id: 'AUD-' + Math.floor(100000 + Math.random() * 900000),
+                timestamp: '30/07/2026 09:15',
+                assignedBy: 'Sistema (Auto-Routing)',
+                previousExecutor: 'Nenhum',
+                newExecutor: lead.executor || (lead.isAi ? 'SDR-01 IA' : 'SDR Humano'),
+                targetType: lead.isAi ? 'ai' : 'human',
+                reason: 'Ingestão Automática de Pipeline',
+                notes: 'Atribuição inicial do sistema ao carregar o lead.'
+              }
+            ];
+          }
+
+          if (lead.isAi) {
+            this.assignmentTab = 'human';
+            this.assignmentForm.targetType = 'human';
+            this.assignmentForm.reason = 'Solicitação de Atendimento Humano';
+          } else {
+            this.assignmentTab = 'ai';
+            this.assignmentForm.targetType = 'ai';
+            this.assignmentForm.reason = 'Devolução para Cadência Autônoma IA';
+          }
+
+          this.assignmentForm.initialMessage = '';
+          this.assignmentForm.notes = '';
+          this.showAssignmentModal = true;
+          this.showWhatsAppTakeoverModal = true;
+        },
+
+        takeoverLead(lead) {
+          this.openAssignmentModal(lead);
+        },
+
+        executeAssignmentChange() {
+          const lead = this.assignmentForm.selectedLead || this.selectedLeadJourney;
+          if (!lead) return;
+
+          const isAiTarget = this.assignmentTab === 'ai' || this.assignmentForm.targetType === 'ai';
+          const previousExec = lead.executor || (lead.isAi ? 'SDR-01 IA' : 'SDR Humano');
+          const newExec = isAiTarget ? this.assignmentForm.selectedAiAgent : this.assignmentForm.selectedHuman;
+
+          lead.isAi = isAiTarget;
+          lead.executor = newExec;
+
+          const mainLead = this.leadsList.find(l => (l.id === lead.id || l.leadName === lead.leadName || l.name === lead.name));
+          if (mainLead) {
+            mainLead.isAi = isAiTarget;
+            mainLead.executor = newExec;
+            if (!mainLead.assignmentAuditLog) mainLead.assignmentAuditLog = [];
+          }
+
+          if (this.selectedLeadJourney) {
+            this.selectedLeadJourney.isAi = isAiTarget;
+            this.selectedLeadJourney.executor = newExec;
+            this.selectedLeadJourney.aiAutonomy = isAiTarget ? '100% Autônomo (IA)' : 'Híbrido (Assumido por SDR)';
+            this.selectedLeadJourney.assignedSdr = newExec;
+          }
+
+          const auditRecord = {
+            id: 'AUD-' + Math.floor(100000 + Math.random() * 900000),
+            timestamp: new Date().toLocaleString('pt-BR'),
+            assignedBy: this.assignmentForm.assignedBy || 'Fernando Silva (Gestor de Vendas)',
+            previousExecutor: previousExec,
+            newExecutor: newExec,
+            targetType: isAiTarget ? 'ai' : 'human',
+            reason: this.assignmentForm.reason || 'Alteração Manual de Atribuição',
+            notes: this.assignmentForm.notes || this.assignmentForm.initialMessage || 'Atribuição atualizada via Central de Transbordo.'
+          };
+
+          if (!lead.assignmentAuditLog) lead.assignmentAuditLog = [];
+          lead.assignmentAuditLog.unshift(auditRecord);
+          if (mainLead && mainLead !== lead) {
+            mainLead.assignmentAuditLog.unshift(auditRecord);
+          }
+
+          if (this.selectedLeadJourney) {
+            if (!this.selectedLeadJourney.timelineEvents) this.selectedLeadJourney.timelineEvents = [];
+            this.selectedLeadJourney.timelineEvents.unshift({
+              id: Date.now(),
+              type: 'system',
+              channel: 'Atribuição',
+              channelClass: isAiTarget ? 'badge-primary' : 'badge-secondary',
+              sender: 'system',
+              senderName: auditRecord.assignedBy,
+              senderAvatar: '🛡️',
+              timestamp: 'Agora',
+              latency: '< 1s',
+              content: `⚡ Transbordo de Atendimento: de [${previousExec}] para [${newExec}]. Autorizado por: ${auditRecord.assignedBy}. Motivo: ${auditRecord.reason}`,
+              sentiment: 'neutral',
+              sentimentLabel: '⚪ Auditoria OK',
+              intent: 'Reatribuição'
+            });
+          }
+
+          this.showAssignmentModal = false;
+          this.showWhatsAppTakeoverModal = false;
+          this.showNotification(`⚡ Atendimento de ${lead.leadName || lead.name || 'Lead'} transferido com sucesso para ${newExec}! Auditoria gravada.`, 'success');
           this.closeLeadDrawer();
           this.handoffQueue = this.handoffQueue.filter(item => item.id !== lead.id);
         },
@@ -17646,31 +18042,7 @@
         },
 
         executeWhatsAppTakeover() {
-          this.showWhatsAppTakeoverModal = false;
-          if (this.selectedLeadJourney) {
-            this.selectedLeadJourney.aiAutonomy = 'Híbrido (Assumido por SDR)';
-            this.selectedLeadJourney.assignedSdr = 'Fernando Silva (SDR)';
-            if (!this.selectedLeadJourney.timelineEvents) {
-              this.selectedLeadJourney.timelineEvents = [];
-            }
-            const msg = this.whatsappTakeoverForm.initialMessage || 'Atendimento no WhatsApp assumido pelo SDR.';
-            this.selectedLeadJourney.timelineEvents.unshift({
-              id: Date.now(),
-              type: 'message',
-              channel: 'WhatsApp',
-              channelClass: 'badge-success',
-              sender: 'sdr',
-              senderName: 'Fernando Silva (SDR)',
-              senderAvatar: '👤',
-              timestamp: 'Agora',
-              latency: '< 1s',
-              content: `💬 [Handoff Humano]: ${msg}`,
-              sentiment: 'positive',
-              sentimentLabel: '🟢 Handoff Ativo',
-              intent: 'Atendimento Humano'
-            });
-          }
-          this.showNotification(`💬 Atendimento no WhatsApp assumido por Fernando Silva!`, 'success');
+          this.executeAssignmentChange();
         },
 
         executeRestartCadence() {
