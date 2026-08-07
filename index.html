@@ -1062,8 +1062,8 @@
                       <button @click="openLeadDrawer(item)" class="btn btn-xs btn-ghost text-xs font-bold">
                         <span>👁️</span> Ver Raio-X
                       </button>
-                      <button @click="resolveHandoff(item, 'WhatsApp')" class="btn btn-xs btn-success text-white font-bold gap-1">
-                        <span>💬</span> Assumir no WhatsApp
+                      <button @click="resolveHandoff(item, 'Zap')" class="btn btn-xs btn-success text-white font-bold gap-1">
+                        <span>💬</span> Assumir no Zap
                       </button>
                       <button @click="resolveHandoff(item, 'Chamada')" class="btn btn-xs btn-primary font-bold gap-1">
                         <span>📞</span> Iniciar Chamada
@@ -1099,7 +1099,7 @@
                 <span class="text-xs font-semibold text-base-content/70">Filtro de Canal:</span>
                 <select x-model="leadChannelFilter" class="select select-xs select-bordered font-medium">
                   <option value="all">Todos os Canais</option>
-                  <option value="WhatsApp">WhatsApp 🟢</option>
+                  <option value="Zap">Zap 🟢</option>
                   <option value="Email">Email 🔵</option>
                   <option value="LinkedIn">LinkedIn 🟣</option>
                   <option value="Meta Ads">Meta Ads 🟡</option>
@@ -1224,7 +1224,7 @@
 
                   <select class="select select-sm select-bordered text-xs font-medium" x-model="leadChannelFilter">
                     <option value="all">Todos os Canais</option>
-                    <option value="WhatsApp">WhatsApp</option>
+                    <option value="Zap">Zap</option>
                     <option value="Email">Email</option>
                     <option value="LinkedIn">LinkedIn</option>
                     <option value="Meta Ads">Meta Ads</option>
@@ -1346,7 +1346,7 @@
                   <span class="text-3xl">🧠</span>
                   <div>
                     <h3 class="text-base font-extrabold text-base-content">Lead Brain Deduplication Engine (v0.2.0)</h3>
-                    <p class="text-xs text-base-content/70">O Lead Brain unifica automaticamente múltiplos canais de entrada (WhatsApp, Meta Ads, Landing Pages, Indicação) mantendo a Identidade Única Omnichannel do Lead.</p>
+                    <p class="text-xs text-base-content/70">O Lead Brain unifica automaticamente múltiplos canais de entrada (Zap, Meta Ads, Landing Pages, Indicação) mantendo a Identidade Única Omnichannel do Lead.</p>
                   </div>
                 </div>
                 <span class="badge badge-warning font-bold text-xs px-3 py-2" x-text="`${duplicatePairs.length} Conflitos Identificados`"></span>
@@ -1380,7 +1380,7 @@
                       <div class="space-y-2 text-xs">
                         <div class="flex justify-between"><span class="text-base-content/60">Nome:</span> <strong class="text-base-content" x-text="pair.leadA.name"></strong></div>
                         <div class="flex justify-between"><span class="text-base-content/60">Empresa:</span> <strong class="text-base-content" x-text="pair.leadA.company"></strong></div>
-                        <div class="flex justify-between"><span class="text-base-content/60">WhatsApp:</span> <strong class="text-success font-mono" x-text="pair.leadA.phone"></strong></div>
+                        <div class="flex justify-between"><span class="text-base-content/60">Zap:</span> <strong class="text-success font-mono" x-text="pair.leadA.phone"></strong></div>
                         <div class="flex justify-between"><span class="text-base-content/60">E-mail:</span> <strong class="text-base-content font-mono" x-text="pair.leadA.email"></strong></div>
                         <div class="flex justify-between"><span class="text-base-content/60">Canal / Origem:</span> <span class="badge badge-xs badge-success" x-text="pair.leadA.channel"></span></div>
                         <div class="flex justify-between"><span class="text-base-content/60">Estágio Atual:</span> <strong class="text-primary" x-text="pair.leadA.stage"></strong></div>
@@ -1398,7 +1398,7 @@
                       <div class="space-y-2 text-xs">
                         <div class="flex justify-between"><span class="text-base-content/60">Nome Capturado:</span> <strong class="text-base-content" x-text="pair.leadB.name"></strong></div>
                         <div class="flex justify-between"><span class="text-base-content/60">Empresa Capturada:</span> <strong class="text-base-content" x-text="pair.leadB.company"></strong></div>
-                        <div class="flex justify-between"><span class="text-base-content/60">WhatsApp:</span> <strong class="text-success font-mono" x-text="pair.leadB.phone"></strong></div>
+                        <div class="flex justify-between"><span class="text-base-content/60">Zap:</span> <strong class="text-success font-mono" x-text="pair.leadB.phone"></strong></div>
                         <div class="flex justify-between"><span class="text-base-content/60">E-mail Capturado:</span> <strong class="text-warning font-mono" x-text="pair.leadB.email"></strong></div>
                         <div class="flex justify-between"><span class="text-base-content/60">Canal / Origem:</span> <span class="badge badge-xs badge-info" x-text="pair.leadB.channel"></span></div>
                         <div class="flex justify-between"><span class="text-base-content/60">Estágio Capturado:</span> <strong class="text-base-content/70" x-text="pair.leadB.stage"></strong></div>
@@ -1472,7 +1472,7 @@
                 </div>
                 <div class="flex items-center gap-1 overflow-x-auto text-xs pb-1">
                   <button @click="chatFilterChannel = 'all'" :class="chatFilterChannel === 'all' ? 'btn-primary font-bold' : 'btn-ghost text-base-content/70'" class="btn btn-xs">Todos</button>
-                  <button @click="chatFilterChannel = 'whatsapp'" :class="chatFilterChannel === 'whatsapp' ? 'btn-primary font-bold' : 'btn-ghost text-base-content/70'" class="btn btn-xs">WhatsApp</button>
+                  <button @click="chatFilterChannel = 'zap'" :class="chatFilterChannel === 'zap' ? 'btn-primary font-bold' : 'btn-ghost text-base-content/70'" class="btn btn-xs">Zap</button>
                   <button @click="chatFilterChannel = 'email'" :class="chatFilterChannel === 'email' ? 'btn-primary font-bold' : 'btn-ghost text-base-content/70'" class="btn btn-xs">Email</button>
                   <button @click="chatFilterChannel = 'handoff'" :class="chatFilterChannel === 'handoff' ? 'btn-error font-bold text-error-content' : 'btn-ghost text-error'" class="btn btn-xs">🚨 Handoff</button>
                 </div>
@@ -1515,7 +1515,7 @@
                   </div>
                 </div>
                 <div class="flex items-center gap-2">
-                  <button @click="showWhatsAppTakeoverModal = true" class="btn btn-xs btn-warning font-bold gap-1">
+                  <button @click="showZapTakeoverModal = true" class="btn btn-xs btn-warning font-bold gap-1">
                     <span>🤝</span> Assumir Conversa
                   </button>
                 </div>
@@ -1605,7 +1605,7 @@
                 <div class="flex items-center gap-1 bg-base-100 p-1 rounded-xl border border-base-300">
                   <span class="text-[10px] font-bold text-base-content/50 uppercase px-2">Canal:</span>
                   <button @click="cadenceChannelFilter = 'all'" :class="cadenceChannelFilter === 'all' ? 'btn-primary font-bold' : 'btn-ghost'" class="btn btn-xs text-[11px]">Todos</button>
-                  <button @click="cadenceChannelFilter = 'WhatsApp'" :class="cadenceChannelFilter === 'WhatsApp' ? 'btn-primary font-bold' : 'btn-ghost'" class="btn btn-xs text-[11px]">WhatsApp</button>
+                  <button @click="cadenceChannelFilter = 'Zap'" :class="cadenceChannelFilter === 'Zap' ? 'btn-primary font-bold' : 'btn-ghost'" class="btn btn-xs text-[11px]">Zap</button>
                   <button @click="cadenceChannelFilter = 'LinkedIn'" :class="cadenceChannelFilter === 'LinkedIn' ? 'btn-primary font-bold' : 'btn-ghost'" class="btn btn-xs text-[11px]">LinkedIn</button>
                   <button @click="cadenceChannelFilter = 'E-mail'" :class="cadenceChannelFilter === 'E-mail' ? 'btn-primary font-bold' : 'btn-ghost'" class="btn btn-xs text-[11px]">E-mail</button>
                 </div>
@@ -2035,7 +2035,7 @@
                 <div class="space-y-3">
                   <div class="space-y-1">
                     <div class="flex justify-between text-xs font-bold">
-                      <span>Passo 1: Abordagem WhatsApp IA</span>
+                      <span>Passo 1: Abordagem Zap IA</span>
                       <span class="text-primary font-mono">100% (428 leads)</span>
                     </div>
                     <div class="w-full bg-base-300 h-3 rounded-full overflow-hidden">
@@ -2088,7 +2088,7 @@
                   <!-- A/B Test 1 -->
                   <div class="p-3 bg-base-100 rounded-xl border border-base-300 space-y-2 text-xs">
                     <div class="flex items-center justify-between">
-                      <span class="font-extrabold text-xs text-base-content">WhatsApp Inbound: Abordagem Direta vs Consultiva</span>
+                      <span class="font-extrabold text-xs text-base-content">Zap Inbound: Abordagem Direta vs Consultiva</span>
                       <span class="badge badge-success badge-xs font-bold">🏆 Variação B Venceu</span>
                     </div>
                     <div class="grid grid-cols-2 gap-2 text-[11px]">
@@ -2694,7 +2694,7 @@
                       
                       <div class="flex items-center justify-between gap-2">
                         <div class="flex items-center gap-2">
-                          <span class="badge badge-xs font-bold" :class="log.channel === 'WhatsApp' ? 'badge-success' : 'badge-info'" x-text="log.channel"></span>
+                          <span class="badge badge-xs font-bold" :class="log.channel === 'Zap' ? 'badge-success' : 'badge-info'" x-text="log.channel"></span>
                           <span class="font-extrabold text-xs text-base-content" x-text="log.leadName"></span>
                         </div>
 
@@ -4539,7 +4539,7 @@
               </h3>
 
               <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <!-- WhatsApp Business Card -->
+                <!-- Zap Business Card -->
                 <div class="card bg-base-100 border border-base-300 shadow-sm p-5 space-y-4 relative">
                   <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2.5">
@@ -4547,7 +4547,7 @@
                         💬
                       </div>
                       <div>
-                        <h4 class="font-extrabold text-xs text-base-content">WhatsApp Business</h4>
+                        <h4 class="font-extrabold text-xs text-base-content">Zap Business</h4>
                         <span class="text-[10px] text-base-content/50">Evolution API / Baileys</span>
                       </div>
                     </div>
@@ -4557,16 +4557,16 @@
                   <div class="p-3 bg-base-200/50 rounded-xl border border-base-300 space-y-2 text-xs">
                     <div class="flex items-center justify-between">
                       <span class="text-base-content/60 text-[11px]">Número Vinculado:</span>
-                      <strong class="font-mono text-emerald-600 font-bold" x-text="whatsappConfig.number"></strong>
+                      <strong class="font-mono text-emerald-600 font-bold" x-text="zapConfig.number"></strong>
                     </div>
                     <div class="flex items-center justify-between">
                       <span class="text-base-content/60 text-[11px]">Aparelho / Modelo:</span>
-                      <span class="font-semibold text-base-content" x-text="whatsappConfig.deviceName"></span>
+                      <span class="font-semibold text-base-content" x-text="zapConfig.deviceName"></span>
                     </div>
                     <div class="flex items-center justify-between">
                       <span class="text-base-content/60 text-[11px]">Nível de Bateria:</span>
                       <span class="font-bold text-success flex items-center gap-1">
-                        🔋 <span x-text="`${whatsappConfig.battery}%`"></span>
+                        🔋 <span x-text="`${zapConfig.battery}%`"></span>
                       </span>
                     </div>
                   </div>
@@ -4841,10 +4841,10 @@
                   </div>
                 </div>
 
-                <!-- Metric 3: WhatsApp Msgs -->
+                <!-- Metric 3: Zap Msgs -->
                 <div class="p-4 bg-base-200/50 rounded-xl border border-base-300 space-y-3">
                   <div class="flex items-center justify-between">
-                    <span class="font-bold text-xs text-base-content">Mensagens WhatsApp</span>
+                    <span class="font-bold text-xs text-base-content">Mensagens Zap</span>
                     <span class="text-[11px] font-bold text-accent">59.3%</span>
                   </div>
                   <progress class="progress progress-accent w-full" value="8900" max="15000"></progress>
@@ -5246,7 +5246,7 @@
                   <span class="badge badge-xs badge-success font-bold">Diretos</span>
                 </div>
                 <div class="text-xs font-extrabold text-base-content flex items-center gap-2">
-                  <span>💬 WhatsApp</span>
+                  <span>💬 Zap</span>
                   <span>✉️ E-mail</span>
                   <span>📞 Ramal</span>
                 </div>
@@ -5366,14 +5366,14 @@
                         </a>
                       </div>
 
-                      <!-- WhatsApp Direto -->
-                      <div x-show="contact.whatsapp" class="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/20 p-2 rounded-lg">
+                      <!-- Zap Direto -->
+                      <div x-show="contact.zap" class="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/20 p-2 rounded-lg">
                         <div class="flex items-center gap-2">
                           <span>💬</span>
-                          <span class="font-mono text-xs text-emerald-600 font-bold" x-text="contact.whatsapp"></span>
+                          <span class="font-mono text-xs text-emerald-600 font-bold" x-text="contact.zap"></span>
                         </div>
-                        <a :href="`https://wa.me/${contact.whatsapp}`" target="_blank" class="btn btn-xs btn-success text-success-content font-bold text-[10px] gap-1">
-                          <span>💬</span> Chamar WhatsApp
+                        <a :href="`https://wa.me/${contact.zap}`" target="_blank" class="btn btn-xs btn-success text-success-content font-bold text-[10px] gap-1">
+                          <span>💬</span> Chamar Zap
                         </a>
                       </div>
 
@@ -5433,7 +5433,7 @@
                       <th>Contato</th>
                       <th>Cargo / Departamento</th>
                       <th>E-mail</th>
-                      <th>Telefone / WhatsApp</th>
+                      <th>Telefone / Zap</th>
                       <th>Notas de Conversa</th>
                       <th class="text-right">Ações</th>
                     </tr>
@@ -5465,8 +5465,8 @@
                         </td>
                         <td class="whitespace-nowrap font-mono text-[11px]">
                           <div x-text="contact.phone"></div>
-                          <a x-show="contact.whatsapp" :href="`https://wa.me/${contact.whatsapp}`" target="_blank" class="text-emerald-600 font-bold hover:underline flex items-center gap-1 text-[10px]">
-                            <span>💬</span> <span x-text="contact.whatsapp"></span>
+                          <a x-show="contact.zap" :href="`https://wa.me/${contact.zap}`" target="_blank" class="text-emerald-600 font-bold hover:underline flex items-center gap-1 text-[10px]">
+                            <span>💬</span> <span x-text="contact.zap"></span>
                           </a>
                         </td>
                         <td class="max-w-xs">
@@ -5637,7 +5637,7 @@
                     </span>
                   </div>
                   <h5 class="font-extrabold text-xs text-base-content">Ingestão & Omnichannel</h5>
-                  <p class="text-[11px] text-base-content/60">Mensagens e transcrições via WhatsApp, E-mail e Voz chegam via webhooks SSE.</p>
+                  <p class="text-[11px] text-base-content/60">Mensagens e transcrições via Zap, E-mail e Voz chegam via webhooks SSE.</p>
                   <div class="text-[10px] font-mono text-primary font-semibold pt-1">⚡ Tempo real (&lt; 50ms)</div>
                 </div>
 
@@ -6135,7 +6135,7 @@
                     <label class="label py-0.5"><span class="label-text-alt font-bold text-[10px] text-base-content/70">Canal de Origem</span></label>
                     <select x-model="dataManagement.searchChannel" class="select select-xs select-bordered w-full text-xs bg-base-100">
                       <option value="all">Todos os Canais</option>
-                      <option value="WhatsApp">WhatsApp</option>
+                      <option value="Zap">Zap</option>
                       <option value="E-mail">E-mail</option>
                       <option value="Telefone">Telefone</option>
                     </select>
@@ -6172,7 +6172,7 @@
                       <div>
                         <div class="flex items-center gap-2 flex-wrap">
                           <h4 class="font-extrabold text-sm text-base-content" x-text="item.leadName"></h4>
-                          <span class="badge badge-xs font-bold" :class="item.channel === 'WhatsApp' ? 'badge-success' : 'badge-neutral'" x-text="item.channel"></span>
+                          <span class="badge badge-xs font-bold" :class="item.channel === 'Zap' ? 'badge-success' : 'badge-neutral'" x-text="item.channel"></span>
                           <span class="badge badge-outline badge-xs font-mono font-bold text-[10px] text-info">
                             ❄️ Cold Storage - Supabase DW
                           </span>
@@ -6440,7 +6440,7 @@
         <!-- Contact Cards Grid -->
         <div class="grid grid-cols-2 gap-4">
           <div class="p-3.5 bg-base-100 rounded-xl border border-base-300 space-y-1">
-            <span class="text-[10px] text-base-content/60 font-semibold block uppercase">Telefone / WhatsApp</span>
+            <span class="text-[10px] text-base-content/60 font-semibold block uppercase">Telefone / Zap</span>
             <span class="text-xs font-bold text-success font-mono" x-text="selectedLead?.phone || '+55 11 98765-4321'"></span>
           </div>
           <div class="p-3.5 bg-base-100 rounded-xl border border-base-300 space-y-1">
@@ -6490,7 +6490,7 @@
             </div>
             <div class="p-3 bg-base-200/60 rounded-lg border border-base-300 space-y-0.5">
               <span class="text-[10px] text-base-content/60 font-semibold block uppercase">Need (Necessidade)</span>
-              <span class="text-xs font-extrabold text-secondary" x-text="selectedLead?.bant?.need || 'Agente IA WhatsApp 24/7'"></span>
+              <span class="text-xs font-extrabold text-secondary" x-text="selectedLead?.bant?.need || 'Agente IA Zap 24/7'"></span>
             </div>
             <div class="p-3 bg-base-200/60 rounded-lg border border-base-300 space-y-0.5">
               <span class="text-[10px] text-base-content/60 font-semibold block uppercase">Timing (Prazo)</span>
@@ -6605,12 +6605,12 @@
 
       <!-- ABA 4: PREVIEW DE CONVERSA / CHAT -->
       <div x-show="leadDrawerTab === 'chat'" class="space-y-4">
-        <!-- WhatsApp Header Simulation -->
+        <!-- Zap Header Simulation -->
         <div class="p-3 bg-success/20 rounded-xl border border-success/30 flex items-center justify-between">
           <div class="flex items-center gap-2.5">
             <div class="w-2.5 h-2.5 rounded-full bg-success animate-pulse"></div>
             <div>
-              <h4 class="text-xs font-bold text-base-content" x-text="`Conversa WhatsApp com ${selectedLead?.leadName}`"></h4>
+              <h4 class="text-xs font-bold text-base-content" x-text="`Conversa Zap com ${selectedLead?.leadName}`"></h4>
               <span class="text-[10px] text-base-content/60">Agente Virtual: SDR-01 IA</span>
             </div>
           </div>
@@ -6637,7 +6637,7 @@
         <!-- Quick Reply Simulation Input -->
         <div class="flex items-center gap-2 pt-2">
           <input type="text" placeholder="Escreva uma mensagem simulada como SDR Humano..." class="input input-sm input-bordered flex-1 text-xs">
-          <button @click="showNotification('Mensagem enviada no WhatsApp!', 'success')" class="btn btn-sm btn-primary font-bold">Enviar</button>
+          <button @click="showNotification('Mensagem enviada no Zap!', 'success')" class="btn btn-sm btn-primary font-bold">Enviar</button>
         </div>
       </div>
 
@@ -6730,13 +6730,13 @@
 
               <div>
                 <label class="label font-bold text-[11px]">Canal Principal</label>
-                <input type="text" readonly :value="(selectedExecuteAction?.channels || ['WhatsApp', 'E-mail']).join(' + ')" class="input input-sm input-bordered w-full text-xs bg-base-200/50">
+                <input type="text" readonly :value="(selectedExecuteAction?.channels || ['Zap', 'E-mail']).join(' + ')" class="input input-sm input-bordered w-full text-xs bg-base-200/50">
               </div>
             </div>
 
             <label class="label cursor-pointer justify-start gap-2 pt-1">
               <input type="checkbox" x-model="executeForm.notifyTeam" class="checkbox checkbox-xs checkbox-primary" :disabled="executeProcessing">
-              <span class="label-text text-xs">Notificar equipe via Slack/WhatsApp após conclusão</span>
+              <span class="label-text text-xs">Notificar equipe via Slack/Zap após conclusão</span>
             </label>
           </div>
 
@@ -6869,7 +6869,7 @@
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="label font-bold text-xs">WhatsApp / Celular</label>
+            <label class="label font-bold text-xs">Zap / Celular</label>
             <input type="text" x-model="newLeadForm.phone" placeholder="+55 11 99999-8888" class="input input-sm input-bordered w-full">
           </div>
           <div>
@@ -6880,7 +6880,7 @@
         <div>
           <label class="label font-bold text-xs">Cadência Inicial de Ativação</label>
           <select x-model="newLeadForm.cadence" class="select select-sm select-bordered w-full font-medium">
-            <option value="inbound_high">Inbound High Intent (WhatsApp Imediato)</option>
+            <option value="inbound_high">Inbound High Intent (Zap Imediato)</option>
             <option value="outbound_health">Outbound Saúde & Clínicas</option>
             <option value="re-engagement">Re-engajamento de Base Parada</option>
           </select>
@@ -7034,7 +7034,7 @@
         <div>
           <label class="label font-bold text-xs">Tipo de Passo / Ação</label>
           <select x-model="editingStep.type" class="select select-sm select-bordered w-full font-medium">
-            <option value="ai_message">💬 Mensagem IA WhatsApp</option>
+            <option value="ai_message">💬 Mensagem IA Zap</option>
             <option value="email">✉️ Envio de E-mail</option>
             <option value="delay">⏳ Delay / Espera</option>
             <option value="condition_bant">🔀 Condição BANT / Branching</option>
@@ -7105,7 +7105,7 @@
             <div class="flex items-center gap-2">
               <div class="w-2.5 h-2.5 rounded-full bg-success animate-pulse"></div>
               <div>
-                <h4 class="text-xs font-bold text-base-content">Simulador WhatsApp Direct</h4>
+                <h4 class="text-xs font-bold text-base-content">Simulador Zap Direct</h4>
                 <span class="text-[10px] text-base-content/60">Agente: Sofia (IA Inbound)</span>
               </div>
             </div>
@@ -7808,13 +7808,13 @@
     </div>
   </dialog>
 
-  <!-- ==================== MODAL 2: PAREAMENTO QR CODE WHATSAPP ==================== -->
+  <!-- ==================== MODAL 2: PAREAMENTO QR CODE ZAP ==================== -->
   <dialog class="modal" :open="showQrCodeModal" :class="{ 'modal-open': showQrCodeModal }">
     <div class="modal-box bg-base-200 border border-base-300 p-6 space-y-4 max-w-sm text-center transition-all duration-300"
          :class="isQrCodeMaximized ? 'max-w-[96vw] w-[96vw] min-h-[90vh]' : 'max-w-sm w-full'">
       <div class="flex items-center justify-between border-b border-base-300 pb-3">
         <h3 class="font-extrabold text-sm flex items-center gap-2">
-          <span>📱</span> Conectar Instância WhatsApp
+          <span>📱</span> Conectar Instância Zap
         </h3>
         <div class="flex items-center gap-2">
           <button @click="isQrCodeMaximized = !isQrCodeMaximized" 
@@ -7835,7 +7835,7 @@
 
       <div class="space-y-4">
         <p class="text-xs text-base-content/70">
-          Abra o WhatsApp no celular > <strong>Aparelhos Conectados</strong> > <strong>Conectar um Aparelho</strong> e aponte para a tela.
+          Abra o Zap no celular > <strong>Aparelhos Conectados</strong> > <strong>Conectar um Aparelho</strong> e aponte para a tela.
         </p>
 
         <!-- Simulated QR Code Container -->
@@ -7936,7 +7936,7 @@
           </div>
 
           <div>
-            <label class="label font-semibold text-[11px]">WhatsApp / Celular</label>
+            <label class="label font-semibold text-[11px]">Zap / Celular</label>
             <input type="text" x-model="crmConfigForm.fieldMapPhone" class="input input-xs input-bordered w-full font-mono">
           </div>
         </div>
@@ -8547,7 +8547,7 @@
                   <div class="text-[10px] text-base-content/60" x-text="lead.company"></div>
                 </td>
                 <td>
-                  <span class="badge badge-xs font-semibold" :class="lead.channel === 'WhatsApp' ? 'badge-success' : lead.channel === 'LinkedIn' ? 'badge-secondary' : lead.channel === 'E-mail' ? 'badge-info' : 'badge-neutral'" x-text="lead.channel"></span>
+                  <span class="badge badge-xs font-semibold" :class="lead.channel === 'Zap' ? 'badge-success' : lead.channel === 'LinkedIn' ? 'badge-secondary' : lead.channel === 'E-mail' ? 'badge-info' : 'badge-neutral'" x-text="lead.channel"></span>
                 </td>
                 <td>
                   <span class="badge badge-xs font-bold" :class="lead.stage === 4 ? 'badge-accent' : lead.stage === 3 ? 'badge-secondary' : lead.stage === 2 ? 'badge-primary' : 'badge-ghost'" x-text="lead.stageName"></span>
@@ -9311,7 +9311,7 @@
             <span class="text-[11px] text-base-content/60">Canal:</span>
             <select x-model="funnelTimeConfig.selectedChannel" class="select select-xs select-bordered font-semibold">
               <option value="all">Todos os Canais</option>
-              <option value="whatsapp">WhatsApp</option>
+              <option value="zap">Zap</option>
               <option value="email">E-mail</option>
               <option value="linkedin">LinkedIn</option>
               <option value="voice">Voz</option>
@@ -9544,7 +9544,7 @@
               <span class="badge badge-xs badge-info font-bold">25.7%</span>
             </div>
             <div class="text-lg font-black text-info" x-text="`R$ ${costBreakdownComponents.aiInfra.toFixed(2).replace('.', ',')} / agendamento`">R$ 3,80 / agendamento</div>
-            <div class="text-[10px] text-base-content/50">LLMs + WhatsApp API + Twilio Vox</div>
+            <div class="text-[10px] text-base-content/50">LLMs + Zap API + Twilio Vox</div>
           </div>
 
           <div class="p-3.5 bg-base-100 rounded-xl border border-base-300 space-y-1 relative overflow-hidden">
@@ -9643,7 +9643,7 @@
               <input type="radio" name="costCalcMode" value="ai_direct" x-model="costConfig.calculationMode" class="radio radio-xs radio-secondary mt-0.5" />
               <div>
                 <span class="text-xs font-extrabold block text-base-content">Custo Computacional IA</span>
-                <span class="text-[10px] text-base-content/60 block mt-0.5">Apenas consumo de tokens LLM, WhatsApp API e Twilio por agendamento.</span>
+                <span class="text-[10px] text-base-content/60 block mt-0.5">Apenas consumo de tokens LLM, Zap API e Twilio por agendamento.</span>
                 <span class="badge badge-xs badge-ghost font-mono mt-2">R$ 3,80</span>
               </div>
             </label>
@@ -10159,8 +10159,8 @@
                   <button @click="selectedLeadJourneyFilter = 'all'" class="btn btn-xs font-bold" :class="selectedLeadJourneyFilter === 'all' ? 'btn-primary' : 'btn-ghost'">
                     Todos os Canais
                   </button>
-                  <button @click="selectedLeadJourneyFilter = 'WhatsApp'" class="btn btn-xs font-bold gap-1" :class="selectedLeadJourneyFilter === 'WhatsApp' ? 'btn-success' : 'btn-ghost'">
-                    💬 WhatsApp
+                  <button @click="selectedLeadJourneyFilter = 'Zap'" class="btn btn-xs font-bold gap-1" :class="selectedLeadJourneyFilter === 'Zap' ? 'btn-success' : 'btn-ghost'">
+                    💬 Zap
                   </button>
                   <button @click="selectedLeadJourneyFilter = 'E-mail'" class="btn btn-xs font-bold gap-1" :class="selectedLeadJourneyFilter === 'E-mail' ? 'btn-info' : 'btn-ghost'">
                     ✉️ E-mail
@@ -10533,7 +10533,7 @@
 
               <div class="p-2.5 rounded-xl bg-base-100/90 border border-primary/20 text-[11px] space-y-1">
                 <span class="font-bold text-primary block">🎯 Próxima Ação Sugerida:</span>
-                <p class="text-base-content/80 font-semibold">Enviar convite direto do Google Meet do Account Executive ou assumir conversa no WhatsApp se surgir dúvida contratual.</p>
+                <p class="text-base-content/80 font-semibold">Enviar convite direto do Google Meet do Account Executive ou assumir conversa no Zap se surgir dúvida contratual.</p>
               </div>
             </div>
 
@@ -10546,8 +10546,8 @@
                   <span>📅</span> Agendar Reunião Agora
                 </button>
 
-                <button @click="openQuickAction('whatsapp', selectedLeadJourney)" class="btn btn-sm btn-success w-full justify-start gap-2 font-bold text-success-content shadow-xs">
-                  <span>💬</span> Assumir Conversa no WhatsApp
+                <button @click="openQuickAction('zap', selectedLeadJourney)" class="btn btn-sm btn-success w-full justify-start gap-2 font-bold text-success-content shadow-xs">
+                  <span>💬</span> Assumir Conversa no Zap
                 </button>
 
                 <button @click="openQuickAction('cadence', selectedLeadJourney)" class="btn btn-sm btn-outline btn-info w-full justify-start gap-2 font-bold">
@@ -10643,7 +10643,7 @@
           <div class="space-y-1 text-xs">
             <span class="font-bold text-primary block uppercase tracking-wider text-[10px]">AI Briefing & Preferências Coletadas</span>
             <p class="text-base-content/80 leading-relaxed">
-              Lead solicitou reunião comercial no período da tarde via Google Meet. Interesse prioritário: <strong>Automação de no-show & integração WhatsApp/CRM</strong>.
+              Lead solicitou reunião comercial no período da tarde via Google Meet. Interesse prioritário: <strong>Automação de no-show & integração Zap/CRM</strong>.
             </p>
           </div>
         </div>
@@ -10755,8 +10755,8 @@
             </label>
 
             <label class="cursor-pointer flex items-center gap-2 text-xs">
-              <input type="checkbox" x-model="scheduleForm.sendWhatsappReminder" class="checkbox checkbox-xs checkbox-primary">
-              <span>Agendar mensagem de confirmação ativa no WhatsApp 2h antes da reunião</span>
+              <input type="checkbox" x-model="scheduleForm.sendZapReminder" class="checkbox checkbox-xs checkbox-primary">
+              <span>Agendar mensagem de confirmação ativa no Zap 2h antes da reunião</span>
             </label>
 
             <label class="cursor-pointer flex items-center gap-2 text-xs">
@@ -10778,9 +10778,9 @@
   </dialog>
 
   <!-- ==================== MODAL 2: CENTRAL DE TRANSBORDO & ATRIBUIÇÃO DE ATENDIMENTO ==================== -->
-  <dialog class="modal" :open="showAssignmentModal || showWhatsAppTakeoverModal" :class="{ 'modal-open': showAssignmentModal || showWhatsAppTakeoverModal }">
+  <dialog class="modal" :open="showAssignmentModal || showZapTakeoverModal" :class="{ 'modal-open': showAssignmentModal || showZapTakeoverModal }">
     <div class="modal-box max-w-3xl bg-base-100 border border-base-300 shadow-2xl p-0 overflow-hidden rounded-2xl transition-all duration-300"
-         :class="isWhatsAppTakeoverMaximized ? 'max-w-[96vw] w-[96vw] min-h-[90vh]' : 'max-w-3xl w-full'">
+         :class="isZapTakeoverMaximized ? 'max-w-[96vw] w-[96vw] min-h-[90vh]' : 'max-w-3xl w-full'">
       <!-- Header -->
       <div class="bg-gradient-to-r from-primary/15 via-base-200 to-base-200 p-5 border-b border-base-300 flex items-center justify-between">
         <div class="flex items-center gap-3">
@@ -10800,19 +10800,19 @@
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <button @click="isWhatsAppTakeoverMaximized = !isWhatsAppTakeoverMaximized" 
+          <button @click="isZapTakeoverMaximized = !isZapTakeoverMaximized" 
                   class="btn btn-sm btn-ghost gap-1.5 text-xs text-base-content/70 hover:text-base-content" 
-                  :title="isWhatsAppTakeoverMaximized ? 'Restaurar tamanho padrão' : 'Ampliar modal em tela inteira'">
-            <span x-show="!isWhatsAppTakeoverMaximized" class="flex items-center gap-1.5 font-semibold">
+                  :title="isZapTakeoverMaximized ? 'Restaurar tamanho padrão' : 'Ampliar modal em tela inteira'">
+            <span x-show="!isZapTakeoverMaximized" class="flex items-center gap-1.5 font-semibold">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
               Ampliar Modal
             </span>
-            <span x-show="isWhatsAppTakeoverMaximized" class="flex items-center gap-1.5 font-semibold">
+            <span x-show="isZapTakeoverMaximized" class="flex items-center gap-1.5 font-semibold">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 15L4 20m0 0h4m-4 0v-4m11 4l5-5m-5 5v-4m5 4h-4M9 9L4 4m0 0h4m-4 0v4m11-4l5 5m-5-5v4m5-4h-4"/></svg>
               Restaurar
             </span>
           </button>
-          <button @click="showAssignmentModal = false; showWhatsAppTakeoverModal = false;" class="btn btn-sm btn-circle btn-ghost text-base-content/70">✕</button>
+          <button @click="showAssignmentModal = false; showZapTakeoverModal = false;" class="btn btn-sm btn-circle btn-ghost text-base-content/70">✕</button>
         </div>
       </div>
 
@@ -10932,7 +10932,7 @@
             </div>
 
             <div>
-              <label class="block text-[11px] font-bold text-base-content/80 mb-1">Mensagem Inicial / Briefing para o Lead no WhatsApp</label>
+              <label class="block text-[11px] font-bold text-base-content/80 mb-1">Mensagem Inicial / Briefing para o Lead no Zap</label>
               <textarea x-model="assignmentForm.initialMessage" rows="2" class="textarea textarea-bordered w-full text-xs" placeholder="Ex: Olá! Sou Fernando Silva, Closer sênior. Assumi o seu atendimento para apresentar nossa proposta comercial personalizada..."></textarea>
             </div>
           </div>
@@ -11071,7 +11071,7 @@
 
       <!-- Footer -->
       <div class="p-4 bg-base-200/80 border-t border-base-300 flex items-center justify-between">
-        <button @click="showAssignmentModal = false; showWhatsAppTakeoverModal = false;" class="btn btn-sm btn-ghost">Cancelar</button>
+        <button @click="showAssignmentModal = false; showZapTakeoverModal = false;" class="btn btn-sm btn-ghost">Cancelar</button>
         <button @click="executeAssignmentChange()" class="btn btn-sm font-bold gap-2 shadow-md"
                 :class="assignmentTab === 'ai' ? 'btn-primary text-primary-content' : 'btn-secondary text-secondary-content'">
           <span>🚀</span> Confirmar Atribuição e Gravar Auditoria
@@ -11145,7 +11145,7 @@
             <div x-show="restartCadenceForm.startStep !== 1" class="pl-6 pt-1">
               <select x-model="restartCadenceForm.startStep" class="select select-xs select-bordered w-full text-xs">
                 <option value="2">Passo 2: E-mail com Estudo de Caso & ROI</option>
-                <option value="3">Passo 3: WhatsApp Direto com Oferta Especial</option>
+                <option value="3">Passo 3: Zap Direto com Oferta Especial</option>
                 <option value="4">Passo 4: Ligação do SDR / Agente de Voz</option>
                 <option value="5">Passo 5: Break-up Email Final</option>
               </select>
@@ -11347,7 +11347,7 @@
             <span>🚀</span> Evolua a Operação do seu Revenue SDR OS
           </h3>
           <p class="text-xs text-base-content/70 mt-1">
-            Escolha o plano ideal para ampliar sua prospecção, integrar novos canais de WhatsApp e liberar múltiplos agentes de IA.
+            Escolha o plano ideal para ampliar sua prospecção, integrar novos canais de Zap e liberar múltiplos agentes de IA.
           </p>
         </div>
         <div class="flex items-center gap-2">
@@ -11421,7 +11421,7 @@
                 <li class="flex items-center gap-2"><span>👤</span> <strong>1 Usuário</strong> SDR</li>
                 <li class="flex items-center gap-2"><span>🎯</span> <strong>500 Leads</strong>/mês no Pipeline</li>
                 <li class="flex items-center gap-2"><span>🧠</span> <strong>500k Tokens</strong> de IA/mês</li>
-                <li class="flex items-center gap-2"><span>💬</span> <strong>1 Instância</strong> WhatsApp</li>
+                <li class="flex items-center gap-2"><span>💬</span> <strong>1 Instância</strong> Zap</li>
                 <li class="flex items-center gap-2 text-base-content/40"><span>❌</span> Sem suporte BYOK</li>
               </ul>
             </div>
@@ -11459,7 +11459,7 @@
                 <li class="flex items-center gap-2"><span>👥</span> <strong>5 Usuários</strong> SDR</li>
                 <li class="flex items-center gap-2"><span>🎯</span> <strong>5.000 Leads</strong>/mês</li>
                 <li class="flex items-center gap-2"><span>🧠</span> <strong>2M Tokens</strong> de IA/mês</li>
-                <li class="flex items-center gap-2"><span>💬</span> <strong>3 Instâncias</strong> WhatsApp</li>
+                <li class="flex items-center gap-2"><span>💬</span> <strong>3 Instâncias</strong> Zap</li>
                 <li class="flex items-center gap-2"><span>🔑</span> Suporte <strong>BYOK</strong> (Chaves Próprias)</li>
               </ul>
             </div>
@@ -11497,7 +11497,7 @@
                 <li class="flex items-center gap-2"><span>👥</span> <strong>15 Usuários</strong> SDR</li>
                 <li class="flex items-center gap-2"><span>🎯</span> <strong>25.000 Leads</strong>/mês</li>
                 <li class="flex items-center gap-2"><span>🧠</span> <strong>10M Tokens</strong> de IA/mês</li>
-                <li class="flex items-center gap-2"><span>💬</span> <strong>10 Instâncias</strong> WhatsApp</li>
+                <li class="flex items-center gap-2"><span>💬</span> <strong>10 Instâncias</strong> Zap</li>
                 <li class="flex items-center gap-2"><span>🎙️</span> SDR Copilot <strong>Voz / Áudio HD</strong></li>
                 <li class="flex items-center gap-2"><span>🛡️</span> Guardrails & SLA Prioritário</li>
               </ul>
@@ -11529,7 +11529,7 @@
 
               <ul class="text-xs space-y-2 text-base-content/80">
                 <li class="flex items-center gap-2"><span>♾️</span> <strong>Leads & Tokens</strong> Ilimitados</li>
-                <li class="flex items-center gap-2"><span>💬</span> <strong>WhatsApp</strong> Ilimitado</li>
+                <li class="flex items-center gap-2"><span>💬</span> <strong>Zap</strong> Ilimitado</li>
                 <li class="flex items-center gap-2"><span>🖥️</span> VPS Isolada Dedicada (ADR-004)</li>
                 <li class="flex items-center gap-2"><span>🤝</span> Gerente de Conta Dedicado</li>
                 <li class="flex items-center gap-2"><span>🎓</span> Treinamento de LLM Sob Medida</li>
@@ -11585,16 +11585,16 @@
               </div>
             </div>
 
-            <!-- Addon 3: WhatsApp extra -->
+            <!-- Addon 3: Zap extra -->
             <div class="p-4 bg-base-100 rounded-xl border border-base-300 flex items-center justify-between gap-3">
               <div>
-                <span class="font-bold text-xs text-base-content flex items-center gap-1">💬 Instâncias WhatsApp</span>
+                <span class="font-bold text-xs text-base-content flex items-center gap-1">💬 Instâncias Zap</span>
                 <p class="text-[11px] text-base-content/60">+1 Número por R$ 250/mês</p>
               </div>
               <div class="flex items-center gap-2 bg-base-200 p-1 rounded-lg border border-base-300">
-                <button @click="if (extraWhatsappQty > 0) extraWhatsappQty--" class="btn btn-xs btn-square btn-ghost font-black">-</button>
-                <span class="text-xs font-black px-2" x-text="extraWhatsappQty"></span>
-                <button @click="extraWhatsappQty++" class="btn btn-xs btn-square btn-ghost font-black">+</button>
+                <button @click="if (extraZapQty > 0) extraZapQty--" class="btn btn-xs btn-square btn-ghost font-black">-</button>
+                <span class="text-xs font-black px-2" x-text="extraZapQty"></span>
+                <button @click="extraZapQty++" class="btn btn-xs btn-square btn-ghost font-black">+</button>
               </div>
             </div>
 
@@ -11801,7 +11801,7 @@
             <div class="p-4 bg-base-200/50 rounded-xl border border-base-300 text-center space-y-1">
               <span class="text-2xl">💬</span>
               <strong class="block text-sm font-black text-base-content">15.000 Msgs</strong>
-              <span class="text-[11px] text-base-content/60 font-semibold">WhatsApp Disparos</span>
+              <span class="text-[11px] text-base-content/60 font-semibold">Zap Disparos</span>
             </div>
             <div class="p-4 bg-base-200/50 rounded-xl border border-base-300 text-center space-y-1">
               <span class="text-2xl">👥</span>
@@ -12749,11 +12749,11 @@
           </div>
         </div>
 
-        <!-- WhatsApp & Status -->
+        <!-- Zap & Status -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div class="space-y-1">
-            <label class="font-bold text-base-content">WhatsApp (com DDD):</label>
-            <input type="text" x-model="contactForm.whatsapp" placeholder="5511987654321" class="input input-sm input-bordered w-full bg-base-100 focus:border-primary" />
+            <label class="font-bold text-base-content">Zap (com DDD):</label>
+            <input type="text" x-model="contactForm.zap" placeholder="5511987654321" class="input input-sm input-bordered w-full bg-base-100 focus:border-primary" />
           </div>
 
           <div class="space-y-1">
@@ -14177,9 +14177,9 @@
             company: 'Hospital São Lucas',
             phone: '+55 11 98765-4321',
             role: 'Diretor Médico @ Hospital São Lucas',
-            channel: 'WhatsApp',
+            channel: 'Zap',
             channelClass: 'badge-success',
-            channelDetail: 'WhatsApp Official',
+            channelDetail: 'Zap Official',
             time: '14:32',
             lastMsg: 'Gostaria de agendar a demonstração sobre o plano premium...',
             sdrAgent: 'SDR-01 IA',
@@ -14192,7 +14192,7 @@
             funnelStage: 'Reunião Agendada',
             aiMode: 'Ativo (SDR-01)',
             messages: [
-              { sender: 'Dr. Roberto Alves', time: '14:28', isAi: false, isHumanOperator: false, text: 'Olá! Gostaria de entender melhor como funciona a qualificação de leads via WhatsApp.' },
+              { sender: 'Dr. Roberto Alves', time: '14:28', isAi: false, isHumanOperator: false, text: 'Olá! Gostaria de entender melhor como funciona a qualificação de leads via Zap.' },
               { sender: 'Agente IA (Sofia SDR)', time: '14:29', isAi: true, isHumanOperator: false, text: 'Olá Dr. Roberto! Nossa IA SDR conversa de forma 100% natural, aplica a metodologia BANT em tempo real e agenda a demonstração diretamente na agenda dos seus vendedores. Gostaria de agendar 15 minutos hoje?' },
               { sender: 'Dr. Roberto Alves', time: '14:32', isAi: false, isHumanOperator: false, text: 'Perfeito. Vocês têm horário disponível hoje às 16h30?' }
             ]
@@ -14205,9 +14205,9 @@
             company: 'Clinik Odontologia',
             phone: '+55 11 97123-8899',
             role: 'Gestora Comercial @ Clinik Odontologia',
-            channel: 'WhatsApp',
+            channel: 'Zap',
             channelClass: 'badge-success',
-            channelDetail: 'WhatsApp Official',
+            channelDetail: 'Zap Official',
             time: '14:15',
             lastMsg: 'Qual o tempo de implementação da solução?',
             sdrAgent: 'Alerta Handoff',
@@ -14270,10 +14270,10 @@
           searchSdr: 'all',
           searchPeriod: '6m',
           searchResults: [
-            { id: 'hist_101', leadName: 'Dr. Roberto Alves', company: 'Clínica Sorriso', channel: 'WhatsApp', date: '2026-03-14', messageCount: 42, matchSnippet: '...gostaria de agendar a demonstração sobre o plano premium...', sentiment: 'Positivo (88%)', sdr: 'Agente IA (SDR-01)', summary: 'Lead interessado no plano Premium. Agendamento pré-confirmado para demonstração técnica.' },
-            { id: 'hist_102', leadName: 'Mariana Lima', company: 'Imóveis Prime', channel: 'WhatsApp', date: '2026-02-20', messageCount: 28, matchSnippet: '...fechamos a proposta conforme enviado no contrato...', sentiment: 'Neutro/Positivo (75%)', sdr: 'Agente IA (SDR-02)', summary: 'Fechamento de proposta comercial enviado. Solicitada minuta de contrato.' },
+            { id: 'hist_101', leadName: 'Dr. Roberto Alves', company: 'Clínica Sorriso', channel: 'Zap', date: '2026-03-14', messageCount: 42, matchSnippet: '...gostaria de agendar a demonstração sobre o plano premium...', sentiment: 'Positivo (88%)', sdr: 'Agente IA (SDR-01)', summary: 'Lead interessado no plano Premium. Agendamento pré-confirmado para demonstração técnica.' },
+            { id: 'hist_102', leadName: 'Mariana Lima', company: 'Imóveis Prime', channel: 'Zap', date: '2026-02-20', messageCount: 28, matchSnippet: '...fechamos a proposta conforme enviado no contrato...', sentiment: 'Neutro/Positivo (75%)', sdr: 'Agente IA (SDR-02)', summary: 'Fechamento de proposta comercial enviado. Solicitada minuta de contrato.' },
             { id: 'hist_103', leadName: 'Carlos Eduardo Santos', company: 'TechSolutions Ltda', channel: 'E-mail', date: '2025-11-10', messageCount: 15, matchSnippet: '...solicito envio de documentação de homologação de segurança...', sentiment: 'Neutro (60%)', sdr: 'Fernando Silva (Humano)', summary: 'Solicitação de requisitos de segurança de TI e conformidade LGPD.' },
-            { id: 'hist_104', leadName: 'Juliana Paes', company: 'Estética & Saúde', channel: 'WhatsApp', date: '2025-08-05', messageCount: 54, matchSnippet: '...dúvidas quanto aos valores de licença por unidade adicional...', sentiment: 'Positivo (92%)', sdr: 'Agente IA (SDR-01)', summary: 'Dúvidas sobre expansão multi-unidades esclarecidas com envio de tabela.' }
+            { id: 'hist_104', leadName: 'Juliana Paes', company: 'Estética & Saúde', channel: 'Zap', date: '2025-08-05', messageCount: 54, matchSnippet: '...dúvidas quanto aos valores de licença por unidade adicional...', sentiment: 'Positivo (92%)', sdr: 'Agente IA (SDR-01)', summary: 'Dúvidas sobre expansão multi-unidades esclarecidas com envio de tabela.' }
           ],
           syncJobs: [
             { id: 'job_001', datetime: '2026-07-27 02:00', type: 'ETL D-1 (Hot -> Cold)', records: 14250, status: 'Sucesso', duration: '1m 42s' },
@@ -14325,7 +14325,7 @@
         isAiAutonomyMaximized: false,
         isLeadJourneyMaximized: false,
         isScheduleMeetingMaximized: false,
-        isWhatsAppTakeoverMaximized: false,
+        isZapTakeoverMaximized: false,
         isRestartCadenceMaximized: false,
         isChangeStageMaximized: false,
         isUpgradePlanMaximized: false,
@@ -14346,7 +14346,7 @@
 
         // --- ESTADO DOS MODAIS DAS AÇÕES RÁPIDAS DE DECISÃO ---
         showScheduleMeetingModal: false,
-        showWhatsAppTakeoverModal: false,
+        showZapTakeoverModal: false,
         showAssignmentModal: false,
         assignmentTab: 'human', // 'human' | 'ai' | 'history'
         showRestartCadenceModal: false,
@@ -14396,12 +14396,12 @@
           date: '',
           time: '14:30',
           sendEmailInvite: true,
-          sendWhatsappReminder: true,
+          sendZapReminder: true,
           pauseCadence: true,
           meetLink: 'https://meet.google.com/rsd-demo-x89'
         },
 
-        whatsappTakeoverForm: {
+        zapTakeoverForm: {
           reason: 'Objeção de Preço',
           pauseAiMode: '24h',
           initialMessage: ''
@@ -14423,7 +14423,7 @@
 
         // Sub-abas internas dos modais
         leadJourneyModalTab: 'timeline',    // 'timeline' | 'cadence' | 'memory' | 'calls'
-        selectedLeadJourneyFilter: 'all',   // 'all' | 'WhatsApp' | 'E-mail' | 'LinkedIn' | 'Voz' | 'lead'
+        selectedLeadJourneyFilter: 'all',   // 'all' | 'Zap' | 'E-mail' | 'LinkedIn' | 'Voz' | 'lead'
         leadAudioPlaying: false,
         leadAudioPlaybackRate: '1.0x',
         leadAudioCurrentTime: '00:42',
@@ -14450,8 +14450,8 @@
           { stage: 'BANT -> Reunião Agendada', avgDays: 1.2, slaTarget: 1.5, status: 'ok', hoursText: '~28h', isBottleneck: false }
         ],
         funnelLeadsList: [
-          { leadName: 'Dr. Roberto Alves', company: 'Hospital São Lucas', channel: 'WhatsApp', entryDate: '20/07/2026', currentStage: 'Reunião Agendada', daysInStage: 0.3, totalDays: 3.2, slaStatus: '🟢 Dentro do SLA' },
-          { leadName: 'Mariana Costa', company: 'TechMed Solutions', channel: 'WhatsApp', entryDate: '21/07/2026', currentStage: 'Qualificação BANT', daysInStage: 1.1, totalDays: 2.1, slaStatus: '🟡 Alerta SLA' },
+          { leadName: 'Dr. Roberto Alves', company: 'Hospital São Lucas', channel: 'Zap', entryDate: '20/07/2026', currentStage: 'Reunião Agendada', daysInStage: 0.3, totalDays: 3.2, slaStatus: '🟢 Dentro do SLA' },
+          { leadName: 'Mariana Costa', company: 'TechMed Solutions', channel: 'Zap', entryDate: '21/07/2026', currentStage: 'Qualificação BANT', daysInStage: 1.1, totalDays: 2.1, slaStatus: '🟡 Alerta SLA' },
           { leadName: 'Carlos Eduardo Rocha', company: 'Imobiliária Center', channel: 'LinkedIn', entryDate: '19/07/2026', currentStage: 'Engajamento IA', daysInStage: 1.8, totalDays: 4.0, slaStatus: '🔴 Crítico' },
           { leadName: 'Fernanda Lima', company: 'Bela Dermato', channel: 'E-mail', entryDate: '22/07/2026', currentStage: '1ª Abordagem IA', daysInStage: 0.1, totalDays: 0.5, slaStatus: '🟢 Dentro do SLA' },
           { leadName: 'Juliana Paes', company: 'Estética Imperial', channel: 'Voz', entryDate: '18/07/2026', currentStage: 'Reunião Agendada', daysInStage: 0.4, totalDays: 2.8, slaStatus: '🟢 Dentro do SLA' }
@@ -14527,12 +14527,12 @@
 
         // Records for BANT Modal Tab 1
         bantRecordsList: [
-          { id: 1, leadName: 'Dr. Roberto Alves', company: 'Hospital São Lucas', channel: 'WhatsApp', budget: 95, authority: 90, need: 85, timeline: 80, finalScore: 88, status: 'Qualificado SQL', date: 'Hoje às 14:20' },
-          { id: 2, leadName: 'Mariana Costa', company: 'TechMed Solutions', channel: 'WhatsApp', budget: 80, authority: 85, need: 75, timeline: 70, finalScore: 78, status: 'Qualificado SQL', date: 'Hoje às 11:45' },
+          { id: 1, leadName: 'Dr. Roberto Alves', company: 'Hospital São Lucas', channel: 'Zap', budget: 95, authority: 90, need: 85, timeline: 80, finalScore: 88, status: 'Qualificado SQL', date: 'Hoje às 14:20' },
+          { id: 2, leadName: 'Mariana Costa', company: 'TechMed Solutions', channel: 'Zap', budget: 80, authority: 85, need: 75, timeline: 70, finalScore: 78, status: 'Qualificado SQL', date: 'Hoje às 11:45' },
           { id: 3, leadName: 'Carlos Eduardo Rocha', company: 'Imobiliária Center', channel: 'LinkedIn', budget: 60, authority: 70, need: 80, timeline: 50, finalScore: 65, status: 'Em Análise', date: 'Ontem às 16:30' },
           { id: 4, leadName: 'Fernanda Lima', company: 'Bela Dermato', channel: 'E-mail', budget: 90, authority: 95, need: 90, timeline: 85, finalScore: 90, status: 'Qualificado SQL', date: 'Ontem às 10:15' },
           { id: 5, leadName: 'Ricardo Souza', company: 'Clínica Odonto-Vida', channel: 'Voz', budget: 40, authority: 50, need: 60, timeline: 30, finalScore: 45, status: 'Desqualificado', date: '21/07/2026' },
-          { id: 6, leadName: 'Juliana Paes', company: 'Estética Imperial', channel: 'WhatsApp', budget: 85, authority: 80, need: 85, timeline: 75, finalScore: 81, status: 'Qualificado SQL', date: '20/07/2026' }
+          { id: 6, leadName: 'Juliana Paes', company: 'Estética Imperial', channel: 'Zap', budget: 85, authority: 80, need: 85, timeline: 75, finalScore: 81, status: 'Qualificado SQL', date: '20/07/2026' }
         ],
 
         // --- TODO 3: METAS, SLOTS E CALENDÁRIOS ---
@@ -14652,7 +14652,7 @@
           department: 'Financeiro',
           email: '',
           phone: '',
-          whatsapp: '',
+          zap: '',
           isPrimary: false,
           status: 'Ativo',
           notes: ''
@@ -14667,7 +14667,7 @@
             email: 'ana.silva@clinicabela.com.br',
             phone: '(11) 3289-4001',
             extension: '101',
-            whatsapp: '5511987654321',
+            zap: '5511987654321',
             isPrimary: true,
             status: 'Ativo',
             avatarBg: 'bg-emerald-500 text-white',
@@ -14685,7 +14685,7 @@
             email: 'contasapagar@clinicabela.com.br',
             phone: '(11) 3289-4005',
             extension: '105',
-            whatsapp: '5511976543210',
+            zap: '5511976543210',
             isPrimary: false,
             status: 'Ativo',
             avatarBg: 'bg-primary text-primary-content',
@@ -14702,7 +14702,7 @@
             email: 'faturamento@clinicabela.com.br',
             phone: '(11) 3289-4008',
             extension: '108',
-            whatsapp: '5511965432109',
+            zap: '5511965432109',
             isPrimary: false,
             status: 'Em Reunião',
             avatarBg: 'bg-secondary text-secondary-content',
@@ -14719,7 +14719,7 @@
             email: 'tesouraria@clinicabela.com.br',
             phone: '(11) 3289-4012',
             extension: '112',
-            whatsapp: '5511954321098',
+            zap: '5511954321098',
             isPrimary: false,
             status: 'Ativo',
             avatarBg: 'bg-accent text-accent-content',
@@ -14806,7 +14806,7 @@
           { name: 'Auditor Read-Only', description: 'Acesso exclusivo de visualização para auditoria de compliance, logs CoT e BI.', viewLeads: 'Somente Leitura', editCadences: 'Somente Leitura', manageBrain: 'Somente Leitura', manageBilling: 'Somente Leitura' }
         ],
 
-        whatsappConfig: {
+        zapConfig: {
           status: 'connected',
           number: '+55 11 99887-6655',
           battery: 88,
@@ -14854,7 +14854,7 @@
         billingCycle: 'monthly',
         extraTokensQty: 0,
         extraSeatsQty: 0,
-        extraWhatsappQty: 0,
+        extraZapQty: 0,
         acceptUpgradeTerms: false,
 
         billingInfo: {
@@ -14938,7 +14938,7 @@
           { id: 'INV-2026-06', date: '15/06/2026', description: 'Mensalidade Enterprise Growth - Junho/2026', amount: 'R$ 2.490,00', paymentMethod: '💳 Cartão Visa (4892)', status: 'Paga' },
           { id: 'INV-2026-05', date: '15/05/2026', description: 'Mensalidade Enterprise Growth - Maio/2026', amount: 'R$ 2.490,00', paymentMethod: '📄 Boleto Bancário', status: 'Paga' },
           { id: 'INV-2026-04', date: '15/04/2026', description: 'Setup Inicial & Licenças Adicionais - Abril/2026', amount: 'R$ 3.800,00', paymentMethod: '💳 Cartão Visa (4892)', status: 'Paga' },
-          { id: 'INV-2026-03', date: '15/03/2026', description: 'Pacote Adicional Crédito WhatsApp LLM - Março/2026', amount: 'R$ 850,00', paymentMethod: '⚡ PIX Automático', status: 'Pendente' },
+          { id: 'INV-2026-03', date: '15/03/2026', description: 'Pacote Adicional Crédito Zap LLM - Março/2026', amount: 'R$ 850,00', paymentMethod: '⚡ PIX Automático', status: 'Pendente' },
           { id: 'INV-2026-02', date: '15/02/2026', description: 'Serviço de Customização de Prompt Agent - Fevereiro/2026', amount: 'R$ 1.200,00', paymentMethod: '📄 Boleto Bancário', status: 'Cancelada' }
         ],
 
@@ -14992,14 +14992,14 @@
 
         // MOCK DATASET: LEAD MEMORIES LIST
         leadMemoriesList: [
-          { id: 1, leadName: 'Dr. Roberto Alves', leadCompany: 'Hospital São Lucas', category: 'Fatos Financeiros/Orçamento', key: 'orcamento_teto', value: 'Possui orçamento aprovado de R$ 45.000/mês para expansão', score: 98, source: 'WhatsApp IA', verified: true },
-          { id: 2, leadName: 'Dr. Roberto Alves', leadCompany: 'Hospital São Lucas', category: 'Restrições & Datas', key: 'prazo_decisao', value: 'Precisa fechar contrato até dia 10 do próximo mês', score: 95, source: 'WhatsApp IA', verified: true },
-          { id: 3, leadName: 'Mariana Costa', leadCompany: 'TechMed Solutions', category: 'Preferências', key: 'canal_preferencial', value: 'Prefere contato via WhatsApp pela manhã, não atender chamadas', score: 99, source: 'WhatsApp IA', verified: true },
+          { id: 1, leadName: 'Dr. Roberto Alves', leadCompany: 'Hospital São Lucas', category: 'Fatos Financeiros/Orçamento', key: 'orcamento_teto', value: 'Possui orçamento aprovado de R$ 45.000/mês para expansão', score: 98, source: 'Zap IA', verified: true },
+          { id: 2, leadName: 'Dr. Roberto Alves', leadCompany: 'Hospital São Lucas', category: 'Restrições & Datas', key: 'prazo_decisao', value: 'Precisa fechar contrato até dia 10 do próximo mês', score: 95, source: 'Zap IA', verified: true },
+          { id: 3, leadName: 'Mariana Costa', leadCompany: 'TechMed Solutions', category: 'Preferências', key: 'canal_preferencial', value: 'Prefere contato via Zap pela manhã, não atender chamadas', score: 99, source: 'Zap IA', verified: true },
           { id: 4, leadName: 'Mariana Costa', leadCompany: 'TechMed Solutions', category: 'Histórico de Objeções', key: 'objecao_principal', value: 'Preocupação com curva de aprendizado da equipe com a ferramenta', score: 91, source: 'Transcrição de Chamada', verified: false },
-          { id: 5, leadName: 'Carlos Eduardo', leadCompany: 'Imobiliária Center', category: 'Decisor & Processo', key: 'decisor_final', value: 'Precisa de aprovação formal do CFO Sr. Fernando', score: 94, source: 'WhatsApp IA', verified: true },
-          { id: 6, leadName: 'Fernanda Lima', leadCompany: 'Bela Dermato', category: 'Fatos Financeiros/Orçamento', key: 'software_atual', value: 'Utiliza Salesforce CRM atualmente com custo de US$ 120/user', score: 96, source: 'WhatsApp IA', verified: false },
+          { id: 5, leadName: 'Carlos Eduardo', leadCompany: 'Imobiliária Center', category: 'Decisor & Processo', key: 'decisor_final', value: 'Precisa de aprovação formal do CFO Sr. Fernando', score: 94, source: 'Zap IA', verified: true },
+          { id: 6, leadName: 'Fernanda Lima', leadCompany: 'Bela Dermato', category: 'Fatos Financeiros/Orçamento', key: 'software_atual', value: 'Utiliza Salesforce CRM atualmente com custo de US$ 120/user', score: 96, source: 'Zap IA', verified: false },
           { id: 7, leadName: 'Ricardo Souza', leadCompany: 'Clínica Odonto-Vida', category: 'Relacionamento', key: 'indicacao_origem', value: 'Indicado pelo Dr. Roberto Alves do Hospital São Lucas', score: 100, source: 'Edição Manual', verified: true },
-          { id: 8, leadName: 'Ana Beatriz', leadCompany: 'Estética VIP', category: 'Restrições & Datas', key: 'horario_contato', value: 'Disponível apenas após as 17h para reuniões de apresentação', score: 92, source: 'WhatsApp IA', verified: false }
+          { id: 8, leadName: 'Ana Beatriz', leadCompany: 'Estética VIP', category: 'Restrições & Datas', key: 'horario_contato', value: 'Disponível apenas após as 17h para reuniões de apresentação', score: 92, source: 'Zap IA', verified: false }
         ],
 
         // MOCK DATASET: GUARDRAILS CONFIG
@@ -15017,7 +15017,7 @@
           ],
           objectionMatrix: [
             { id: 1, objection: 'O valor está acima do nosso orçamento atual', guideline: 'Apresentar ROI de redução de CAC, economia com horas de SDR e oferecer parcelamento da taxa de onboarding.', active: true },
-            { id: 2, objection: 'Já usamos um CRM/automação da concorrência', guideline: 'Destacar a inteligência multi-agente nativa em WhatsApp, sincronização em tempo real e RAG de memória contínua.', active: true },
+            { id: 2, objection: 'Já usamos um CRM/automação da concorrência', guideline: 'Destacar a inteligência multi-agente nativa em Zap, sincronização em tempo real e RAG de memória contínua.', active: true },
             { id: 3, objection: 'Preciso aprovar com a diretoria/CFO antes', guideline: 'Oferecer envio de One-Pager Executivo focado em ROI e propor agendamento de demo de 15 min com a diretoria.', active: true },
             { id: 4, objection: 'Não tenho tempo para implementar agora', guideline: 'Enfatizar que o onboarding é 100% guiado e que o primeiro Agente IA entra em produção em menos de 48 horas.', active: true }
           ]
@@ -15029,7 +15029,7 @@
             id: 8091,
             timestamp: 'Há 3 min (14:38)',
             leadName: 'Dr. Roberto Alves',
-            channel: 'WhatsApp',
+            channel: 'Zap',
             intent: 'Dúvida sobre cancelamento e garantia do plano',
             confidence: 98,
             guardrailStatus: 'approved',
@@ -15044,13 +15044,13 @@
             id: 8090,
             timestamp: 'Há 14 min (14:27)',
             leadName: 'Mariana Costa',
-            channel: 'WhatsApp',
+            channel: 'Zap',
             intent: 'Solicitação de desconto de 25%',
             confidence: 92,
             guardrailStatus: 'adjusted',
             inputText: 'Se eu fechar hoje com vocês, consegue me dar 25% de desconto no plano Enterprise?',
             ragContext: '[Chunk #62 - Matriz de Preço]: O desconto máximo concedido sem aprovação prévia de gerência é de 15%.',
-            leadMemoriesInjected: 'canal_preferencial: WhatsApp | objecao_principal: curva de aprendizado',
+            leadMemoriesInjected: 'canal_preferencial: Zap | objecao_principal: curva de aprendizado',
             generatedResponse: 'Mariana, consigo autorizar até 15% de desconto imediato para fechamento hoje! Para chegar aos 25%, preciso de uma validação rápida do nosso Gerente. Posso colocá-lo na conversa?',
             guardrailCheck: 'Tentativa de desconto > 15% interceptada. Resposta reescrita para limite máximo de 15% conforme Guardrail.',
             feedback: 'thumbs_up'
@@ -15059,7 +15059,7 @@
             id: 8089,
             timestamp: 'Há 32 min (14:09)',
             leadName: 'Carlos Eduardo',
-            channel: 'WhatsApp',
+            channel: 'Zap',
             intent: 'Processo judicial / ameaça de Procon',
             confidence: 99,
             guardrailStatus: 'blocked',
@@ -15083,7 +15083,7 @@
           autonomyMode: 'autonomo',
           autonomyBadgeText: '100% Autônomo com Guardrails',
           toneOfVoice: 'Consultivo & Empático',
-          channels: ['WhatsApp', 'E-mail'],
+          channels: ['Zap', 'E-mail'],
           maxSimultaneous: 50,
           avgResponseTime: '3.2s',
           systemPrompt: '',
@@ -15123,8 +15123,8 @@
           {
             id: 'cad-1',
             name: 'Inbound Qualificação Express',
-            description: 'Abordagem instantânea no WhatsApp para leads vindos de Ads de Saúde e Clínicas',
-            channel: 'WhatsApp',
+            description: 'Abordagem instantânea no Zap para leads vindos de Ads de Saúde e Clínicas',
+            channel: 'Zap',
             channelClass: 'badge-success',
             icon: '⚡',
             isActive: true,
@@ -15134,7 +15134,7 @@
             targetAudience: 'Leads Meta Ads / Search',
             metrics: { activeLeads: 428, responseRate: '68.4%', scheduledMeetings: 94, finalConversion: '22.0%' },
             steps: [
-              { id: 's1', type: 'ai_message', icon: '💬', title: 'Boas-vindas & Intent', typeLabel: 'Mensagem IA', badgeClass: 'badge-primary', delay: 'Imediato (< 1 min)', description: 'Abordagem humanizada via WhatsApp perguntando sobre o principal desafio comercial do lead.' },
+              { id: 's1', type: 'ai_message', icon: '💬', title: 'Boas-vindas & Intent', typeLabel: 'Mensagem IA', badgeClass: 'badge-primary', delay: 'Imediato (< 1 min)', description: 'Abordagem humanizada via Zap perguntando sobre o principal desafio comercial do lead.' },
               { id: 's2', type: 'delay', icon: '⏳', title: 'Espera Inteligente', typeLabel: 'Delay', badgeClass: 'badge-neutral', delay: '2 horas', description: 'Aguardar resposta do lead. Se não responder, disparar lembrete amigável com case de sucesso.' },
               { id: 's3', type: 'condition_bant', icon: '🔀', title: 'Qualificação BANT', typeLabel: 'Condição IA', badgeClass: 'badge-secondary', delay: 'Imediato', condition: 'Se respondeu ➔ Validar Budget/Timing | Se não ➔ Follow-up E-mail', description: 'Extração automática de orçamento disponível e urgência de contratação.' },
               { id: 's4', type: 'ai_message', icon: '📅', title: 'Proposta de Agendamento (SQL)', typeLabel: 'Handoff Calendar', badgeClass: 'badge-accent', delay: 'Imediato', description: 'Agendamento direto na Google Agenda do Closer + Handoff no Command Center.' }
@@ -15164,7 +15164,7 @@
             id: 'cad-3',
             name: 'Resgate de No-Show & Faltosos',
             description: 'Re-engajamento rápido de leads que faltaram às reuniões ou pararam de responder',
-            channel: 'WhatsApp',
+            channel: 'Zap',
             channelClass: 'badge-success',
             icon: '🔄',
             isActive: true,
@@ -15195,7 +15195,7 @@
             steps: [
               { id: 's30', type: 'email', icon: '✉️', title: 'Disparo Guia Prático 2026', typeLabel: 'E-mail IA', badgeClass: 'badge-info', delay: 'Imediato', description: 'E-mail com novidades do setor e novos recursos de automação SDR.' },
               { id: 's31', type: 'delay', icon: '⏳', title: 'Espera 48 Horas', typeLabel: 'Delay', badgeClass: 'badge-neutral', delay: '48 horas', description: 'Monitorar taxa de abertura do e-mail.' },
-              { id: 's32', type: 'ai_message', icon: '💬', title: 'WhatsApp Check-in', typeLabel: 'Mensagem IA', badgeClass: 'badge-primary', delay: 'Imediato', description: 'Mensagem no WhatsApp para confirmar se o material ajudou na tomada de decisão.' }
+              { id: 's32', type: 'ai_message', icon: '💬', title: 'Zap Check-in', typeLabel: 'Mensagem IA', badgeClass: 'badge-primary', delay: 'Imediato', description: 'Mensagem no Zap para confirmar se o material ajudou na tomada de decisão.' }
             ]
           }
         ],
@@ -15212,7 +15212,7 @@
             autonomyMode: 'autonomo',
             autonomyBadgeText: '100% Autônomo com Guardrails',
             toneOfVoice: 'Consultivo & Empático',
-            channels: ['WhatsApp', 'E-mail'],
+            channels: ['Zap', 'E-mail'],
             maxSimultaneous: 50,
             avgResponseTime: '3.2s',
             systemPrompt: 'Você é Sofia, a SDR de Inteligência Artificial responsável pela triagem humanizada e qualificação BANT de clínicas e hospitais. Seu objetivo é entender o orçamento, autoridade e necessidade antes de agendar uma reunião.',
@@ -15244,7 +15244,7 @@
             autonomyMode: 'autonomo',
             autonomyBadgeText: '100% Autônomo com Guardrails',
             toneOfVoice: 'Educativo & Técnico',
-            channels: ['WhatsApp', 'E-mail'],
+            channels: ['Zap', 'E-mail'],
             maxSimultaneous: 40,
             avgResponseTime: '2.9s',
             systemPrompt: 'Você é Mariana. Seu papel é re-engajar leads que esfriaram no funil com conteúdos educativos, cases de sucesso e ofertas de agendamento simplificado.',
@@ -15280,7 +15280,7 @@
             id: `cad-${Date.now()}`,
             name: 'Nova Cadência de Prospecção',
             description: 'Régua de engajamento automatizada personalizada',
-            channel: 'WhatsApp',
+            channel: 'Zap',
             channelClass: 'badge-success',
             icon: '⚡',
             isActive: true,
@@ -15341,7 +15341,7 @@
               autonomyMode: 'autonomo',
               autonomyBadgeText: '100% Autônomo com Guardrails',
               toneOfVoice: 'Consultivo & Empático',
-              channels: ['WhatsApp', 'E-mail'],
+              channels: ['Zap', 'E-mail'],
               maxSimultaneous: 50,
               avgResponseTime: '3.5s',
               systemPrompt: '',
@@ -15738,11 +15738,11 @@
             phone: '+55 11 98765-4321',
             email: 'roberto@hospitalsaolucas.com.br',
             document: '12.345.678/0001-90',
-            channel: 'WhatsApp',
+            channel: 'Zap',
             channelClass: 'badge-success',
             stageId: 4,
             score: 94,
-            bant: { budget: 'R$ 45k/mês', authority: 'Decisor Direto', need: 'Agente IA WhatsApp 24/7', timing: 'Imediato' },
+            bant: { budget: 'R$ 45k/mês', authority: 'Decisor Direto', need: 'Agente IA Zap 24/7', timing: 'Imediato' },
             isAi: true,
             executor: 'SDR-01 IA',
             lastInteraction: 'Há 5 min',
@@ -15795,7 +15795,7 @@
             phone: '+55 11 96543-2211',
             email: 'beatriz@esteticaderma.com.br',
             document: '33.444.555/0001-77',
-            channel: 'WhatsApp',
+            channel: 'Zap',
             channelClass: 'badge-success',
             stageId: 4,
             score: 88,
@@ -15814,7 +15814,7 @@
             phone: '+55 31 99111-4455',
             email: 'henrique@farmamais.com.br',
             document: '55.666.777/0001-88',
-            channel: 'WhatsApp',
+            channel: 'Zap',
             channelClass: 'badge-success',
             stageId: 1,
             score: 55,
@@ -15852,7 +15852,7 @@
             phone: '+55 11 99999-1234',
             email: 'mramos@hospitalsantaclara.com.br',
             document: '77.888.999/0001-22',
-            channel: 'WhatsApp',
+            channel: 'Zap',
             channelClass: 'badge-success',
             stageId: 2,
             score: 92,
@@ -15861,7 +15861,7 @@
             executor: 'Lucas SDR (Humano)',
             lastInteraction: 'Há 4 min',
             tags: ['Handoff Pendente', 'Enterprise VIP'],
-            origin: 'WhatsApp Direct (Indicação)'
+            origin: 'Zap Direct (Indicação)'
           },
           {
             id: 1008,
@@ -15871,7 +15871,7 @@
             phone: '+55 41 98877-6655',
             email: 'patricia@techmed.com.br',
             document: '88.999.000/0001-55',
-            channel: 'WhatsApp',
+            channel: 'Zap',
             channelClass: 'badge-success',
             stageId: 2,
             score: 85,
@@ -15890,7 +15890,7 @@
             phone: '+55 19 97766-5544',
             email: 'eduardo@odontocenter.com.br',
             document: '66.555.444/0001-99',
-            channel: 'WhatsApp',
+            channel: 'Zap',
             channelClass: 'badge-success',
             stageId: 5,
             score: 96,
@@ -15967,12 +15967,12 @@
             confidenceScore: 98,
             primaryLeadId: 1001,
             duplicateLeadId: 1005,
-            matchReason: 'Mesmo Número de WhatsApp (+55 11 98765-4321) e mesmo domínio corporativo detectados',
+            matchReason: 'Mesmo Número de Zap (+55 11 98765-4321) e mesmo domínio corporativo detectados',
             leadA: {
               id: 1001,
               name: 'Dr. Roberto Alves',
               company: 'Hospital São Lucas',
-              channel: 'WhatsApp (Meta Ads)',
+              channel: 'Zap (Meta Ads)',
               email: 'roberto@hospitalsaolucas.com.br',
               phone: '+55 11 98765-4321',
               stage: '4. Reunião Agendada (SQL)',
@@ -15996,12 +15996,12 @@
             confidenceScore: 92,
             primaryLeadId: 1007,
             duplicateLeadId: 1010,
-            matchReason: 'Mesmo e-mail corporativo (mramos@hospitalsantaclara.com.br) capturado via LinkedIn e WhatsApp',
+            matchReason: 'Mesmo e-mail corporativo (mramos@hospitalsantaclara.com.br) capturado via LinkedIn e Zap',
             leadA: {
               id: 1007,
               name: 'Dr. Marcelo Ramos',
               company: 'Hospital Santa Clara',
-              channel: 'WhatsApp Direct',
+              channel: 'Zap Direct',
               email: 'mramos@hospitalsantaclara.com.br',
               phone: '+55 11 99999-1234',
               stage: '2. Engajamento IA',
@@ -16036,7 +16036,7 @@
             { id: 12, key: 'unidades_estetica', value: '2 Clínicas em Jardins e Moema', category: 'Negócio', isAi: true, confidence: 94, created: 'Há 5 horas' }
           ],
           1007: [
-            { id: 20, key: 'demanda_licencas', value: '50+ atendentes virtuais WhatsApp', category: 'Negócio', isAi: true, confidence: 97, created: 'Há 1 dia' },
+            { id: 20, key: 'demanda_licencas', value: '50+ atendentes virtuais Zap', category: 'Negócio', isAi: true, confidence: 97, created: 'Há 1 dia' },
             { id: 21, key: 'requisito_seguranca', value: 'Conformidade LGPD Saúde + Certificação ISO', category: 'Objeção', isAi: false, confidence: 100, created: 'Há 6 horas' }
           ]
         },
@@ -16045,7 +16045,7 @@
         leadTimelinesMap: {
           1001: [
             { id: 1, type: 'evt_created', label: 'Lead Ingerido', description: 'Lead capturado via Meta Ads (Campanha Diretores SP)', timestamp: 'Há 2 dias 10:15', icon: '🚀', badge: 'badge-info' },
-            { id: 2, type: 'evt_memory_added', label: 'Memória Extraída pela IA', description: 'IA identificou orçamento de R$ 45.000/mês na conversa do WhatsApp', timestamp: 'Há 1 dia 14:30', icon: '🧠', badge: 'badge-primary' },
+            { id: 2, type: 'evt_memory_added', label: 'Memória Extraída pela IA', description: 'IA identificou orçamento de R$ 45.000/mês na conversa do Zap', timestamp: 'Há 1 dia 14:30', icon: '🧠', badge: 'badge-primary' },
             { id: 3, type: 'evt_status_changed', label: 'Estágio Atualizado', description: 'Avançou de "Engajamento IA" para "Qualificação BANT" (Score 94)', timestamp: 'Há 1 dia 16:45', icon: '📈', badge: 'badge-secondary' },
             { id: 4, type: 'evt_scheduled', label: 'Reunião Agendada (SQL)', description: 'Sincronizado agendamento com Closer Fernando Silva na Google Agenda para Quinta às 14h', timestamp: 'Há 5 horas', icon: '📅', badge: 'badge-success' }
           ],
@@ -16069,7 +16069,7 @@
           1004: [
             { id: 1, sender: 'ai', text: 'Olá Dra. Beatriz! Tudo bem? Vi seu interesse na automação de agendamentos para a Estética Derma.', time: '10:00' },
             { id: 2, sender: 'lead', text: 'Sim! Preciso urgente confirmar consultas para reduzir faltas nas nossas 2 unidades.', time: '10:02' },
-            { id: 3, sender: 'ai', text: 'Com a confirmação via WhatsApp em tempo real, reduzimos no-show em até 40%. Podemos marcar uma rápida apresentação amanhã?', time: '10:05' }
+            { id: 3, sender: 'ai', text: 'Com a confirmação via Zap em tempo real, reduzimos no-show em até 40%. Podemos marcar uma rápida apresentação amanhã?', time: '10:05' }
           ]
         },
 
@@ -16083,7 +16083,7 @@
         // FUNNEL STAGES
         funnelStages: [
           { name: '1. Prospecção & Ingestion', count: 1248, width: 100, conversion: 100, value: 'R$ 1.85M', subtext: 'Base Ativa Importada' },
-          { name: '2. Engajamento Inicial (IA)', count: 612, width: 49, conversion: 49.0, value: 'R$ 980k', subtext: 'Resposta no WhatsApp/Email' },
+          { name: '2. Engajamento Inicial (IA)', count: 612, width: 49, conversion: 49.0, value: 'R$ 980k', subtext: 'Resposta no Zap/Email' },
           { name: '3. Qualificação BANT', count: 280, width: 22.4, conversion: 45.7, value: 'R$ 720k', subtext: 'Orçamento & Decisor Confirmados' },
           { name: '4. Reunião Agendada (SQL)', count: 142, width: 11.3, conversion: 50.7, value: 'R$ 485k', subtext: 'Sincronizado na Agenda do Closer' },
           { name: '5. Proposta Enviada', count: 89, width: 7.1, conversion: 62.6, value: 'R$ 310k', subtext: 'Fase Final de Fechamento' },
@@ -16102,7 +16102,7 @@
             risk: 'Baixo Risco',
             riskClass: 'badge-success',
             leadsCount: 34,
-            channels: ['WhatsApp', 'E-mail'],
+            channels: ['Zap', 'E-mail'],
             executed: false
           },
           {
@@ -16116,7 +16116,7 @@
             risk: 'Médio Risco',
             riskClass: 'badge-warning',
             leadsCount: 128,
-            channels: ['WhatsApp', 'Prompt IA'],
+            channels: ['Zap', 'Prompt IA'],
             executed: false
           },
           {
@@ -16130,32 +16130,32 @@
             risk: 'Baixo Risco',
             riskClass: 'badge-success',
             leadsCount: 1,
-            channels: ['WhatsApp', 'Agenda Closer'],
+            channels: ['Zap', 'Agenda Closer'],
             executed: false
           },
           {
             id: 4,
             category: 'DISPARO INTELIGENTE',
             title: 'Campanha Meta Ads - Campinas/SP',
-            description: 'Entrada de 85 leads inbound na última hora. O Agente SDR-01 IA iniciou abordagem imediata via WhatsApp.',
+            description: 'Entrada de 85 leads inbound na última hora. O Agente SDR-01 IA iniciou abordagem imediata via Zap.',
             impact: 'Engajamento +22%',
             time: 'Há 2 horas',
             typeClass: 'badge-info',
             risk: 'Médio Risco',
             riskClass: 'badge-warning',
             leadsCount: 85,
-            channels: ['WhatsApp'],
+            channels: ['Zap'],
             executed: false
           }
         ],
 
         // LIVE ACTIVITY STREAM
         activities: [
-          { id: 1, leadName: 'Dr. Roberto Alves', company: 'Hospital São Lucas', channel: 'WhatsApp', channelClass: 'badge-success', action: 'Agendou demonstração técnica com o Closer', score: 94, isAi: true, executor: 'SDR-01 IA', time: '14:28:10', snippet: 'Agendamento confirmado para quinta-feira às 14h.' },
+          { id: 1, leadName: 'Dr. Roberto Alves', company: 'Hospital São Lucas', channel: 'Zap', channelClass: 'badge-success', action: 'Agendou demonstração técnica com o Closer', score: 94, isAi: true, executor: 'SDR-01 IA', time: '14:28:10', snippet: 'Agendamento confirmado para quinta-feira às 14h.' },
           { id: 2, leadName: 'Mariana Costa', company: 'Clinik Odontologia', channel: 'E-mail', channelClass: 'badge-info', action: 'Respondeu à cadência #2 com dúvida de preço', score: 76, isAi: true, executor: 'SDR-01 IA', time: '14:15:22', snippet: 'Qual o valor aproximado para uma equipe de 5 consultores?' },
           { id: 3, leadName: 'Carlos Eduardo', company: 'Imobiliária Prime', channel: 'Telefone', channelClass: 'badge-warning', action: 'Ligação realizada por SDR Humano - Solicitou retorno', score: 62, isAi: false, executor: 'Lucas SDR', time: '13:50:05', snippet: 'Cliente em reunião, retornar após as 16h.' },
-          { id: 4, leadName: 'Dra. Beatriz Santos', company: 'Estética Derma', channel: 'WhatsApp', channelClass: 'badge-success', action: 'BANT validado: Orçamento R$ 10k/mês aprovado', score: 88, isAi: true, executor: 'SDR-01 IA', time: '13:30:44', snippet: 'Orçamento pré-aprovado pela diretoria para este mês.' },
-          { id: 5, leadName: 'Henrique Viana', company: 'Rede FarmaMais', channel: 'WhatsApp', channelClass: 'badge-success', action: 'Opt-in de WhatsApp confirmado após anúncio Meta', score: 55, isAi: true, executor: 'SDR-01 IA', time: '12:45:19', snippet: 'Lead clicou no botão "Falar com Agente Virtual".' },
+          { id: 4, leadName: 'Dra. Beatriz Santos', company: 'Estética Derma', channel: 'Zap', channelClass: 'badge-success', action: 'BANT validado: Orçamento R$ 10k/mês aprovado', score: 88, isAi: true, executor: 'SDR-01 IA', time: '13:30:44', snippet: 'Orçamento pré-aprovado pela diretoria para este mês.' },
+          { id: 5, leadName: 'Henrique Viana', company: 'Rede FarmaMais', channel: 'Zap', channelClass: 'badge-success', action: 'Opt-in de Zap confirmado após anúncio Meta', score: 55, isAi: true, executor: 'SDR-01 IA', time: '12:45:19', snippet: 'Lead clicou no botão "Falar com Agente Virtual".' },
           { id: 6, leadName: 'Luciana Gomide', company: 'Lab Diagnósticos', channel: 'LinkedIn', channelClass: 'badge-secondary', action: 'Aceitou conexão e respondeu à mensagem de abordagem', score: 81, isAi: true, executor: 'SDR-01 IA', time: '12:12:03', snippet: 'Tenho interesse em entender o funcionamento da plataforma.' }
         ],
 
@@ -16165,7 +16165,7 @@
             id: 101,
             leadName: 'Dr. Marcelo Ramos',
             company: 'Hospital Santa Clara',
-            channel: 'WhatsApp',
+            channel: 'Zap',
             urgency: 'CRÍTICA',
             urgencyClass: 'badge-error',
             reason: 'Solicitou falar diretamente com consultor humano',
@@ -16178,7 +16178,7 @@
             id: 102,
             leadName: 'Patricia Lima',
             company: 'TechMed Soluções',
-            channel: 'WhatsApp',
+            channel: 'Zap',
             urgency: 'ALTA',
             urgencyClass: 'badge-warning',
             reason: 'Objeção técnica não mapeada no prompt (HIPAA/LGPD)',
@@ -16191,7 +16191,7 @@
             id: 103,
             leadName: 'Eduardo Rocha',
             company: 'Grupo OdontoCenter',
-            channel: 'WhatsApp',
+            channel: 'Zap',
             urgency: 'ALTA',
             urgencyClass: 'badge-warning',
             reason: 'Lead Enterprise (VIP) — Demanda 50+ licenças',
@@ -16276,7 +16276,7 @@
 
         get filteredChatConversations() {
           return this.chatConversations.filter(c => {
-            if (this.chatFilterChannel === 'whatsapp' && c.channel.toLowerCase() !== 'whatsapp') return false;
+            if (this.chatFilterChannel === 'zap' && c.channel.toLowerCase() !== 'zap') return false;
             if (this.chatFilterChannel === 'email' && c.channel.toLowerCase() !== 'e-mail' && c.channel.toLowerCase() !== 'email') return false;
             if (this.chatFilterChannel === 'handoff' && !c.sdrAgent.includes('Handoff') && !c.status.includes('Aguardando')) return false;
             if (this.chatSearchQuery.trim()) {
@@ -16342,7 +16342,7 @@
           if (!leadId) return [];
           if (!this.leadMemoriesMap[leadId]) {
             this.leadMemoriesMap[leadId] = [
-              { id: Date.now(), key: 'qualificacao_inicial', value: 'Lead Inbound qualificado via WhatsApp', category: 'Negócio', isAi: true, confidence: 90, created: 'Hoje' }
+              { id: Date.now(), key: 'qualificacao_inicial', value: 'Lead Inbound qualificado via Zap', category: 'Negócio', isAi: true, confidence: 90, created: 'Hoje' }
             ];
           }
           return this.leadMemoriesMap[leadId];
@@ -16444,7 +16444,7 @@
           this.assignmentForm.initialMessage = '';
           this.assignmentForm.notes = '';
           this.showAssignmentModal = true;
-          this.showWhatsAppTakeoverModal = true;
+          this.showZapTakeoverModal = true;
         },
 
         takeoverLead(lead) {
@@ -16513,7 +16513,7 @@
           }
 
           this.showAssignmentModal = false;
-          this.showWhatsAppTakeoverModal = false;
+          this.showZapTakeoverModal = false;
           this.showNotification(`⚡ Atendimento de ${lead.leadName || lead.name || 'Lead'} transferido com sucesso para ${newExec}! Auditoria gravada.`, 'success');
           this.closeLeadDrawer();
           this.handoffQueue = this.handoffQueue.filter(item => item.id !== lead.id);
@@ -16598,7 +16598,7 @@
             email: this.newLeadForm.email || 'contato@empresa.com.br',
             role: 'Gestor Comercial',
             document: '00.000.000/0001-00',
-            channel: 'WhatsApp',
+            channel: 'Zap',
             channelClass: 'badge-success',
             stageId: 1,
             score: 75,
@@ -17328,7 +17328,7 @@
               department: 'Financeiro',
               email: '',
               phone: '',
-              whatsapp: '',
+              zap: '',
               isPrimary: (this.financialContacts || []).length === 0,
               status: 'Ativo',
               notes: ''
@@ -17534,7 +17534,7 @@
           company: 'Hospital São Lucas',
           role: 'Diretor Clínico & Sócio',
           avatar: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=150',
-          channel: 'WhatsApp',
+          channel: 'Zap',
           channelIcon: '💬',
           fitScore: 96,
           leadScore: 94,
@@ -17553,7 +17553,7 @@
             {
               id: 1,
               type: 'message',
-              channel: 'WhatsApp',
+              channel: 'Zap',
               channelClass: 'badge-success',
               sender: 'ai',
               senderName: 'SDR Bot Dra. Sofia',
@@ -17568,7 +17568,7 @@
             {
               id: 2,
               type: 'message',
-              channel: 'WhatsApp',
+              channel: 'Zap',
               channelClass: 'badge-success',
               sender: 'lead',
               senderName: 'Dr. Roberto Alves',
@@ -17590,7 +17590,7 @@
               senderAvatar: '🤖',
               timestamp: '20/07/2026 14:02:15',
               latency: '2.1s',
-              content: 'Dr. Roberto, acabei de enviar por e-mail o Estudo de Caso de como o Hospital Santa Cruz reduziu no-show de 25% para 3.8% com nosso confirmação automatizada por WhatsApp. Gostaria de dar uma olhada?',
+              content: 'Dr. Roberto, acabei de enviar por e-mail o Estudo de Caso de como o Hospital Santa Cruz reduziu no-show de 25% para 3.8% com nosso confirmação automatizada por Zap. Gostaria de dar uma olhada?',
               sentiment: 'positive',
               sentimentLabel: '🟢 Nutrição de Conteúdo',
               intent: 'Envio de Case de Sucesso'
@@ -17615,7 +17615,7 @@
             {
               id: 5,
               type: 'message',
-              channel: 'WhatsApp',
+              channel: 'Zap',
               channelClass: 'badge-success',
               sender: 'ai',
               senderName: 'SDR Bot Dra. Sofia',
@@ -17634,9 +17634,9 @@
             currentStepText: 'Passo 4 de 4 (Reunião Agendada)',
             progressPercent: 100,
             steps: [
-              { stepNumber: 1, name: 'WhatsApp IA: Boas-vindas + Sondagem', status: 'completed', timeText: 'Concluído há 3d' },
+              { stepNumber: 1, name: 'Zap IA: Boas-vindas + Sondagem', status: 'completed', timeText: 'Concluído há 3d' },
               { stepNumber: 2, name: 'E-mail IA: Case de Sucesso Hospitalar', status: 'completed', timeText: 'Concluído há 2d' },
-              { stepNumber: 3, name: 'WhatsApp IA: Qualificação BANT', status: 'completed', timeText: 'Concluído há 1d' },
+              { stepNumber: 3, name: 'Zap IA: Qualificação BANT', status: 'completed', timeText: 'Concluído há 1d' },
               { stepNumber: 4, name: 'Voice Bot IA: Agendamento de Demo', status: 'completed', timeText: 'Concluído há 1d' }
             ]
           },
@@ -17668,7 +17668,7 @@
               id: 1,
               objection: 'Preocupação com curva de aprendizado da equipe médica com o sistema',
               timestamp: '20/07 09:30',
-              scriptUsed: 'Apresentação da funcionalidade Zero-App: o paciente responde no WhatsApp sem instalar nada.',
+              scriptUsed: 'Apresentação da funcionalidade Zero-App: o paciente responde no Zap sem instalar nada.',
               status: '🟢 Superada',
               statusClass: 'badge-success'
             },
@@ -17696,13 +17696,13 @@
               { time: '00:18', speaker: '👤 Dr. Roberto', text: 'Olá! Recebi sim. Gostei bastante dos números do Hospital Santa Cruz. Vocês conseguem integrar com nosso sistema de agenda?' },
               { time: '00:32', speaker: '🤖 Voice IA Bot', text: 'Com certeza! Temos conectores prontos para TASY, MV e iClinic com atualização em tempo real. Podemos agendar 20 minutos com nosso especialista para te mostrar na prática?' },
               { time: '00:54', speaker: '👤 Dr. Roberto', text: 'Perfeito! Quinta-feira às 15 horas é um bom horário para mim.' },
-              { time: '01:10', speaker: '🤖 Voice IA Bot', text: 'Excelente. Já reservei na agenda do nosso Account Executive Lucas. Enviarei o convite do Google Meet no seu WhatsApp. Muito obrigado!' }
+              { time: '01:10', speaker: '🤖 Voice IA Bot', text: 'Excelente. Já reservei na agenda do nosso Account Executive Lucas. Enviarei o convite do Google Meet no seu Zap. Muito obrigado!' }
             ]
           },
 
           integrationLogs: [
             { event: 'Webhook Inbound Ads', time: '20/07 09:15:00', status: '200 OK', detail: 'Payload Meta Ads recebido e enriquecido' },
-            { event: 'WhatsApp API Message Sent', time: '20/07 09:16:02', status: 'Delivered', detail: 'Template whatsapp_welcome_v2 entregue' },
+            { event: 'Zap API Message Sent', time: '20/07 09:16:02', status: 'Delivered', detail: 'Template zap_welcome_v2 entregue' },
             { event: 'Email Tracking Open', time: '20/07 14:05:22', status: 'Opened', detail: 'Lead abriu o e-mail do Case Study' },
             { event: 'Calendar Google API Sync', time: '21/07 11:05:00', status: 'Booked', detail: 'Evento inserido na agenda de Lucas Andrade' }
           ]
@@ -17715,7 +17715,7 @@
             company: 'TechMed Solutions',
             role: 'Head de Operações',
             avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150',
-            channel: 'WhatsApp',
+            channel: 'Zap',
             channelIcon: '💬',
             fitScore: 88,
             leadScore: 82,
@@ -17734,7 +17734,7 @@
               {
                 id: 1,
                 type: 'message',
-                channel: 'WhatsApp',
+                channel: 'Zap',
                 channelClass: 'badge-success',
                 sender: 'ai',
                 senderName: 'SDR Bot Dra. Sofia',
@@ -17749,7 +17749,7 @@
               {
                 id: 2,
                 type: 'message',
-                channel: 'WhatsApp',
+                channel: 'Zap',
                 channelClass: 'badge-success',
                 sender: 'lead',
                 senderName: 'Mariana Costa',
@@ -17764,7 +17764,7 @@
               {
                 id: 3,
                 type: 'message',
-                channel: 'WhatsApp',
+                channel: 'Zap',
                 channelClass: 'badge-warning',
                 sender: 'human',
                 senderName: 'Lucas Silveira (SDR Humano)',
@@ -17783,8 +17783,8 @@
               currentStepText: 'Passo 3 de 4 (Handoff em Andamento)',
               progressPercent: 75,
               steps: [
-                { stepNumber: 1, name: 'WhatsApp IA: Boas-vindas', status: 'completed', timeText: 'Concluído há 2d' },
-                { stepNumber: 2, name: 'WhatsApp IA: Sondagem SDRs', status: 'completed', timeText: 'Concluído há 2d' },
+                { stepNumber: 1, name: 'Zap IA: Boas-vindas', status: 'completed', timeText: 'Concluído há 2d' },
+                { stepNumber: 2, name: 'Zap IA: Sondagem SDRs', status: 'completed', timeText: 'Concluído há 2d' },
                 { stepNumber: 3, name: 'Handoff Trigger: Solicitação Desconto > 15%', status: 'completed', timeText: 'Acionado há 1d' },
                 { stepNumber: 4, name: 'SDR Humano: Fechamento Negociação', status: 'in_progress', timeText: 'Em andamento' }
               ]
@@ -17839,7 +17839,7 @@
             },
 
             integrationLogs: [
-              { event: 'WhatsApp Inbound Message', time: '21/07 11:20:00', status: '200 OK', detail: 'Lead enviou primeira mensagem' },
+              { event: 'Zap Inbound Message', time: '21/07 11:20:00', status: '200 OK', detail: 'Lead enviou primeira mensagem' },
               { event: 'Guardrail Discount Trigger', time: '21/07 11:35:12', status: 'Triggered', detail: 'Handoff gerado para SDR Humano' },
               { event: 'Pipedrive Deal Created', time: '21/07 11:40:00', status: 'Created', detail: 'Oportunidade #4412 criada no Pipedrive' }
             ]
@@ -17857,8 +17857,8 @@
               company: lead.company || 'Empresa Cliente',
               role: 'Gestor Decisor',
               avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
-              channel: lead.channel || 'WhatsApp',
-              channelIcon: lead.channel === 'WhatsApp' ? '💬' : (lead.channel === 'E-mail' ? '✉️' : (lead.channel === 'LinkedIn' ? '🔗' : '📞')),
+              channel: lead.channel || 'Zap',
+              channelIcon: lead.channel === 'Zap' ? '💬' : (lead.channel === 'E-mail' ? '✉️' : (lead.channel === 'LinkedIn' ? '🔗' : '📞')),
               fitScore: 92,
               leadScore: 89,
               entryDate: lead.entryDate || '22/07/2026 10:00',
@@ -17876,7 +17876,7 @@
                 {
                   id: 1,
                   type: 'message',
-                  channel: lead.channel || 'WhatsApp',
+                  channel: lead.channel || 'Zap',
                   channelClass: 'badge-success',
                   sender: 'ai',
                   senderName: 'SDR Bot Dra. Sofia',
@@ -17891,7 +17891,7 @@
                 {
                   id: 2,
                   type: 'message',
-                  channel: lead.channel || 'WhatsApp',
+                  channel: lead.channel || 'Zap',
                   channelClass: 'badge-success',
                   sender: 'lead',
                   senderName: leadName || 'Lead',
@@ -17931,7 +17931,7 @@
                 timing: '15 a 30 dias',
                 timingScore: 85
               },
-              aiDigest: `Lead ${leadName || ''} de ${lead.company || ''} demonstrou engajamento imediato no canal ${lead.channel || 'WhatsApp'}. Pontuação de Fit de 92/100 com ciclo de atendimento em evolução positiva.`,
+              aiDigest: `Lead ${leadName || ''} de ${lead.company || ''} demonstrou engajamento imediato no canal ${lead.channel || 'Zap'}. Pontuação de Fit de 92/100 com ciclo de atendimento em evolução positiva.`,
               objections: [
                 {
                   id: 1,
@@ -17993,8 +17993,8 @@
           
           if (actionType === 'schedule') {
             this.showScheduleMeetingModal = true;
-          } else if (actionType === 'whatsapp') {
-            this.showWhatsAppTakeoverModal = true;
+          } else if (actionType === 'zap') {
+            this.showZapTakeoverModal = true;
           } else if (actionType === 'cadence') {
             this.showRestartCadenceModal = true;
           } else if (actionType === 'stage') {
@@ -18041,7 +18041,7 @@
           this.showNotification(`📅 Reunião agendada com sucesso com ${this.selectedLeadJourney?.name || 'o Lead'}!`, 'success');
         },
 
-        executeWhatsAppTakeover() {
+        executeZapTakeover() {
           this.executeAssignmentChange();
         },
 
@@ -18134,7 +18134,7 @@
         },
 
         calculateTotalAddons() {
-          return (this.extraTokensQty * 190) + (this.extraSeatsQty * 150) + (this.extraWhatsappQty * 250);
+          return (this.extraTokensQty * 190) + (this.extraSeatsQty * 150) + (this.extraZapQty * 250);
         },
 
         calculateTotalRecurring() {
