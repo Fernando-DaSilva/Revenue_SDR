@@ -223,15 +223,17 @@
               <span x-html="getLucideSVG('menu', { strokeWidth: 2, class: 'w-4 h-4' })"></span>
             </button>
 
-            <h2 class="text-base lg:text-lg font-extrabold tracking-tight shrink-0 whitespace-nowrap" x-text="isTabActive('leads') ? 'Pipeline de Leads' : (isTabActive('dashboard') ? 'Central de Controle / DHS' : (activeTab === 'inbox' ? 'Inbox de Atendimento' : (activeTab === 'cadences' ? 'Cadências & Agentes' : (isTabActive('memory') ? 'AI Memory & Brain' : (activeTab === 'data_management' ? 'Gestão de Dados & Histórico' : (isTabActive('theme_studio') ? 'Studio de Temas White-Label' : (isTabActive('billing') ? 'Planos, Faturamento & Cotas' : (activeTab === 'settings' ? 'Configurações Tenant' : 'Command Center'))))))))"></h2>
+            <h2 class="text-base lg:text-lg font-extrabold tracking-tight shrink-0 whitespace-nowrap" x-text="isTabActive('leads') ? 'Pipeline de Leads' : (isTabActive('dashboard') ? 'Central de Controle / DHS' : (activeTab === 'inbox' ? 'Inbox de Atendimento' : (isTabActive('calendar') ? 'Agenda & Reuniões' : (activeTab === 'cadences' ? 'Cadências & Agentes' : (isTabActive('memory') ? 'AI Memory & Brain' : (activeTab === 'data_management' ? 'Gestão de Dados & Histórico' : (isTabActive('theme_studio') ? 'Studio de Temas White-Label' : (isTabActive('billing') ? 'Planos, Faturamento & Cotas' : (activeTab === 'settings' ? 'Configurações Tenant' : 'Command Center')))))))))"></h2>
             
             <span class="badge badge-error badge-sm font-bold animate-pulse text-[10px] shrink-0" x-show="isTabActive('dashboard') && handoffQueue.length > 0" x-text="`${handoffQueue.length} Alertas`"></span>
             <span class="badge badge-primary badge-sm font-bold text-[10px] shrink-0" x-show="isTabActive('leads')" x-text="`${leadsList.length} Leads`"></span>
+            <span class="badge badge-accent badge-sm font-bold text-[10px] shrink-0" x-show="isTabActive('calendar')" x-text="`${calendarEventsList ? calendarEventsList.length : 8} Reuniões`"></span>
             <span class="badge badge-secondary badge-sm font-bold text-[10px] shrink-0" x-show="activeTab === 'cadences'" x-text="`${cadencesList.length} Cadências`"></span>
             <span class="badge badge-accent badge-sm font-bold text-[10px] shrink-0" x-show="isTabActive('memory')" x-text="`${documentsList.length} Docs | ${leadMemoriesList.length} Memórias`"></span>
             <span class="badge badge-warning badge-sm font-bold text-[10px] shrink-0 hidden md:inline-flex" x-show="activeTab === 'settings'" x-text="`Org: ${orgForm.name}`"></span>
             <span class="badge badge-info badge-sm font-bold text-[10px] shrink-0" x-show="activeTab === 'data_management'" x-text="`Hot: ${dataManagement.hotStorage.sizeMb}MB | Cold: ${dataManagement.coldStorage.sizeGb}GB`"></span>
             <span class="badge badge-error badge-sm font-bold text-[10px] shrink-0" x-show="activeTab === 'inbox'">3 Mensagens Pendentes</span>
+
           </div>
 
           <!-- Right Header Actions -->
@@ -362,6 +364,37 @@
             </button>
           </nav>
 
+          <!-- AGENDA & REUNIÕES SUB-VISÕES (activeTab === 'calendar') -->
+          <nav x-show="activeTab === 'calendar'" class="flex flex-wrap items-center gap-1.5 bg-base-100 p-1.5 rounded-xl border border-base-300 w-full min-w-0 shadow-xs">
+            <button 
+              @click="calendarTab = 'overview'" 
+              :class="calendarTab === 'overview' ? 'btn-primary font-bold shadow-xs' : 'btn-ghost text-base-content/70 hover:text-base-content'"
+              class="btn btn-xs gap-1.5 text-xs whitespace-nowrap shrink-0">
+              <span>📅</span> Visão Geral & Agenda
+            </button>
+            
+            <button 
+              @click="calendarTab = 'availabilities'" 
+              :class="calendarTab === 'availabilities' ? 'btn-primary font-bold shadow-xs' : 'btn-ghost text-base-content/70 hover:text-base-content'"
+              class="btn btn-xs gap-1.5 text-xs whitespace-nowrap shrink-0">
+              <span>🕒</span> Janelas de Disponibilidade
+            </button>
+
+            <button 
+              @click="calendarTab = 'meeting_types'" 
+              :class="calendarTab === 'meeting_types' ? 'btn-primary font-bold shadow-xs' : 'btn-ghost text-base-content/70 hover:text-base-content'"
+              class="btn btn-xs gap-1.5 text-xs whitespace-nowrap shrink-0">
+              <span>🏷️</span> Tipos de Reunião
+            </button>
+
+            <button 
+              @click="calendarTab = 'external_sync'" 
+              :class="calendarTab === 'external_sync' ? 'btn-primary font-bold shadow-xs' : 'btn-ghost text-base-content/70 hover:text-base-content'"
+              class="btn btn-xs gap-1.5 text-xs whitespace-nowrap shrink-0">
+              <span>🔄</span> Sincronização & Feed .ics
+            </button>
+          </nav>
+
           <!-- CADÊNCIAS & AGENTES SUB-VISÕES (activeTab === 'cadences') -->
           <nav x-show="activeTab === 'cadences'" class="flex flex-wrap items-center gap-1.5 bg-base-100 p-1.5 rounded-xl border border-base-300 w-full min-w-0 shadow-xs">
             <button 
@@ -369,6 +402,14 @@
               :class="cadenceTab === 'cadences' ? 'btn-primary font-bold shadow-xs' : 'btn-ghost text-base-content/70 hover:text-base-content'"
               class="btn btn-xs gap-1.5 text-xs whitespace-nowrap shrink-0">
               <span>⚡</span> Réguas & Cadências
+            </button>
+
+            <button 
+              @click="cadenceTab = 'follow_up_engine'" 
+              :class="cadenceTab === 'follow_up_engine' ? 'btn-primary font-bold shadow-xs' : 'btn-ghost text-base-content/70 hover:text-base-content'"
+              class="btn btn-xs gap-1.5 text-xs whitespace-nowrap shrink-0">
+              <span>🔁</span> Follow-up Multi-Cenário
+              <span class="badge badge-xs badge-secondary font-bold" x-text="followUpQueueList ? followUpQueueList.length : 6"></span>
             </button>
             
             <button 
@@ -392,6 +433,7 @@
               <span>📊</span> Analytics & Testes A/B
             </button>
           </nav>
+
 
           <!-- AI MEMORY & BRAIN SUB-VISÕES (activeTab === 'memory') -->
           <nav x-show="activeTab === 'memory'" class="flex flex-wrap items-center gap-1.5 bg-base-100 p-1.5 rounded-xl border border-base-300 w-full min-w-0 shadow-xs">
@@ -1585,8 +1627,686 @@
           </div>
         </div>
 
+        <!-- ==================== TAB: AGENDA & AGENDAMENTOS (activeTab === 'calendar') ==================== -->
+        <div x-show="activeTab === 'calendar'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6">
+
+          <!-- SUB-VISÃO 1: VISÃO GERAL & AGENDA INTERATIVA (calendarTab === 'overview') -->
+          <div x-show="calendarTab === 'overview'" class="space-y-6">
+            
+            <!-- Top Metrics & Operational Status Summary Bar (Explicit Color Coding Directive) -->
+            <div class="space-y-4">
+              <!-- Summary Header Title & Quick Metrics -->
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-base-200/60 p-3 rounded-2xl border border-base-300/60 shadow-2xs">
+                <div class="flex items-center gap-2">
+                  <span class="text-lg">📊</span>
+                  <h3 class="text-xs font-bold uppercase tracking-wider text-base-content/80">Painel Operacional — Totais por Cenário de Agendamento</h3>
+                </div>
+                <div class="flex items-center gap-4 text-xs">
+                  <span class="font-semibold text-base-content/70">Total Reuniões: <strong class="text-primary font-black" x-text="calendarEventsList.length">7</strong></span>
+                  <span class="font-semibold text-base-content/70">Hoje: <strong class="text-secondary font-black" x-text="calendarEventsList.filter(e => e.date === '2026-08-13').length">4</strong></span>
+                  <span class="font-semibold text-base-content/70">Taxa Comparência: <strong class="text-accent font-black">94.2%</strong></span>
+                </div>
+              </div>
+
+              <!-- 5 Explicit Operational Scenario Status Cards -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+                <!-- 🟢 Confirmada -->
+                <div class="stat bg-success/20 text-success border border-success/30 rounded-2xl shadow-2xs p-4 transition-all hover:scale-[1.02]">
+                  <div class="stat-figure text-success">
+                    <span class="text-2xl">🟢</span>
+                  </div>
+                  <div class="stat-title text-xs font-bold text-success/90 uppercase tracking-wide">Confirmadas</div>
+                  <div class="stat-value text-2xl font-black text-success" x-text="calendarEventsList.filter(e => e.status === 'confirmed').length">2</div>
+                  <div class="stat-desc text-[10px] text-success/80 font-semibold mt-1">Lembrete 24h & 1h disparados</div>
+                </div>
+
+                <!-- 🔵 Reagendada -->
+                <div class="stat bg-info/20 text-info border border-info/30 rounded-2xl shadow-2xs p-4 transition-all hover:scale-[1.02]">
+                  <div class="stat-figure text-info">
+                    <span class="text-2xl">🔵</span>
+                  </div>
+                  <div class="stat-title text-xs font-bold text-info/90 uppercase tracking-wide">Reagendadas</div>
+                  <div class="stat-value text-2xl font-black text-info" x-text="calendarEventsList.filter(e => e.status === 'rescheduled').length">1</div>
+                  <div class="stat-desc text-[10px] text-info/80 font-semibold mt-1">Gatilho reconfirmação ativado</div>
+                </div>
+
+                <!-- 🔴 No-Show / Cancelada -->
+                <div class="stat bg-error/20 text-error border border-error/30 rounded-2xl shadow-2xs p-4 transition-all hover:scale-[1.02]">
+                  <div class="stat-figure text-error">
+                    <span class="text-2xl">🔴</span>
+                  </div>
+                  <div class="stat-title text-xs font-bold text-error/90 uppercase tracking-wide">No-Show / Cancelada</div>
+                  <div class="stat-value text-2xl font-black text-error" x-text="calendarEventsList.filter(e => e.status === 'no_show' || e.status === 'noshow' || e.status === 'cancelled').length">1</div>
+                  <div class="stat-desc text-[10px] text-error/80 font-semibold mt-1">Cadência recovery em andamento</div>
+                </div>
+
+                <!-- 🟡 Pendente / A Confirmar -->
+                <div class="stat bg-warning/20 text-warning border border-warning/30 rounded-2xl shadow-2xs p-4 transition-all hover:scale-[1.02]">
+                  <div class="stat-figure text-warning">
+                    <span class="text-2xl">🟡</span>
+                  </div>
+                  <div class="stat-title text-xs font-bold text-warning/90 uppercase tracking-wide">Pendente / A Confirmar</div>
+                  <div class="stat-value text-2xl font-black text-warning" x-text="calendarEventsList.filter(e => e.status === 'scheduled' || e.status === 'pending').length">2</div>
+                  <div class="stat-desc text-[10px] text-warning/80 font-semibold mt-1">Aguardando aceite do lead</div>
+                </div>
+
+                <!-- 🩶 Concluída -->
+                <div class="stat bg-neutral/40 text-base-content/80 border border-base-300 rounded-2xl shadow-2xs p-4 transition-all hover:scale-[1.02]">
+                  <div class="stat-figure text-base-content/70">
+                    <span class="text-2xl">🩶</span>
+                  </div>
+                  <div class="stat-title text-xs font-bold text-base-content/80 uppercase tracking-wide">Concluídas</div>
+                  <div class="stat-value text-2xl font-black text-base-content/90" x-text="calendarEventsList.filter(e => e.status === 'completed').length">1</div>
+                  <div class="stat-desc text-[10px] text-base-content/70 font-semibold mt-1">Reuniões realizadas com sucesso</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Controls, View Switchers & Filters Bar -->
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between bg-base-200 p-4 rounded-2xl border border-base-300 gap-4 shadow-xs">
+              
+              <!-- Left Filters & View Mode Switcher -->
+              <div class="flex flex-wrap items-center gap-3">
+                <!-- View Mode Switcher -->
+                <div class="flex items-center gap-1 bg-base-100 p-1 rounded-xl border border-base-300">
+                  <span class="text-[10px] font-bold text-base-content/50 uppercase px-2">Visão:</span>
+                  <button @click="calendarViewMode = 'month'" :class="calendarViewMode === 'month' ? 'btn-primary font-bold shadow-xs' : 'btn-ghost'" class="btn btn-xs text-[11px]">Mês</button>
+                  <button @click="calendarViewMode = 'week'" :class="calendarViewMode === 'week' ? 'btn-primary font-bold shadow-xs' : 'btn-ghost'" class="btn btn-xs text-[11px]">Semana</button>
+                  <button @click="calendarViewMode = 'day'" :class="calendarViewMode === 'day' ? 'btn-primary font-bold shadow-xs' : 'btn-ghost'" class="btn btn-xs text-[11px]">Dia</button>
+                  <button @click="calendarViewMode = 'agenda'" :class="calendarViewMode === 'agenda' ? 'btn-primary font-bold shadow-xs' : 'btn-ghost'" class="btn btn-xs text-[11px]">Lista</button>
+                </div>
+
+                <!-- Host Filter -->
+                <div class="flex items-center gap-1.5 bg-base-100 p-1 rounded-xl border border-base-300">
+                  <span class="text-[10px] font-bold text-base-content/50 uppercase px-2">Vendedor / Host:</span>
+                  <select x-model="selectedCalendarHostFilter" class="select select-xs select-ghost text-xs font-semibold focus:outline-hidden">
+                    <option value="all">Todos os Vendedores</option>
+                    <option value="Fernando Silva (Admin)">Fernando Silva (Closer)</option>
+                    <option value="Ana Costa (Closer)">Ana Costa (AE)</option>
+                    <option value="Sofia (Agente IA)">Sofia (SDR Copilot IA)</option>
+                  </select>
+                </div>
+
+                <!-- Status Filter -->
+                <div class="flex items-center gap-1.5 bg-base-100 p-1 rounded-xl border border-base-300">
+                  <span class="text-[10px] font-bold text-base-content/50 uppercase px-2">Status:</span>
+                  <select x-model="selectedCalendarStatusFilter" class="select select-xs select-ghost text-xs font-semibold focus:outline-hidden">
+                    <option value="all">Todos os Status</option>
+                    <option value="confirmed">Confirmadas (🟢)</option>
+                    <option value="rescheduled">Reagendadas (🔵)</option>
+                    <option value="no_show">No-Show / Canceladas (🔴)</option>
+                    <option value="scheduled">Pendentes / A Confirmar (🟡)</option>
+                    <option value="completed">Concluídas (🩶)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Right Actions Buttons -->
+              <div class="flex items-center gap-2">
+                <button @click="calendarTab = 'external_sync'" class="btn btn-sm btn-outline btn-neutral gap-1.5 font-bold text-xs">
+                  <span>🔄</span> Sync Provedores
+                </button>
+                <button @click="showBookMeetingModal = true" class="btn btn-sm btn-primary shadow-md gap-1.5 font-bold text-xs">
+                  <span>+</span> Agendar Reunião
+                </button>
+              </div>
+            </div>
+
+            <!-- SUB-VISÃO 1: MÊS (calendarViewMode === 'month') -->
+            <div x-show="calendarViewMode === 'month'" class="space-y-4">
+              <div class="bg-base-200 rounded-2xl border border-base-300 p-4 space-y-3 shadow-xs">
+                <div class="flex items-center justify-between px-2 py-1">
+                  <div class="flex items-center gap-2">
+                    <h3 class="text-sm font-extrabold tracking-tight">Agosto de 2026</h3>
+                    <span class="badge badge-sm badge-primary font-bold">Hoje: 13 Ago</span>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <button class="btn btn-xs btn-ghost btn-square">◀</button>
+                    <button class="btn btn-xs btn-ghost font-bold text-xs">Hoje</button>
+                    <button class="btn btn-xs btn-ghost btn-square">▶</button>
+                  </div>
+                </div>
+
+                <!-- Calendar Grid Header -->
+                <div class="grid grid-cols-7 gap-1 text-center font-extrabold text-[11px] text-base-content/60 uppercase py-2 bg-base-300/40 rounded-xl">
+                  <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
+                </div>
+
+                <!-- Calendar Days Grid (August 2026 Mock Grid) -->
+                <div class="grid grid-cols-7 gap-1.5">
+                  <!-- Empty padding days for previous month -->
+                  <div class="h-24 bg-base-100/30 rounded-xl p-1.5 border border-base-300/30 opacity-40 text-[10px] font-bold">26</div>
+                  <div class="h-24 bg-base-100/30 rounded-xl p-1.5 border border-base-300/30 opacity-40 text-[10px] font-bold">27</div>
+                  <div class="h-24 bg-base-100/30 rounded-xl p-1.5 border border-base-300/30 opacity-40 text-[10px] font-bold">28</div>
+                  <div class="h-24 bg-base-100/30 rounded-xl p-1.5 border border-base-300/30 opacity-40 text-[10px] font-bold">29</div>
+                  <div class="h-24 bg-base-100/30 rounded-xl p-1.5 border border-base-300/30 opacity-40 text-[10px] font-bold">30</div>
+                  <div class="h-24 bg-base-100/30 rounded-xl p-1.5 border border-base-300/30 opacity-40 text-[10px] font-bold">31</div>
+                  
+                  <!-- Day 1 -->
+                  <div class="h-24 bg-base-100 rounded-xl p-1.5 border border-base-300 text-[10px] font-bold flex flex-col justify-between hover:border-primary transition-all">
+                    <span class="text-base-content/70">1</span>
+                  </div>
+
+                  <!-- Days 2 to 12 -->
+                  <template x-for="day in [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]" :key="day">
+                    <div class="h-24 bg-base-100 rounded-xl p-1.5 border border-base-300 text-[10px] font-bold flex flex-col justify-between hover:border-primary transition-all">
+                      <span class="text-base-content/70" x-text="day"></span>
+                      <template x-if="day === 10 || day === 11">
+                        <span class="badge badge-xs badge-neutral font-semibold truncate">2 Concluídas</span>
+                      </template>
+                    </div>
+                  </template>
+
+                  <!-- Day 13 (TODAY - HIGHLIGHTED) -->
+                  <div class="h-24 bg-primary/10 rounded-xl p-1.5 border-2 border-primary text-[10px] font-bold flex flex-col justify-between shadow-xs">
+                    <div class="flex items-center justify-between">
+                      <span class="text-primary font-extrabold text-xs">13★</span>
+                      <span class="badge badge-xs badge-primary font-bold">Hoje</span>
+                    </div>
+                    <div class="space-y-1">
+                      <div @click="selectedMeetingForDetail = calendarEventsList[0]; showMeetingDetailModal = true;" class="rounded px-1 py-0.5 text-[9px] truncate cursor-pointer hover:scale-105 transition-transform font-bold" :class="getEventBadgeStyle(calendarEventsList[0])" title="14:00 - Dr. Roberto Mendes">
+                        14:00 Demo Revenue OS
+                      </div>
+                      <div @click="selectedMeetingForDetail = calendarEventsList[1]; showMeetingDetailModal = true;" class="rounded px-1 py-0.5 text-[9px] truncate cursor-pointer hover:scale-105 transition-transform font-bold" :class="getEventBadgeStyle(calendarEventsList[1])" title="15:30 - Dra. Patricia Lima">
+                        15:30 Diagnóstico TechMed
+                      </div>
+                      <div @click="selectedMeetingForDetail = calendarEventsList[2]; showMeetingDetailModal = true;" class="rounded px-1 py-0.5 text-[9px] truncate cursor-pointer hover:scale-105 transition-transform font-bold" :class="getEventBadgeStyle(calendarEventsList[2])" title="17:00 - Lucas Oliveira">
+                        17:00 Proposta Bela Dermato
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Days 14 to 31 -->
+                  <template x-for="day in [14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31]" :key="day">
+                    <div class="h-24 bg-base-100 rounded-xl p-1.5 border border-base-300 text-[10px] font-bold flex flex-col justify-between hover:border-primary transition-all">
+                      <span class="text-base-content/70" x-text="day"></span>
+                      <template x-if="day === 14">
+                        <div class="space-y-1">
+                          <div @click="selectedMeetingForDetail = calendarEventsList[3]; showMeetingDetailModal = true;" class="rounded px-1 py-0.5 text-[9px] truncate cursor-pointer hover:scale-105 transition-transform" :class="getEventBadgeStyle(calendarEventsList[3])">10:00 Onboarding</div>
+                          <div @click="selectedMeetingForDetail = calendarEventsList[4]; showMeetingDetailModal = true;" class="rounded px-1 py-0.5 text-[9px] truncate cursor-pointer hover:scale-105 transition-transform" :class="getEventBadgeStyle(calendarEventsList[4])">11:30 Reagendada</div>
+                        </div>
+                      </template>
+                      <template x-if="day === 15">
+                        <div @click="selectedMeetingForDetail = calendarEventsList[5]; showMeetingDetailModal = true;" class="rounded px-1 py-0.5 text-[9px] truncate cursor-pointer hover:scale-105 transition-transform" :class="getEventBadgeStyle(calendarEventsList[5])">16:00 Apresentação</div>
+                      </template>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </div>
+
+            <!-- SUB-VISÃO 2: SEMANA (calendarViewMode === 'week') -->
+            <div x-show="calendarViewMode === 'week'" class="bg-base-200 rounded-2xl border border-base-300 p-5 space-y-4 shadow-xs">
+              <!-- Week View Header -->
+              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-base-100 p-3.5 rounded-xl border border-base-300">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h3 class="text-sm font-extrabold tracking-tight">Visão Semanal de Agendamentos</h3>
+                    <span class="badge badge-sm badge-primary font-bold">Semana 33</span>
+                  </div>
+                  <p class="text-xs text-base-content/60">Distribuição visual de compromissos de 10 a 16 de Agosto de 2026.</p>
+                </div>
+                <div class="flex items-center gap-1.5 self-end sm:self-center">
+                  <button class="btn btn-xs btn-ghost btn-square">◀</button>
+                  <button class="btn btn-xs btn-ghost font-bold text-xs px-3">Semana Atual</button>
+                  <button class="btn btn-xs btn-ghost btn-square">▶</button>
+                </div>
+              </div>
+
+              <!-- 7-Column Week Grid -->
+              <div class="grid grid-cols-1 md:grid-cols-7 gap-3">
+                <template x-for="dayObj in [
+                  { dayName: 'Segunda', dateNum: '10', dateStr: '2026-08-10', isToday: false },
+                  { dayName: 'Terça', dateNum: '11', dateStr: '2026-08-11', isToday: false },
+                  { dayName: 'Quarta', dateNum: '12', dateStr: '2026-08-12', isToday: false },
+                  { dayName: 'Quinta', dateNum: '13', dateStr: '2026-08-13', isToday: true },
+                  { dayName: 'Sexta', dateNum: '14', dateStr: '2026-08-14', isToday: false },
+                  { dayName: 'Sábado', dateNum: '15', dateStr: '2026-08-15', isToday: false },
+                  { dayName: 'Domingo', dateNum: '16', dateStr: '2026-08-16', isToday: false }
+                ]" :key="dayObj.dateStr">
+                  <div class="flex flex-col min-h-[320px] rounded-xl border p-2.5 transition-all"
+                       :class="dayObj.isToday ? 'bg-primary/5 border-2 border-primary/60 shadow-sm' : 'bg-base-100 border-base-300'">
+                    <!-- Column Header -->
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-base-300/60">
+                      <div>
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider block" :class="dayObj.isToday ? 'text-primary' : 'text-base-content/60'" x-text="dayObj.dayName"></span>
+                        <span class="text-xs font-bold" x-text="`${dayObj.dateNum} Ago`"></span>
+                      </div>
+                      <template x-if="dayObj.isToday">
+                        <span class="badge badge-xs badge-primary font-bold">Hoje</span>
+                      </template>
+                    </div>
+
+                    <!-- Column Events Stack -->
+                    <div class="space-y-2 flex-1">
+                      <template x-for="event in getFilteredCalendarEvents().filter(e => e.date === dayObj.dateStr)" :key="event.id">
+                        <div @click="selectedMeetingForDetail = event; showMeetingDetailModal = true;" 
+                             class="p-2.5 rounded-lg border cursor-pointer transition-all space-y-1.5 shadow-2xs hover:scale-[1.02]"
+                             :class="getEventBadgeStyle(event)">
+                          <div class="flex items-center justify-between gap-1">
+                            <span class="text-[10px] font-extrabold" x-text="`${event.startTime} - ${event.endTime}`"></span>
+                            <span class="badge badge-2xs font-bold" :class="event.statusClass" x-text="event.statusLabel"></span>
+                          </div>
+                          <p class="text-xs font-bold leading-tight truncate" x-text="event.title"></p>
+                          <div class="flex items-center justify-between text-[10px] opacity-80">
+                            <span class="truncate font-semibold" x-text="event.leadName"></span>
+                            <span class="badge badge-ghost text-[9px] px-1 py-0" x-text="event.hostAvatar"></span>
+                          </div>
+                        </div>
+                      </template>
+
+                      <!-- Empty State if no events -->
+                      <template x-if="getFilteredCalendarEvents().filter(e => e.date === dayObj.dateStr).length === 0">
+                        <div class="h-full flex flex-col items-center justify-center py-8 text-center text-base-content/40 space-y-1">
+                          <span class="text-lg">☕</span>
+                          <span class="text-[10px] font-medium">Sem reuniões</span>
+                        </div>
+                      </template>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+
+            <!-- SUB-VISÃO 3: DIA (calendarViewMode === 'day') -->
+            <div x-show="calendarViewMode === 'day'" class="bg-base-200 rounded-2xl border border-base-300 p-5 space-y-4 shadow-xs">
+              <!-- Day View Header -->
+              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-base-100 p-4 rounded-xl border border-base-300">
+                <div class="space-y-0.5">
+                  <div class="flex items-center gap-2">
+                    <h3 class="text-sm font-extrabold tracking-tight">Visão Diária de Reuniões</h3>
+                    <span class="badge badge-sm badge-primary font-bold">Hoje • 13 de Agosto de 2026</span>
+                  </div>
+                  <p class="text-xs text-base-content/60">Linha do tempo hora a hora dos compromissos operacionais.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button class="btn btn-xs btn-ghost btn-square">◀</button>
+                  <span class="badge badge-md badge-outline font-bold text-xs">Quinta, 13 Ago</span>
+                  <button class="btn btn-xs btn-ghost btn-square">▶</button>
+                </div>
+              </div>
+
+              <!-- Day Timeline Slots (08:00 - 18:00) -->
+              <div class="bg-base-100 rounded-xl border border-base-300 divide-y divide-base-300/70 overflow-hidden">
+                <template x-for="timeSlot in [
+                  { hour: '08:00', label: '08:00 AM' },
+                  { hour: '09:00', label: '09:00 AM' },
+                  { hour: '10:00', label: '10:00 AM' },
+                  { hour: '11:00', label: '11:00 AM' },
+                  { hour: '12:00', label: '12:00 PM' },
+                  { hour: '13:00', label: '13:00 PM' },
+                  { hour: '14:00', label: '14:00 PM' },
+                  { hour: '15:00', label: '15:00 PM' },
+                  { hour: '16:00', label: '16:00 PM' },
+                  { hour: '17:00', label: '17:00 PM' },
+                  { hour: '18:00', label: '18:00 PM' }
+                ]" :key="timeSlot.hour">
+                  <div class="flex flex-col md:flex-row min-h-[64px] hover:bg-base-200/30 transition-all">
+                    <!-- Left Hour Marker -->
+                    <div class="w-full md:w-28 p-3 bg-base-200/50 md:border-r border-base-300 flex items-center justify-between md:justify-center shrink-0">
+                      <span class="text-xs font-bold text-base-content/70" x-text="timeSlot.hour"></span>
+                      <span class="text-[10px] text-base-content/40 md:hidden" x-text="timeSlot.label"></span>
+                    </div>
+
+                    <!-- Right Slot Events -->
+                    <div class="flex-1 p-2 flex flex-col justify-center">
+                      <template x-for="event in getFilteredCalendarEvents().filter(e => e.date === '2026-08-13' && e.startTime.startsWith(timeSlot.hour.substring(0, 2)))" :key="event.id">
+                        <div class="p-3 border rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-2xs transition-all" :class="getEventBadgeStyle(event)">
+                          <div class="flex items-center gap-3 min-w-0">
+                            <div class="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-xs text-primary shrink-0">
+                              <span x-text="event.hostAvatar"></span>
+                            </div>
+                            <div class="min-w-0 space-y-0.5">
+                              <div class="flex items-center gap-2 flex-wrap">
+                                <span class="font-bold text-xs" x-text="event.title"></span>
+                                <span class="badge badge-xs font-bold" :class="event.statusClass" x-text="event.statusLabel"></span>
+                                <span class="badge badge-xs badge-ghost text-[10px]" x-text="`${event.startTime} - ${event.endTime}`"></span>
+                              </div>
+                              <p class="text-xs text-base-content/70 flex items-center gap-2">
+                                <span class="font-semibold text-primary" x-text="event.leadName"></span>
+                                <span>•</span>
+                                <span class="text-base-content/50" x-text="event.company"></span>
+                                <span>•</span>
+                                <span class="text-base-content/50" x-text="`Host: ${event.hostName}`"></span>
+                              </p>
+                            </div>
+                          </div>
+                          <div class="flex items-center gap-2 shrink-0 self-end md:self-center">
+                            <a :href="event.locationUrl" target="_blank" class="btn btn-xs btn-outline btn-primary font-bold gap-1">
+                              <span>📹</span> Entrar
+                            </a>
+                            <button @click="selectedMeetingForDetail = event; showMeetingDetailModal = true;" class="btn btn-xs btn-ghost gap-1">
+                              <span>👁️</span> Detalhes
+                            </button>
+                          </div>
+                        </div>
+                      </template>
+
+                      <!-- Empty Hour Slot -->
+                      <template x-if="getFilteredCalendarEvents().filter(e => e.date === '2026-08-13' && e.startTime.startsWith(timeSlot.hour.substring(0, 2))).length === 0">
+                        <div class="text-[11px] text-base-content/30 italic px-2 py-1 font-medium">
+                          Nenhum compromisso agendado neste horário.
+                        </div>
+                      </template>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+
+            <!-- SUB-VISÃO 4: LISTA / AGENDA (calendarViewMode === 'agenda') -->
+            <div x-show="calendarViewMode === 'agenda'" class="bg-base-200 rounded-2xl border border-base-300 p-5 space-y-4 shadow-xs">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-sm font-extrabold tracking-tight">Próximos Compromissos & Reuniões Agendadas</h3>
+                  <p class="text-xs text-base-content/60">Lista sincronizada de eventos operacionais com o fluxo de leads.</p>
+                </div>
+                <span class="badge badge-sm badge-outline font-bold" x-text="`${getFilteredCalendarEvents().length} Registros`"></span>
+              </div>
+
+              <div class="divide-y divide-base-300/60">
+                <template x-for="event in getFilteredCalendarEvents()" :key="event.id">
+                  <div class="py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-4 p-2 rounded-xl transition-all border-l-4" :class="getEventBadgeStyle(event)">
+                    <!-- Left Info -->
+                    <div class="flex items-center gap-3.5 min-w-0">
+                      <div class="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-xs text-primary shrink-0">
+                        <span x-text="event.hostAvatar"></span>
+                      </div>
+                      <div class="min-w-0 space-y-0.5">
+                        <div class="flex items-center gap-2 flex-wrap">
+                          <span class="font-bold text-xs truncate" x-text="event.title"></span>
+                          <span class="badge badge-xs font-bold" :class="event.statusClass" x-text="event.statusLabel"></span>
+                          <span class="badge badge-xs badge-ghost text-[10px]" x-text="event.provider"></span>
+                        </div>
+                        <p class="text-xs text-base-content/70 flex items-center gap-2">
+                          <span class="font-semibold text-primary" x-text="event.leadName"></span>
+                          <span>•</span>
+                          <span class="text-base-content/50" x-text="event.company"></span>
+                        </p>
+                        <p class="text-[11px] text-base-content/50 flex items-center gap-2">
+                          <span>📅 <strong x-text="event.date"></strong> (<span x-text="event.startTime"></span> - <span x-text="event.endTime"></span>)</span>
+                          <span>•</span>
+                          <span>Host: <strong x-text="event.hostName"></strong></span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <!-- Right Actions -->
+                    <div class="flex items-center gap-2 shrink-0 self-end md:self-center">
+                      <a :href="event.locationUrl" target="_blank" class="btn btn-xs btn-outline btn-primary gap-1 font-bold">
+                        <span>📹</span> Entrar na Sala
+                      </a>
+                      <button @click="selectedMeetingForDetail = event; showMeetingDetailModal = true;" class="btn btn-xs btn-ghost gap-1">
+                        <span>👁️</span> Detalhes
+                      </button>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUB-VISÃO 2: JANELAS DE DISPONIBILIDADE (calendarTab === 'availabilities') -->
+          <div x-show="calendarTab === 'availabilities'" class="space-y-6">
+            <div class="bg-base-200 p-5 rounded-2xl border border-base-300 space-y-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-sm font-extrabold tracking-tight">Janelas de Disponibilidade dos Hosts & SDRs</h3>
+                  <p class="text-xs text-base-content/60">Configure os horários operacionais em que a IA ou o sistema podem alocar agendamentos.</p>
+                </div>
+                <button @click="showNotification('Janela de disponibilidade salva!', 'success')" class="btn btn-xs btn-primary font-bold">+ Nova Janela</button>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <template x-for="host in hostAvailabilitiesList" :key="host.id">
+                  <div class="bg-base-100 p-4 rounded-xl border border-base-300 space-y-3">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <h4 class="font-bold text-xs" x-text="host.name"></h4>
+                        <p class="text-[10px] text-base-content/60" x-text="host.role"></p>
+                      </div>
+                      <span class="badge badge-xs badge-success font-bold">Ativo</span>
+                    </div>
+
+                    <div class="space-y-1.5 text-xs bg-base-200 p-2.5 rounded-lg border border-base-300/60">
+                      <p class="flex justify-between"><span class="text-base-content/60">Horário:</span> <strong x-text="host.slots"></strong></p>
+                      <p class="flex justify-between"><span class="text-base-content/60">Máx / Dia:</span> <strong x-text="`${host.maxDaily} reuniões`"></strong></p>
+                      <p class="flex justify-between"><span class="text-base-content/60">Intervalo (Buffer):</span> <strong x-text="host.buffer"></strong></p>
+                    </div>
+
+                    <button class="btn btn-xs btn-outline btn-block btn-neutral font-bold text-[11px]">Editar Janela</button>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUB-VISÃO 3: TIPOS DE REUNIÃO (calendarTab === 'meeting_types') -->
+          <div x-show="calendarTab === 'meeting_types'" class="space-y-6">
+            <div class="bg-base-200 p-5 rounded-2xl border border-base-300 space-y-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-sm font-extrabold tracking-tight">Tipos de Reunião & Predefinições</h3>
+                  <p class="text-xs text-base-content/60">Defina os formatos de compromisso disponíveis para o agendamento do SDR.</p>
+                </div>
+                <button @click="showNotification('Novo tipo de reunião criado!', 'success')" class="btn btn-xs btn-primary font-bold">+ Novo Tipo</button>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <template x-for="mt in meetingTypesList" :key="mt.id">
+                  <div class="bg-base-100 p-4 rounded-xl border-2 space-y-3" :class="mt.color">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-2">
+                        <span class="text-lg" x-text="mt.icon"></span>
+                        <h4 class="font-bold text-xs" x-text="mt.name"></h4>
+                      </div>
+                      <span class="badge badge-xs badge-info font-bold" x-text="`${mt.activeCount} Agendadas`"></span>
+                    </div>
+
+                    <div class="space-y-1.5 text-xs bg-base-200 p-2.5 rounded-lg border border-base-300/60">
+                      <p class="flex justify-between"><span class="text-base-content/60">Duração:</span> <strong x-text="mt.duration"></strong></p>
+                      <p class="flex justify-between"><span class="text-base-content/60">Tempo de Preparação:</span> <strong x-text="mt.buffer"></strong></p>
+                    </div>
+
+                    <div class="flex gap-2">
+                      <button class="btn btn-xs btn-outline btn-primary flex-1 font-bold">Editar Preset</button>
+                      <button class="btn btn-xs btn-ghost text-error">Deletar</button>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUB-VISÃO 4: SINCRONIZAÇÃO & FEED .ICS (calendarTab === 'external_sync') -->
+          <div x-show="calendarTab === 'external_sync'" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <!-- Google Calendar Card -->
+              <div class="bg-base-200 p-5 rounded-2xl border border-base-300 space-y-3.5 shadow-xs">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">📅</span>
+                    <div>
+                      <h4 class="font-extrabold text-xs">Google Calendar (OAuth2)</h4>
+                      <p class="text-[10px] text-base-content/60">Sincronização bidirecional por tenant</p>
+                    </div>
+                  </div>
+                  <span class="badge badge-xs badge-success font-bold">Conectado</span>
+                </div>
+                <p class="text-xs text-base-content/70">Permite que o SDR OS agende, reagende e sincronize salas do Google Meet automaticamente.</p>
+                <div class="bg-base-100 p-2.5 rounded-xl border border-base-300 text-xs">
+                  <p class="text-[11px] font-bold text-base-content/70">Conta Conectada:</p>
+                  <p class="font-mono text-primary truncate text-[11px]">vendas@clinica-bela.com</p>
+                </div>
+                <button @click="showNotification('Google Calendar sincronizado com sucesso!', 'success')" class="btn btn-xs btn-outline btn-primary w-full font-bold">Reautenticar / Testar Sync</button>
+              </div>
+
+              <!-- Cal.com Card -->
+              <div class="bg-base-200 p-5 rounded-2xl border border-base-300 space-y-3.5 shadow-xs">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">⚡</span>
+                    <div>
+                      <h4 class="font-extrabold text-xs">Cal.com (API & Webhooks)</h4>
+                      <p class="text-[10px] text-base-content/60">Integração nativa de slots</p>
+                    </div>
+                  </div>
+                  <span class="badge badge-xs badge-success font-bold">Ativo</span>
+                </div>
+                <p class="text-xs text-base-content/70">Receba webhooks em tempo real de novos agendamentos criados externamente no Cal.com.</p>
+                <div class="bg-base-100 p-2.5 rounded-xl border border-base-300 text-xs">
+                  <p class="text-[11px] font-bold text-base-content/70">Webhook Listener URL:</p>
+                  <p class="font-mono text-xs truncate text-secondary">/api/v1/integrations/calcom/webhook</p>
+                </div>
+                <button @click="showNotification('Conexão Cal.com verificada!', 'info')" class="btn btn-xs btn-outline btn-secondary w-full font-bold">Configurar Webhook Secret</button>
+              </div>
+
+              <!-- iCalendar (.ics) Feed Card -->
+              <div class="bg-base-200 p-5 rounded-2xl border border-base-300 space-y-3.5 shadow-xs">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">🔗</span>
+                    <div>
+                      <h4 class="font-extrabold text-xs">Feed Subscrição iCalendar (.ics)</h4>
+                      <p class="text-[10px] text-base-content/60">Padrão universal RFC 5545</p>
+                    </div>
+                  </div>
+                  <span class="badge badge-xs badge-accent font-bold">Pronto</span>
+                </div>
+                <p class="text-xs text-base-content/70">Inscreva o link no Apple Calendar, Outlook ou Thunderbird para sincronizar a agenda no celular.</p>
+                <div class="bg-base-100 p-2.5 rounded-xl border border-base-300 text-xs space-y-1">
+                  <p class="text-[11px] font-bold text-base-content/70">URL de Subscrição (.ics):</p>
+                  <p class="font-mono text-[10px] text-accent truncate">https://app.revenuesdros.com/api/v1/calendar/export/tok_7f9a2b/feed.ics</p>
+                </div>
+                <button @click="showNotification('URL .ics copiada para a área de transferência!', 'success')" class="btn btn-xs btn-accent w-full font-bold">Copiar Link .ics</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
         <!-- ==================== TAB: CADÊNCIAS & AGENTES (activeTab === 'cadences') ==================== -->
         <div x-show="activeTab === 'cadences'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6">
+
+          <!-- ==================== SUB-VISÃO: MOTOR DE FOLLOW-UP MULTI-CENÁRIO (cadenceTab === 'follow_up_engine') ==================== -->
+          <div x-show="cadenceTab === 'follow_up_engine'" class="space-y-6">
+            
+            <!-- Metrics Banner -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div class="stat bg-base-200 rounded-2xl border border-base-300 p-4">
+                <div class="stat-title text-xs text-base-content/60">Follow-ups Ativos</div>
+                <div class="stat-value text-xl font-extrabold text-primary">54 Leads</div>
+                <div class="stat-desc text-[10px] text-success">Em acompanhamento automatizado</div>
+              </div>
+              <div class="stat bg-base-200 rounded-2xl border border-base-300 p-4">
+                <div class="stat-title text-xs text-base-content/60">Recuperação de Objeções</div>
+                <div class="stat-value text-xl font-extrabold text-secondary">34.2%</div>
+                <div class="stat-desc text-[10px] text-success">Leads que converteram pós-objeção</div>
+              </div>
+              <div class="stat bg-base-200 rounded-2xl border border-base-300 p-4">
+                <div class="stat-title text-xs text-base-content/60">Re-engajamentos Mês</div>
+                <div class="stat-value text-xl font-extrabold text-accent">118</div>
+                <div class="stat-desc text-[10px] text-info">Ex-clientes reativados</div>
+              </div>
+              <div class="stat bg-base-200 rounded-2xl border border-base-300 p-4">
+                <div class="stat-title text-xs text-base-content/60">Fila Async Taskiq</div>
+                <div class="stat-value text-xl font-extrabold text-warning">5 em Fila</div>
+                <div class="stat-desc text-[10px] text-base-content/60">Próximo disparo às 14:00</div>
+              </div>
+            </div>
+
+            <!-- Multi-Scenario Rules Grid -->
+            <div class="bg-base-200 p-5 rounded-2xl border border-base-300 space-y-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-sm font-extrabold tracking-tight">Regras de Follow-up Multi-Cenário Automatizado</h3>
+                  <p class="text-xs text-base-content/60">Configuração de réguas específicas para objeções, re-venda e lembretes de agenda (ADR-039).</p>
+                </div>
+                <button @click="showAddFollowUpRuleModal = true" class="btn btn-xs btn-primary font-bold shadow-xs">+ Nova Regra de Cenário</button>
+              </div>
+
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <template x-for="rule in followUpRulesList" :key="rule.id">
+                  <div class="bg-base-100 p-4 rounded-xl border border-base-300 space-y-3 hover:border-primary transition-all">
+                    <div class="flex items-start justify-between gap-3">
+                      <div>
+                        <div class="flex items-center gap-2">
+                          <span class="font-extrabold text-xs text-primary" x-text="rule.scenario"></span>
+                          <span class="badge badge-xs badge-success font-bold" x-show="rule.isActive">Ativa</span>
+                        </div>
+                        <p class="text-[11px] text-base-content/60 mt-0.5" x-text="rule.condition"></p>
+                      </div>
+                      <input type="checkbox" x-model="rule.isActive" class="toggle toggle-xs toggle-primary" />
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2 bg-base-200 p-2.5 rounded-lg border border-base-300/60 text-xs">
+                      <div>
+                        <p class="text-[10px] text-base-content/50 font-semibold">Intervalo / Delay:</p>
+                        <p class="font-bold text-xs" x-text="`${rule.delayDays} dias`"></p>
+                      </div>
+                      <div>
+                        <p class="text-[10px] text-base-content/50 font-semibold">Canal Alvo:</p>
+                        <p class="font-bold text-xs" x-text="rule.channel"></p>
+                      </div>
+                      <div>
+                        <p class="text-[10px] text-base-content/50 font-semibold">Taxa de Conversão:</p>
+                        <p class="font-bold text-xs text-success" x-text="rule.conversionRate"></p>
+                      </div>
+                    </div>
+
+                    <div class="flex items-center justify-between text-[11px] pt-1">
+                      <span class="text-base-content/60">Template: <strong class="text-base-content/80" x-text="rule.template"></strong></span>
+                      <button @click="showNotification('Configuração da regra atualizada', 'info')" class="btn btn-xs btn-ghost btn-outline text-xs">Editar</button>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+
+            <!-- Taskiq Background Queue Monitor -->
+            <div class="bg-base-200 p-5 rounded-2xl border border-base-300 space-y-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-sm font-extrabold tracking-tight">Fila de Disparos Programados (Taskiq Background Jobs)</h3>
+                  <p class="text-xs text-base-content/60">Garantia de entrega respeitando a Janela Meta de 24h e rate limiting (ADR-030 / ADR-032).</p>
+                </div>
+                <span class="badge badge-sm badge-info font-bold" x-text="`${followUpQueueList.length} Jobs Agendados`"></span>
+              </div>
+
+              <div class="overflow-x-auto">
+                <table class="table table-xs w-full bg-base-100 rounded-xl border border-base-300">
+                  <thead>
+                    <tr class="bg-base-300/50 text-[11px] uppercase">
+                      <th>Lead</th>
+                      <th>Cenário / Gatilho</th>
+                      <th>Evento Origem</th>
+                      <th>Agendado Para</th>
+                      <th>Canal / Guardrail</th>
+                      <th>Status</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template x-for="job in followUpQueueList" :key="job.id">
+                      <tr class="hover:bg-base-200/50">
+                        <td class="font-bold text-xs text-primary" x-text="job.leadName"></td>
+                        <td class="text-xs" x-text="job.scenario"></td>
+                        <td class="text-[11px] text-base-content/60" x-text="job.triggerEvent"></td>
+                        <td class="font-mono text-xs text-accent" x-text="job.scheduledFor"></td>
+                        <td class="text-xs font-semibold" x-text="job.channel"></td>
+                        <td><span class="badge badge-xs font-bold" :class="job.statusClass" x-text="job.status"></span></td>
+                        <td>
+                          <button @click="showNotification(`Envio forçado para ${job.leadName}!`, 'success')" class="btn btn-xs btn-outline btn-primary font-bold">Forçar Agora</button>
+                        </td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+
 
           <!-- ==================== SUB-VISÃO 1: RÉGUAS & CADÊNCIAS ATIVAS (cadenceTab === 'cadences') ==================== -->
           <div x-show="cadenceTab === 'cadences'" class="space-y-6">
@@ -10600,8 +11320,155 @@
     </div>
   </dialog>
 
+  <!-- ==================== MODAL: NOVO AGENDAMENTO DE REUNIÃO (ADR-040) ==================== -->
+  <dialog class="modal" :open="showBookMeetingModal" :class="{ 'modal-open': showBookMeetingModal }">
+    <div class="modal-box max-w-xl bg-base-100 border border-base-300 shadow-2xl p-0 overflow-hidden rounded-2xl">
+      <div class="bg-gradient-to-r from-primary/10 via-base-200 to-base-200 p-5 border-b border-base-300 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-primary text-primary-content flex items-center justify-center font-bold text-lg shadow-md shadow-primary/30">📅</div>
+          <div>
+            <h3 class="font-extrabold text-base tracking-tight">Agendar Reunião no Calendar Core</h3>
+            <p class="text-xs text-base-content/60">Alocação interna de horário com sync automático Google/Cal.com</p>
+          </div>
+        </div>
+        <button @click="showBookMeetingModal = false" class="btn btn-sm btn-circle btn-ghost text-base-content/70">✕</button>
+      </div>
+      <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-base-content/70">Lead / Empresa:</label>
+          <input type="text" x-model="newMeetingForm.leadName" placeholder="Nome do Lead" class="input input-sm input-bordered w-full text-xs font-semibold">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-base-content/70">Vendedor / Host:</label>
+            <select x-model="newMeetingForm.hostUserId" class="select select-sm select-bordered w-full text-xs">
+              <option value="usr-1">Fernando Silva (Closer)</option>
+              <option value="usr-2">Ana Costa (AE)</option>
+              <option value="usr-3">Sofia (SDR Copilot IA)</option>
+            </select>
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-base-content/70">Tipo de Reunião:</label>
+            <select x-model="newMeetingForm.meetingTypeId" class="select select-sm select-bordered w-full text-xs">
+              <option value="mt-1">Demonstração Técnica (30 min)</option>
+              <option value="mt-2">Diagnóstico Comercial BANT (45 min)</option>
+              <option value="mt-3">Apresentação de Proposta (60 min)</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-base-content/70">Data:</label>
+            <input type="date" x-model="newMeetingForm.date" class="input input-sm input-bordered w-full text-xs">
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-base-content/70">Horário:</label>
+            <input type="time" x-model="newMeetingForm.time" class="input input-sm input-bordered w-full text-xs">
+          </div>
+        </div>
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-base-content/70">Notas / Pauta:</label>
+          <textarea x-model="newMeetingForm.notes" rows="2" class="textarea textarea-sm textarea-bordered w-full text-xs" placeholder="Objetivo comercial da reunião..."></textarea>
+        </div>
+        <div class="p-3 bg-base-200 rounded-xl border border-base-300 flex items-center justify-between text-xs">
+          <span class="flex items-center gap-1.5 font-semibold text-base-content/80"><span>🔄</span> Sincronizar com Google Calendar</span>
+          <input type="checkbox" checked class="toggle toggle-xs toggle-primary">
+        </div>
+      </div>
+      <div class="bg-base-200 p-4 border-t border-base-300 flex justify-end gap-2">
+        <button @click="showBookMeetingModal = false" class="btn btn-sm btn-ghost font-bold text-xs">Cancelar</button>
+        <button @click="calendarEventsList.unshift({ id: `evt-${Date.now()}`, title: newMeetingForm.notes || 'Reunião Agendada', leadName: newMeetingForm.leadName, company: 'Lead Novo', hostName: 'Fernando Silva (Admin)', hostAvatar: 'FD', meetingType: 'Demonstração 30min', date: newMeetingForm.date, startTime: newMeetingForm.time, endTime: '15:00', status: 'scheduled', statusLabel: 'Pendente', statusClass: 'badge-warning', locationUrl: 'https://meet.google.com/new-room', provider: 'Google Calendar' }); showBookMeetingModal = false; showNotification('Reunião agendada e sincronizada com sucesso!', 'success');" class="btn btn-sm btn-primary font-bold text-xs">Confirmar Agendamento</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ==================== MODAL: DETALHES & AÇÕES DA REUNIÃO (ADR-040) ==================== -->
+  <dialog class="modal" :open="showMeetingDetailModal" :class="{ 'modal-open': showMeetingDetailModal }">
+    <div class="modal-box max-w-lg bg-base-100 border border-base-300 shadow-2xl p-0 overflow-hidden rounded-2xl">
+      <div class="bg-gradient-to-r from-primary/10 via-base-200 to-base-200 p-5 border-b border-base-300 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-primary text-primary-content flex items-center justify-center font-bold text-lg">📹</div>
+          <div>
+            <h3 class="font-extrabold text-base tracking-tight" x-text="selectedMeetingForDetail?.title || 'Detalhes da Reunião'"></h3>
+            <p class="text-xs text-base-content/60" x-text="`${selectedMeetingForDetail?.date} às ${selectedMeetingForDetail?.startTime}`"></p>
+          </div>
+        </div>
+        <button @click="showMeetingDetailModal = false" class="btn btn-sm btn-circle btn-ghost text-base-content/70">✕</button>
+      </div>
+      <div class="p-6 space-y-4 text-xs">
+        <div class="bg-base-200 p-3.5 rounded-xl border border-base-300 space-y-2">
+          <p class="flex justify-between"><span class="text-base-content/60">Lead:</span> <strong class="text-primary" x-text="selectedMeetingForDetail?.leadName"></strong></p>
+          <p class="flex justify-between"><span class="text-base-content/60">Empresa:</span> <strong x-text="selectedMeetingForDetail?.company"></strong></p>
+          <p class="flex justify-between"><span class="text-base-content/60">Host Responsável:</span> <strong x-text="selectedMeetingForDetail?.hostName"></strong></p>
+          <p class="flex justify-between"><span class="text-base-content/60">Status Atual:</span> <span class="badge badge-xs font-bold" :class="selectedMeetingForDetail?.statusClass" x-text="selectedMeetingForDetail?.statusLabel"></span></p>
+        </div>
+        <div class="space-y-2">
+          <label class="font-bold text-base-content/70">Alterar Status do Agendamento:</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button @click="if (selectedMeetingForDetail) { selectedMeetingForDetail.status = 'confirmed'; selectedMeetingForDetail.statusLabel = 'Confirmada'; selectedMeetingForDetail.statusClass = 'badge-success'; } showMeetingDetailModal = false; showNotification('Status atualizado para Confirmada', 'success');" class="btn btn-xs btn-outline btn-success font-bold">✅ Confirmar</button>
+            <button @click="if (selectedMeetingForDetail) { selectedMeetingForDetail.status = 'rescheduled'; selectedMeetingForDetail.statusLabel = 'Reagendada'; selectedMeetingForDetail.statusClass = 'badge-info'; } showMeetingDetailModal = false; showNotification('Gatilho de Reagendamento Ativado!', 'info');" class="btn btn-xs btn-outline btn-info font-bold">🔄 Reagendar</button>
+            <button @click="if (selectedMeetingForDetail) { selectedMeetingForDetail.status = 'no_show'; selectedMeetingForDetail.statusLabel = 'No-Show'; selectedMeetingForDetail.statusClass = 'badge-error'; } showMeetingDetailModal = false; showNotification('No-Show registrado! Cadência de recuperação disparada.', 'warning');" class="btn btn-xs btn-outline btn-error font-bold">❌ No-Show</button>
+          </div>
+        </div>
+      </div>
+      <div class="bg-base-200 p-4 border-t border-base-300 flex justify-end">
+        <button @click="showMeetingDetailModal = false" class="btn btn-sm btn-ghost font-bold text-xs">Fechar</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ==================== MODAL: CRIAR REGRA DE FOLLOW-UP MULTI-CENÁRIO (ADR-039) ==================== -->
+  <dialog class="modal" :open="showAddFollowUpRuleModal" :class="{ 'modal-open': showAddFollowUpRuleModal }">
+    <div class="modal-box max-w-lg bg-base-100 border border-base-300 shadow-2xl p-0 overflow-hidden rounded-2xl">
+      <div class="bg-gradient-to-r from-primary/10 via-base-200 to-base-200 p-5 border-b border-base-300 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-primary text-primary-content flex items-center justify-center font-bold text-lg">🔁</div>
+          <div>
+            <h3 class="font-extrabold text-base tracking-tight">Nova Regra de Follow-up Multi-Cenário</h3>
+            <p class="text-xs text-base-content/60">Configure o gatilho, delay e template automatizado (ADR-039)</p>
+          </div>
+        </div>
+        <button @click="showAddFollowUpRuleModal = false" class="btn btn-sm btn-circle btn-ghost text-base-content/70">✕</button>
+      </div>
+      <div class="p-6 space-y-4 text-xs">
+        <div class="space-y-1.5">
+          <label class="font-bold text-base-content/70">Nome do Cenário:</label>
+          <input type="text" placeholder="Ex: Objeção Competidor / Concorrente" class="input input-sm input-bordered w-full text-xs font-semibold">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1.5">
+            <label class="font-bold text-base-content/70">Gatilho (Trigger):</label>
+            <select class="select select-sm select-bordered w-full text-xs">
+              <option value="objection_price">Objeção: Preço / Orçamento</option>
+              <option value="objection_timing">Objeção: Sem Tempo</option>
+              <option value="winback_inactive">Lead Inativo > 30 Dias</option>
+              <option value="agenda_reminder">Lembrete Pré-Reunião</option>
+            </select>
+          </div>
+          <div class="space-y-1.5">
+            <label class="font-bold text-base-content/70">Delay / Espera (Dias):</label>
+            <input type="number" value="3" class="input input-sm input-bordered w-full text-xs font-bold">
+          </div>
+        </div>
+        <div class="space-y-1.5">
+          <label class="font-bold text-base-content/70">Template / Mensagem Automática:</label>
+          <select class="select select-sm select-bordered w-full text-xs">
+            <option value="hsm_1">Meta HSM: Reavaliação de Orçamento</option>
+            <option value="hsm_2">Meta HSM: Horários Libertos na Agenda</option>
+            <option value="hsm_3">Novo Case de Sucesso no Setor</option>
+          </select>
+        </div>
+      </div>
+      <div class="bg-base-200 p-4 border-t border-base-300 flex justify-end gap-2">
+        <button @click="showAddFollowUpRuleModal = false" class="btn btn-sm btn-ghost font-bold text-xs">Cancelar</button>
+        <button @click="showAddFollowUpRuleModal = false; showNotification('Nova regra de follow-up ativada com sucesso!', 'success');" class="btn btn-sm btn-primary font-bold text-xs">Salvar Regra</button>
+      </div>
+    </div>
+  </dialog>
+
   <!-- ==================== MODAL 1: AGENDAR REUNIÃO AGORA ==================== -->
   <dialog class="modal" :open="showScheduleMeetingModal" :class="{ 'modal-open': showScheduleMeetingModal }">
+
     <div class="modal-box max-w-2xl bg-base-100 border border-base-300 shadow-2xl p-0 overflow-hidden rounded-2xl transition-all duration-300"
          :class="isScheduleMeetingMaximized ? 'max-w-[96vw] w-[96vw] min-h-[90vh]' : 'max-w-2xl w-full'">
       <!-- Header -->
@@ -14594,8 +15461,93 @@
           { id: 'mrr-106', date: '17/07/2026', company: 'Rede Saúde Mais', stage: 'Proposta Aceita', mrrEst: 22000, setupFee: 8000, prob: 90, weightedValue: 19800 }
         ],
         
+        // NATIVE CALENDAR & SCHEDULING OPERATIONS STATE (ADR-040)
+        calendarTab: 'overview', // 'overview', 'availabilities', 'meeting_types', 'external_sync'
+        calendarViewMode: 'month', // 'month', 'week', 'day', 'agenda'
+        selectedCalendarHostFilter: 'all',
+        selectedCalendarStatusFilter: 'all',
+        showBookMeetingModal: false,
+        showMeetingDetailModal: false,
+        selectedMeetingForDetail: null,
+        showSyncProviderModal: false,
+        newMeetingForm: {
+          leadName: 'Dra. Mariana Souza',
+          leadCompany: 'Clínica Dermatologia Avançada',
+          hostUserId: 'usr-1',
+          meetingTypeId: 'mt-1',
+          date: '2026-08-14',
+          time: '14:30',
+          locationType: 'google_meet',
+          notes: 'Demonstração de integração com Z-API e WhatsApp Copilot.'
+        },
+
+        calendarEventsList: [
+          { id: 'evt-101', title: 'Demonstração Revenue SDR OS', leadName: 'Dr. Roberto Mendes', company: 'Hospital São Lucas', hostName: 'Fernando Silva (Admin)', hostAvatar: 'FD', meetingType: 'Demonstração 30min', date: '2026-08-13', startTime: '14:00', endTime: '14:30', status: 'confirmed', statusLabel: 'Confirmada', statusClass: 'badge-success', locationUrl: 'https://meet.google.com/abc-defg-hij', provider: 'Google Calendar' },
+          { id: 'evt-102', title: 'Diagnóstico Comercial & BANT', leadName: 'Dra. Patricia Lima', company: 'TechMed Solutions', hostName: 'Sofia (Agente IA)', hostAvatar: '🤖', meetingType: 'Diagnóstico 45min', date: '2026-08-13', startTime: '15:30', endTime: '16:15', status: 'scheduled', statusLabel: 'Pendente', statusClass: 'badge-warning', locationUrl: 'https://meet.google.com/xyz-uvwx-rst', provider: 'Cal.com' },
+          { id: 'evt-103', title: 'Alinhamento de Proposta & Closers', leadName: 'Lucas Oliveira', company: 'Bela Dermato', hostName: 'Fernando Silva (Admin)', hostAvatar: 'FD', meetingType: 'Proposta 60min', date: '2026-08-13', startTime: '17:00', endTime: '18:00', status: 'confirmed', statusLabel: 'Confirmada', statusClass: 'badge-success', locationUrl: 'https://meet.google.com/mno-pqrs-tuv', provider: 'Google Calendar' },
+          { id: 'evt-104', title: 'Reunião de Onboarding Técnico', leadName: 'Juliana Costa', company: 'Rede Saúde Mais', hostName: 'Ana Costa (Closer)', hostAvatar: 'AC', meetingType: 'Demonstração 30min', date: '2026-08-14', startTime: '10:00', endTime: '10:30', status: 'scheduled', statusLabel: 'Pendente', statusClass: 'badge-warning', locationUrl: 'https://meet.google.com/def-ghij-klm', provider: 'Cal.com' },
+          { id: 'evt-105', title: 'Reagendamento No-Show Recovery', leadName: 'Marcos Vinicius', company: 'Clínica Odonto-Vida', hostName: 'Fernando Silva (Admin)', hostAvatar: 'FD', meetingType: 'Diagnóstico 45min', date: '2026-08-14', startTime: '11:30', endTime: '12:15', status: 'rescheduled', statusLabel: 'Reagendada', statusClass: 'badge-info', locationUrl: 'https://meet.google.com/opq-rstu-vwx', provider: 'iCalendar .ics' },
+          { id: 'evt-106', title: 'Apresentação Executiva de Resultados', leadName: 'Carla Dias', company: 'Imobiliária Center', hostName: 'Ana Costa (Closer)', hostAvatar: 'AC', meetingType: 'Proposta 60min', date: '2026-08-15', startTime: '16:00', endTime: '17:00', status: 'completed', statusLabel: 'Concluída', statusClass: 'badge-neutral', locationUrl: 'https://meet.google.com/yza-bcde-fgh', provider: 'Google Calendar' },
+          { id: 'evt-107', title: 'Recuperação Cadência No-Show Direct', leadName: 'Roberto Alves', company: 'Clínica Saúde Total', hostName: 'Sofia (Agente IA)', hostAvatar: '🤖', meetingType: 'Demonstração 30min', date: '2026-08-13', startTime: '18:30', endTime: '19:00', status: 'no_show', statusLabel: 'No-Show', statusClass: 'badge-error', locationUrl: 'https://meet.google.com/xyz-noshow', provider: 'Google Calendar' }
+        ],
+
+        getEventBadgeStyle(evt) {
+          if (!evt) return 'bg-base-200 text-base-content border border-base-300';
+          const st = evt.status || '';
+          if (st === 'confirmed') return 'bg-success/20 text-success border border-success/30';
+          if (st === 'rescheduled') return 'bg-info/20 text-info border border-info/30';
+          if (st === 'no_show' || st === 'noshow' || st === 'cancelled') return 'bg-error/20 text-error border border-error/30';
+          if (st === 'scheduled' || st === 'pending') return 'bg-warning/20 text-warning border border-warning/30';
+          if (st === 'completed') return 'bg-neutral/40 text-base-content/80 border border-base-300';
+          return 'bg-primary/20 text-primary border border-primary/30';
+        },
+
+        getFilteredCalendarEvents() {
+          return (this.calendarEventsList || []).filter(evt => {
+            const matchHost = this.selectedCalendarHostFilter === 'all' || evt.hostName === this.selectedCalendarHostFilter;
+            const filterSt = this.selectedCalendarStatusFilter;
+            let matchStatus = filterSt === 'all' || evt.status === filterSt;
+            if (filterSt === 'no_show') {
+              matchStatus = (evt.status === 'no_show' || evt.status === 'noshow' || evt.status === 'cancelled');
+            }
+            return matchHost && matchStatus;
+          });
+        },
+
+        hostAvailabilitiesList: [
+          { id: 'host-1', name: 'Fernando Silva', role: 'Gestor SDR & Closer', slots: 'Seg-Sex: 09:00 - 18:00', maxDaily: 6, buffer: '15 min' },
+          { id: 'host-2', name: 'Ana Costa', role: 'Account Executive Senior', slots: 'Seg-Sex: 10:00 - 19:00', maxDaily: 8, buffer: '15 min' },
+          { id: 'host-3', name: 'Sofia (SDR Copilot IA)', role: 'Auto-Booking Autônomo', slots: '24/7 (Janelas de 30min)', maxDaily: 50, buffer: '10 min' }
+        ],
+
+        meetingTypesList: [
+          { id: 'mt-1', name: 'Demonstração Técnica', duration: '30 min', buffer: '15 min', icon: '⚡', color: 'border-primary', activeCount: 42 },
+          { id: 'mt-2', name: 'Diagnóstico Comercial & BANT', duration: '45 min', buffer: '15 min', icon: '🎯', color: 'border-secondary', activeCount: 28 },
+          { id: 'mt-3', name: 'Apresentação de Proposta', duration: '60 min', buffer: '20 min', icon: '💼', color: 'border-accent', activeCount: 15 }
+        ],
+
+        // AUTOMATED MULTI-SCENARIO FOLLOW-UP ENGINE STATE (ADR-039)
+        followUpRulesList: [
+          { id: 'fur-1', scenario: 'Objection Recovery (Preço/Orçamento)', condition: 'Objeção "price" detectada pela Memory Brain', delayDays: 3, channel: 'WhatsApp / Zap', template: 'HSM Meta: Reavaliação de Orçamento', isActive: true, recoveries: 34, conversionRate: '28.5%' },
+          { id: 'fur-2', scenario: 'Objection Recovery (Sem Tempo/Reagendar)', condition: 'Objeção "timing" detectada', delayDays: 2, channel: 'WhatsApp / Zap', template: 'HSM Meta: Horários Livres na Agenda', isActive: true, recoveries: 48, conversionRate: '41.2%' },
+          { id: 'fur-3', scenario: 'Win-Back Re-engajamento ex-Clientes', condition: 'Lead inativo >30 dias sem interação', delayDays: 30, channel: 'WhatsApp + E-mail', template: 'Novo Case de Sucesso no Seu Setor', isActive: true, recoveries: 19, conversionRate: '18.0%' },
+          { id: 'fur-4', scenario: 'Lembrete Pré-Reunião (24h & 1h)', condition: 'Reunião agendada na Agenda Interna', delayDays: 0, channel: 'WhatsApp / Zap', template: 'Lembrete de Confirmação com Link da Sala', isActive: true, recoveries: 92, conversionRate: '89.4%' },
+          { id: 'fur-5', scenario: 'No-Show Recovery (Reagendamento)', condition: 'Status da reunião alterado para No-Show', delayDays: 1, channel: 'WhatsApp / Zap', template: 'HSM Meta: Sentimos Sua Falta - Reagende', isActive: true, recoveries: 14, conversionRate: '35.0%' }
+        ],
+
+        followUpQueueList: [
+          { id: 'fq-1', leadName: 'Dr. Lucas Vasconcelos', scenario: 'Objeção: Preço / Orçamento', triggerEvent: 'Objeção "price" no chat (11/08)', scheduledFor: '14/08/2026 às 10:00', channel: 'WhatsApp (Meta HSM)', status: 'Programado', statusClass: 'badge-primary' },
+          { id: 'fq-2', leadName: 'Renata Silveira', scenario: 'Lembrete Pré-Reunião (24h)', triggerEvent: 'Reunião amanhã às 14:00', scheduledFor: '13/08/2026 às 14:00', channel: 'WhatsApp', status: 'Em Fila', statusClass: 'badge-warning' },
+          { id: 'fq-3', leadName: 'Gustavo Pinheiro', scenario: 'No-Show Recovery', triggerEvent: 'Falta na reunião das 11:00', scheduledFor: '14/08/2026 às 09:00', channel: 'WhatsApp (Meta HSM)', status: 'Programado', statusClass: 'badge-primary' },
+          { id: 'fq-4', leadName: 'Camila Fernandes', scenario: 'Win-Back Lead Inativo', triggerEvent: 'Inativo há 32 dias', scheduledFor: '15/08/2026 às 15:00', channel: 'E-mail + Zap', status: 'Programado', statusClass: 'badge-primary' },
+          { id: 'fq-5', leadName: 'Bruno Alcantara', scenario: 'Objeção: Falar com Sócio', triggerEvent: 'Objeção "decision_maker" (10/08)', scheduledFor: '15/08/2026 às 11:00', channel: 'WhatsApp', status: 'Programado', statusClass: 'badge-primary' }
+        ],
+
+        showAddFollowUpRuleModal: false,
+
         // CADÊNCIAS & AGENTES STATE
-        cadenceTab: 'cadences', // Sub-visões: 'cadences', 'agents', 'builder', 'analytics'
+        cadenceTab: 'cadences', // Sub-visões: 'cadences', 'follow_up_engine', 'agents', 'builder', 'analytics'
+
         cadenceChannelFilter: 'all',
         cadenceStatusFilter: 'all',
         searchCadenceQuery: '',
@@ -15572,7 +16524,21 @@
                   { id: 'handoffs', label: 'Handoffs & Alertas' }
                 ]
               },
-              { id: 'inbox', activeId: 'inbox', label: 'Inbox de Atendimento', icon: '💬', badge: '3', badgeColor: 'badge-error' }
+              { id: 'inbox', activeId: 'inbox', label: 'Inbox de Atendimento', icon: '💬', badge: '3', badgeColor: 'badge-error' },
+              { 
+                id: 'calendar', 
+                activeId: 'calendar', 
+                label: 'Agenda & Reuniões', 
+                icon: '📅', 
+                badge: '8 Hoje', 
+                badgeColor: 'badge-accent',
+                subItems: [
+                  { id: 'overview', label: 'Visão Geral & Agenda' },
+                  { id: 'availabilities', label: 'Janelas de Disponibilidade' },
+                  { id: 'meeting_types', label: 'Tipos de Reunião' },
+                  { id: 'external_sync', label: 'Sincronização & Feed .ics' }
+                ]
+              }
             ]
           },
           {
@@ -15585,11 +16551,13 @@
                 icon: '⚡',
                 subItems: [
                   { id: 'cadences', label: 'Réguas & Cadências' },
+                  { id: 'follow_up_engine', label: 'Follow-up Multi-Cenário' },
                   { id: 'agents', label: 'Agentes SDR & Personas' },
                   { id: 'builder', label: 'Construtor Visual' },
                   { id: 'analytics', label: 'Analytics & Testes A/B' }
                 ]
               },
+
               { 
                 id: 'memory', 
                 activeId: 'brain', 
@@ -15690,6 +16658,7 @@
           this.selectTab(parentId);
           if (parentId === 'leads') this.leadsView = subId;
           else if (parentId === 'dashboard') this.commandCenterTab = subId;
+          else if (parentId === 'calendar') this.calendarTab = subId;
           else if (parentId === 'cadences') this.cadenceTab = subId;
           else if (parentId === 'memory') this.memoryTab = subId;
           else if (parentId === 'settings') this.settingsTab = subId;
@@ -15703,6 +16672,7 @@
           if (!this.isTabActive(parentId)) return false;
           if (parentId === 'leads') return this.leadsView === subId;
           if (parentId === 'dashboard') return this.commandCenterTab === subId;
+          if (parentId === 'calendar') return this.calendarTab === subId;
           if (parentId === 'cadences') return this.cadenceTab === subId;
           if (parentId === 'memory') return this.memoryTab === subId;
           if (parentId === 'settings') return this.settingsTab === subId;
